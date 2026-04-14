@@ -395,6 +395,7 @@
 </div>
 
 <div class="toast-wrap"></div>
+<script src="../js/config.js"></script>
 <script src="../admin.js"></script>
 <script>
 /* ════════════════════════════════════════
@@ -772,6 +773,7 @@ async function saveRecord() {
 
 // ── 頁面初始化
 document.addEventListener('DOMContentLoaded', () => {
+  document.title = `${SITE_TEMPLATE_CONFIG.brand.adminName}｜政績專區管理`;
   initUploaders();
   load();
 });

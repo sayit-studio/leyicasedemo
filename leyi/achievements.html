@@ -579,12 +579,13 @@
   <div class="footer-copy">© 2025 數位服務處 · All rights reserved.</div>
 </footer>
 
+<script src="../js/config.js"></script>
 <script>
 /* ════════════════════════════════════════
    政績專區 — 前台邏輯
    ════════════════════════════════════════ */
 
-const WEBHOOK = 'https://drwu.zeabur.app/webhook/leyidemo';
+const WEBHOOK = SITE_UTILS.webhook();
 
 // ── 狀態
 let _state = {
@@ -951,6 +952,15 @@ document.getElementById('hamburgerBtn').addEventListener('click', () => {
 });
 
 // ── 頁面初始化
+document.title = SITE_TEMPLATE_CONFIG.seo.achievementsTitle;
+document.querySelector('meta[name="description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
+document.querySelector('meta[property="og:title"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsTitle);
+document.querySelector('meta[property="og:description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
+document.querySelector('.nav-brand-icon').textContent = SITE_TEMPLATE_CONFIG.brand.icon;
+document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.brand.name;
+document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
+document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();
+
 fetchAchievements();
 
 // ── URL hash 跳轉到指定政績

@@ -3,15 +3,64 @@
    ════════════════════════════════════════ */
 
 /* ── Webhook 端點（從 config.js 讀取）*/
-const W_BASE   = CONFIG.WEBHOOK_BASE;
-const W_PREFIX = CONFIG.WEBHOOK_PREFIX;
 const WEBHOOK  = {
-  STATS:     `${W_BASE}/webhook/${W_PREFIX}/stats`,
-  LIST:      `${W_BASE}/webhook/${W_PREFIX}/list`,
-  QUERY:     `${W_BASE}/webhook/${W_PREFIX}/query`,
-  DASH:      `${W_BASE}/webhook/${W_PREFIX}/dashboard`,
-  SUBMIT:    `${W_BASE}/webhook/${W_PREFIX}/submit`,
+  STATS:     SITE_UTILS.webhook('stats'),
+  LIST:      SITE_UTILS.webhook('list'),
+  QUERY:     SITE_UTILS.webhook('query'),
+  DASH:      SITE_UTILS.webhook('dashboard'),
+  SUBMIT:    SITE_UTILS.webhook('submit'),
+  INSPECTIONS: SITE_UTILS.webhook('inspections'),
+  INTERPELLATIONS: SITE_UTILS.webhook('interpellations'),
+  PROPOSALS: SITE_UTILS.webhook('proposals'),
 };
+
+function setText(selector, value) {
+  const el = document.querySelector(selector);
+  if (el && value !== undefined) el.textContent = value;
+}
+
+function setHtml(selector, value) {
+  const el = document.querySelector(selector);
+  if (el && value !== undefined) el.innerHTML = value;
+}
+
+function setHref(selector, value) {
+  document.querySelectorAll(selector).forEach(el => {
+    el.href = value;
+  });
+}
+
+function hydrateSiteShell() {
+  document.title = SITE_TEMPLATE_CONFIG.seo.homeTitle;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.homeDescription);
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.homeTitle);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.homeDescription);
+  document.querySelector('meta[property="og:image"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.ogImage);
+
+  setText('.nav-brand-icon', SITE_TEMPLATE_CONFIG.brand.icon);
+  setText('.nav-brand-name', SITE_TEMPLATE_CONFIG.brand.name);
+  setText('.hero-badge', `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.tagline}`);
+  setHtml('.hero-title', `${CONFIG.HERO_TITLE[0]}<br><span class="accent">${CONFIG.HERO_TITLE[1]}</span>`);
+  setText('.hero-sub', CONFIG.HERO_SUB);
+  setText('.footer-brand', `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`);
+  setText('.footer-sub', SITE_TEMPLATE_CONFIG.brand.footerTagline);
+  setText('.footer-copy', SITE_UTILS.footerCopyright());
+  setHref('.footer-social-card', CONFIG.LINE_URL);
+  setHref('.flow-line-btn', CONFIG.LINE_URL);
+
+  const faqList = document.querySelector('#page-faq .faq-list');
+  if (faqList && Array.isArray(CONFIG.FAQ_ITEMS)) {
+    faqList.innerHTML = CONFIG.FAQ_ITEMS.map(item => `
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>${item.q}</span>
+          <span class="arrow">▾</span>
+        </div>
+        <div class="faq-a">${item.a}${item.q.includes('LINE') ? `<br><br><a href="${CONFIG.LINE_URL}" target="_blank" style="color:#06C755;font-weight:700;">💬 ${SITE_TEMPLATE_CONFIG.content.lineLinkLabel}</a>` : ''}</div>
+      </div>
+    `).join('');
+  }
+}
 
 /* ══════════════════════════════
    1. 導覽 & 漢堡選單
@@ -331,7 +380,7 @@ async function loadInspections() {
   if(!grid)return;
   grid.innerHTML='<div class="loading-row"><div class="loading-spinner"></div>載入中…</div>';
   try {
-    const res=await fetch(`${W_BASE}/webhook/${W_PREFIX}/inspections`);
+    const res=await fetch(WEBHOOK.INSPECTIONS);
     const data=await res.json();
     if(!data.success||!data.items?.length){grid.innerHTML='<div class="empty-row">📭 目前尚無會勘紀錄</div>';return;}
     grid.innerHTML=data.items.map(item=>`
@@ -352,7 +401,7 @@ async function loadInterpellations() {
   if(!grid)return;
   grid.innerHTML='<div class="loading-row"><div class="loading-spinner"></div>載入中…</div>';
   try {
-    const res=await fetch(`${W_BASE}/webhook/${W_PREFIX}/interpellations`);
+    const res=await fetch(WEBHOOK.INTERPELLATIONS);
     const data=await res.json();
     if(!data.success||!data.items?.length){grid.innerHTML='<div class="empty-row">📭 目前尚無質詢紀錄</div>';return;}
     grid.innerHTML=data.items.map(item=>`
@@ -373,7 +422,7 @@ async function loadProposals() {
   if(!grid)return;
   grid.innerHTML='<div class="loading-row"><div class="loading-spinner"></div>載入中…</div>';
   try {
-    const res=await fetch(`${W_BASE}/webhook/${W_PREFIX}/proposals`);
+    const res=await fetch(WEBHOOK.PROPOSALS);
     const data=await res.json();
     if(!data.success||!data.items?.length){grid.innerHTML='<div class="empty-row">📭 目前尚無提案紀錄</div>';return;}
     grid.innerHTML=data.items.map(item=>`
@@ -403,6 +452,7 @@ function toggleFaq(el) {
    9. Enter 鍵查詢
 ══════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  hydrateSiteShell();
   const qi=document.getElementById('queryInput');
   if(qi) qi.addEventListener('keydown',e=>{if(e.key==='Enter')queryCase();});
   document.querySelectorAll('.dash-tab').forEach(btn=>{btn.addEventListener('click',()=>loadDashboard(btn.dataset.period));});

@@ -311,9 +311,23 @@ body::before {
 
 </div>
 
+<script src="js/config.js"></script>
 <script>
 // ── 設定（實際部署時替換為真實 API）
 const API_BASE = './api';  // Next.js API Routes
+
+function hydrateLoginBranding() {
+  document.title = SITE_TEMPLATE_CONFIG.seo.loginTitle;
+
+  const brandTitle = document.querySelector('.brand-title');
+  if (brandTitle) brandTitle.textContent = SITE_TEMPLATE_CONFIG.brand.adminName;
+
+  const brandSub = document.querySelector('.brand-sub');
+  if (brandSub) brandSub.textContent = `${SITE_TEMPLATE_CONFIG.brand.name}後台 · ${SITE_TEMPLATE_CONFIG.brand.adminSubtitle}`;
+
+  const footer = document.querySelector('.login-footer');
+  if (footer) footer.textContent = `${SITE_TEMPLATE_CONFIG.brand.adminName}管理後台 v2.0 · 僅限授權人員使用`;
+}
 
 // ── 記住我
 let _remember = false;
@@ -406,6 +420,8 @@ document.addEventListener('keydown', e => {
     window.location.href = dest;
   }
 })();
+
+hydrateLoginBranding();
 </script>
 </body>
 </html>

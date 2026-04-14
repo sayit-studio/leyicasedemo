@@ -376,8 +376,22 @@ input.invalid, textarea.invalid, select.invalid {
   <div style="margin-top:4px;opacity:0.5;font-size:11px;">© 2025 數位服務處 · All rights reserved.</div>
 </footer>
 
+<script src="js/config.js"></script>
 <script>
-const WEBHOOK_SUBMIT = 'https://drwu.zeabur.app/webhook/leyidemo/submit';
+const WEBHOOK_SUBMIT = SITE_UTILS.webhook('submit');
+
+function hydrateFormBranding() {
+  document.title = SITE_TEMPLATE_CONFIG.seo.formTitle;
+
+  const navTitle = document.querySelector('.nav-title');
+  if (navTitle) navTitle.textContent = '填寫陳情表單';
+
+  const footerBrand = document.querySelector('footer div');
+  if (footerBrand) footerBrand.textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
+
+  const footerCopy = document.querySelector('footer div:last-child');
+  if (footerCopy) footerCopy.textContent = SITE_UTILS.footerCopyright();
+}
 
 function updateCount() {
   const len = document.getElementById('caseContent').value.length;
@@ -447,6 +461,8 @@ function copyCaseId() {
     setTimeout(() => el.classList.remove('show'), 2500);
   });
 }
+
+hydrateFormBranding();
 </script>
 </body>
 </html>

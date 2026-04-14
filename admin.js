@@ -10,6 +10,8 @@ const ADMIN_CONFIG = {
   NOTION_BASE: '',  // 由 settings 動態讀取
 };
 
+const TEMPLATE_CONFIG = window.SITE_TEMPLATE_CONFIG || null;
+
 /* ══════════════════════════════
    1. 身份驗證
 ══════════════════════════════ */
@@ -183,6 +185,14 @@ const Sidebar = {
     const nameEl  = document.getElementById('sidebarUserName');
     const tagEl   = document.getElementById('sidebarUserTag');
     const avatarEl = document.getElementById('sidebarAvatar');
+    const brandNameEl = document.querySelector('.brand-name');
+    const brandRoleEl = document.querySelector('.brand-role');
+    const brandIconEl = document.querySelector('.brand-icon');
+    if (TEMPLATE_CONFIG) {
+      if (brandNameEl) brandNameEl.textContent = TEMPLATE_CONFIG.brand.adminName;
+      if (brandRoleEl) brandRoleEl.textContent = TEMPLATE_CONFIG.brand.adminSubtitle;
+      if (brandIconEl) brandIconEl.textContent = TEMPLATE_CONFIG.brand.icon;
+    }
     if (nameEl)   nameEl.textContent  = Auth.getName() || '使用者';
     if (tagEl)    tagEl.textContent   = this._roleLabel(Auth.getRole());
     if (avatarEl) avatarEl.textContent = (Auth.getName() || 'U')[0].toUpperCase();
@@ -192,6 +202,7 @@ const Sidebar = {
     document.querySelectorAll('.nav-item').forEach(el => {
       el.classList.toggle('active', el.dataset.page === page);
     });
+    this.ensurePageNavItem(page);
 
     // 隱藏無權限的 nav items
     if (!Auth.isAdmin()) {
@@ -211,6 +222,23 @@ const Sidebar = {
 
   navigate(page) {
     window.location.href = page + '.html';
+  },
+
+  ensurePageNavItem(page) {
+    const nav = document.querySelector('.sidebar-nav');
+    if (!nav || nav.querySelector('[data-page="pages"]')) return;
+
+    const settingsItem = nav.querySelector('[data-page="settings"]');
+    const pageItem = document.createElement('div');
+    pageItem.className = 'nav-item';
+    pageItem.dataset.page = 'pages';
+    pageItem.dataset.role = 'admin';
+    pageItem.innerHTML = '<span class="nav-icon">🗂️</span><span class="nav-label">頁面管理</span>';
+    pageItem.addEventListener('click', () => this.navigate('pages'));
+    if (page === 'pages') pageItem.classList.add('active');
+
+    if (settingsItem) settingsItem.before(pageItem);
+    else nav.appendChild(pageItem);
   },
 
   _roleLabel(role) {

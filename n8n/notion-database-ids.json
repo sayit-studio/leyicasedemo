@@ -1,0 +1,42 @@
+{
+  "demoDB_site_settings": {
+    "databaseId": "344b3ad1d1cd8015a7abf91dfb965033",
+    "env": "NOTION_DB_SITE_SETTINGS",
+    "purpose": "網站 / 客戶設定"
+  },
+  "demoDB_site_pages": {
+    "databaseId": "343b3ad1d1cd80079903dfd6c5592c9f",
+    "env": "NOTION_DB_SITE_PAGES",
+    "purpose": "前台頁面 / 導覽"
+  },
+  "demoDB_case": {
+    "databaseId": "343b3ad1d1cd800391f1ff4907635829",
+    "env": "NOTION_DB_CASE",
+    "purpose": "民眾陳情案件"
+  },
+  "demoDB_inspection": {
+    "databaseId": "343b3ad1d1cd81b089b1f63021bf47a0",
+    "env": "NOTION_DB_INSPECTION",
+    "purpose": "會勘 / 現勘紀錄"
+  },
+  "demoDB_interpellation": {
+    "databaseId": "343b3ad1d1cd81fe86c6fee911681d3b",
+    "env": "NOTION_DB_INTERPELLATION",
+    "purpose": "質詢紀錄"
+  },
+  "demoDB_proposal": {
+    "databaseId": "343b3ad1d1cd81818a10e1b43e6fb120",
+    "env": "NOTION_DB_PROPOSAL",
+    "purpose": "提案 / 建議案"
+  },
+  "demoDB_achievement": {
+    "databaseId": "344b3ad1d1cd80dfb8dad1099b9e0e6a",
+    "env": "NOTION_DB_ACHIEVEMENT",
+    "purpose": "政績展示"
+  },
+  "demoDB_media_asset": {
+    "databaseId": "344b3ad1d1cd80899ebffc481ef732b1",
+    "env": "NOTION_DB_MEDIA_ASSET",
+    "purpose": "圖片 / 影片 / 附件素材"
+  }
+}

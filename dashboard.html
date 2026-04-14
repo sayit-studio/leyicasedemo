@@ -210,6 +210,7 @@
 <!-- Toast -->
 <div class="toast-wrap" id="toastWrap"></div>
 
+<script src="js/config.js"></script>
 <script src="js/admin.js"></script>
 <script>
 // ── 初始化
@@ -220,7 +221,7 @@ document.getElementById('topbarDate').textContent =
 
 // 政績版顯示額外導覽
 (function checkMode() {
-  const mode = localStorage.getItem('system_mode') || 'transparent';
+  const mode = localStorage.getItem('system_mode') || (window.CONFIG?.SYSTEM_MODE || 'transparent');
   if (mode === 'achievement') {
     ['navGroupAchievement','navInspections','navInterpellations','navProposals']
       .forEach(id => { const el = document.getElementById(id); if(el) el.style.display = ''; });
