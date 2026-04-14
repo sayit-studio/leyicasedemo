@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政績專區 — 數位服務處</title>
+<meta name="description" content="數位服務處政績一覽，包含立法成果、選民服務、會勘、質詢、提案等重要事蹟。">
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="政績專區 — 數位服務處">
+<meta property="og:description" content="數位服務處政績一覽，公開透明呈現每一項服務成果。">
+<meta property="og:locale"      content="zh_TW">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/theme.css">
+
+<style>
+/* ════════════════════════════════
+   政績專區 — 頁面私有樣式
+   ════════════════════════════════ */
+
+/* ── 頁頭 */
+.ach-hero {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  padding: 80px 20px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.ach-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 10% 50%, rgba(255,200,30,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 20%, rgba(255,255,255,.10) 0%, transparent 60%);
+  pointer-events: none;
+}
+.ach-hero-tag {
+  display: inline-block;
+  background: rgba(255,255,255,.18);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 4px 16px;
+  border-radius: var(--radius-full);
+  margin-bottom: 18px;
+}
+.ach-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 48px);
+  color: #fff;
+  margin-bottom: 12px;
+  line-height: 1.2;
+  position: relative;
+}
+.ach-hero p {
+  color: rgba(255,255,255,.85);
+  font-size: 15px;
+  max-width: 560px;
+  margin: 0 auto 32px;
+  line-height: 1.75;
+}
+
+/* ── 篩選 Tab */
+.filter-wrap {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--border-solid);
+  position: sticky; top: 60px; z-index: 100;
+  padding: 0 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-wrap::-webkit-scrollbar { display: none; }
+.filter-tabs {
+  display: flex;
+  gap: 0;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-width: max-content;
+}
+.ftab {
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all var(--transition);
+  white-space: nowrap;
+  background: none;
+  border-top: none; border-left: none; border-right: none;
+  font-family: var(--font-body);
+}
+.ftab:hover { color: var(--color-primary); }
+.ftab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ── 時間軸主體 */
+.timeline-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+}
+
+/* 中央軸線 */
+.timeline {
+  position: relative;
+  padding: 0 0 40px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--color-primary) 0%, var(--color-accent) 100%);
+  transform: translateX(-50%);
+  border-radius: 3px;
+}
+
+/* 每個項目 */
+.tl-item {
+  display: grid;
+  grid-template-columns: 1fr 52px 1fr;
+  gap: 0;
+  margin-bottom: 60px;
+  align-items: start;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.tl-item.visible { opacity: 1; transform: translateY(0); }
+
+/* 奇數項：卡片在左，日期在右 */
+.tl-item:nth-child(odd)  .tl-card { grid-column: 1; grid-row: 1; }
+.tl-item:nth-child(odd)  .tl-dot  { grid-column: 2; grid-row: 1; }
+.tl-item:nth-child(odd)  .tl-date { grid-column: 3; grid-row: 1; padding-left: 28px; }
+
+/* 偶數項：日期在左，卡片在右 */
+.tl-item:nth-child(even) .tl-date { grid-column: 1; grid-row: 1; text-align: right; padding-right: 28px; }
+.tl-item:nth-child(even) .tl-dot  { grid-column: 2; grid-row: 1; }
+.tl-item:nth-child(even) .tl-card { grid-column: 3; grid-row: 1; }
+
+/* 時間軸節點 */
+.tl-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 24px;
+  position: relative;
+  z-index: 1;
+}
+.tl-dot-circle {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-pale);
+  flex-shrink: 0;
+}
+.tl-dot-circle.pinned {
+  width: 24px; height: 24px;
+  background: var(--color-primary);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 5px rgba(232,127,36,.2), 0 0 12px rgba(232,127,36,.4);
+}
+
+/* 日期欄 */
+.tl-date {
+  padding-top: 26px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  line-height: 1.5;
+}
+.tl-date-year { font-size: 11px; color: var(--color-text-light); }
+
+/* ── 政績卡片 */
+.ach-card {
+  background: var(--glass-bg2);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.ach-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 奇數：卡片需向右讓出些間距 */
+.tl-item:nth-child(odd)  .ach-card { margin-right: 26px; }
+.tl-item:nth-child(even) .ach-card { margin-left: 26px; }
+
+/* 滑入動畫方向 */
+.tl-item:nth-child(odd)  { transform: translateX(-20px) translateY(20px); }
+.tl-item:nth-child(even) { transform: translateX(20px) translateY(20px); }
+.tl-item.visible { transform: translateY(0) !important; }
+
+.ach-card-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: var(--color-bg-dark);
+  display: block;
+}
+.ach-card-cover-placeholder {
+  width: 100%; height: 200px;
+  background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-section) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; color: var(--color-primary-pale);
+}
+
+.ach-card-body { padding: 20px; }
+
+.ach-meta {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; margin-bottom: 10px;
+}
+.ach-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  padding: 3px 10px; border-radius: var(--radius-full);
+  background: var(--color-primary-glass);
+  color: var(--color-primary-dark);
+}
+.ach-badge.pinned-badge {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: #fff;
+}
+.ach-date-sm {
+  font-size: 12px; color: var(--color-text-light);
+}
+
+.ach-card-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.ach-card-content {
+  font-size: 14px; color: var(--color-text-muted);
+  line-height: 1.75;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+/* 標籤 */
+.ach-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+}
+.ach-tag {
+  font-size: 11px; color: var(--color-text-light);
+  background: var(--color-bg-dark);
+  padding: 2px 8px; border-radius: var(--radius-full);
+}
+
+/* 縮圖列 */
+.ach-thumbs {
+  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: nowrap; overflow: hidden;
+}
+.ach-thumb {
+  width: 72px; height: 56px; border-radius: var(--radius-sm);
+  object-fit: cover; cursor: pointer; flex-shrink: 0;
+  border: 2px solid transparent;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.ach-thumb:hover { border-color: var(--color-primary); transform: scale(1.05); }
+.ach-thumb-more {
+  width: 72px; height: 56px; border-radius: var(--radius-sm);
+  background: var(--color-bg-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--color-text-muted);
+  cursor: pointer; flex-shrink: 0;
+}
+
+/* 底部操作列 */
+.ach-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+.ach-like-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px; color: var(--color-text-muted);
+  padding: 6px 10px; border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  position: relative;
+}
+.ach-like-btn:hover { background: var(--color-primary-pale); color: var(--color-primary); }
+.ach-like-btn.liked { color: #E0334C; }
+.ach-like-btn.liked .like-heart { filter: none; }
+.like-heart { font-size: 16px; transition: transform .2s; display: inline-block; }
+.ach-like-btn:not(.liked) .like-heart { filter: grayscale(1) opacity(.5); }
+.ach-like-btn.liked .like-heart { filter: none; }
+.like-float {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  font-size: 13px; font-weight: 700; color: #E0334C;
+  pointer-events: none; animation: likeFloat .6s ease forwards;
+}
+@keyframes likeFloat {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
+}
+
+/* 分享區 */
+.ach-share-wrap { position: relative; }
+.ach-share-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px; color: var(--color-text-muted);
+  padding: 6px 10px; border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  display: flex; align-items: center; gap: 6px;
+}
+.ach-share-btn:hover { background: var(--color-primary-pale); color: var(--color-primary); }
+.share-popover {
+  position: absolute; bottom: calc(100% + 8px); right: 0;
+  background: #fff;
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px;
+  display: none; flex-direction: column; gap: 4px;
+  min-width: 150px; z-index: 200;
+}
+.share-popover.open { display: flex; }
+.share-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  text-decoration: none; color: var(--color-text);
+  transition: background var(--transition-fast);
+}
+.share-option:hover { background: var(--color-bg-section); }
+
+/* ── 骨架屏 */
+.skeleton-list { display: flex; flex-direction: column; gap: 60px; }
+.skeleton-item {
+  display: grid;
+  grid-template-columns: 1fr 52px 1fr;
+  align-items: start;
+}
+.skeleton-card {
+  background: var(--color-bg-dark);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-card:nth-child(1) { margin-right: 26px; }
+.skeleton-cover { height: 180px; background: var(--color-bg-section); }
+.skeleton-body { padding: 20px; }
+.skeleton-line {
+  height: 14px; border-radius: 7px;
+  background: var(--color-bg-section);
+  margin-bottom: 10px;
+}
+.skeleton-line.short { width: 40%; }
+.skeleton-line.med   { width: 70%; }
+.skeleton-dot-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 24px; }
+.skeleton-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--color-bg-dark); animation: shimmer 1.5s infinite; }
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ── Lightbox */
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,.9);
+  align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.lightbox.open { display: flex; }
+.lightbox-img {
+  max-width: min(90vw, 1000px);
+  max-height: 80vh;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
+.lightbox-controls {
+  display: flex; align-items: center; gap: 24px; margin-top: 20px;
+}
+.lb-btn {
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+  color: #fff; border-radius: var(--radius-full);
+  width: 44px; height: 44px; cursor: pointer; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition-fast);
+}
+.lb-btn:hover { background: rgba(255,255,255,.3); }
+.lb-close {
+  position: absolute; top: 20px; right: 20px;
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; border-radius: 50%; width: 44px; height: 44px;
+  cursor: pointer; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition-fast);
+}
+.lb-close:hover { background: rgba(255,255,255,.35); }
+.lb-counter { color: rgba(255,255,255,.7); font-size: 13px; }
+
+/* ── 載入更多 sentinel */
+.load-sentinel {
+  height: 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.load-spinner {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 3px solid var(--color-primary-pale);
+  border-top-color: var(--color-primary);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.all-loaded {
+  text-align: center; padding: 32px 0;
+  font-size: 14px; color: var(--color-text-light);
+}
+
+/* Toast */
+.toast-container {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 2000; display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.toast-msg {
+  background: var(--color-text);
+  color: #fff; font-size: 13px; font-weight: 500;
+  padding: 10px 20px; border-radius: var(--radius-full);
+  box-shadow: var(--shadow);
+  animation: toastIn .3s ease;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RWD：行動裝置 */
+@media (max-width: 768px) {
+  .ach-hero { padding: 60px 20px 48px; }
+
+  .timeline::before { left: 16px; }
+
+  .tl-item {
+    grid-template-columns: 36px 1fr;
+    grid-template-rows: auto;
+    margin-bottom: 40px;
+  }
+  /* 在 mobile 全部變成：dot 在左，card 在右，date 藏進 card */
+  .tl-item:nth-child(odd)  .tl-card,
+  .tl-item:nth-child(even) .tl-card { grid-column: 2; grid-row: 1; margin-left: 12px; margin-right: 0; }
+  .tl-item:nth-child(odd)  .tl-dot,
+  .tl-item:nth-child(even) .tl-dot  { grid-column: 1; grid-row: 1; }
+  .tl-item:nth-child(odd)  .tl-date,
+  .tl-item:nth-child(even) .tl-date { display: none; }
+
+  .tl-item:nth-child(odd),
+  .tl-item:nth-child(even) { transform: translateY(20px); }
+
+  .ach-card-cover,
+  .ach-card-cover-placeholder { height: 160px; }
+  .ach-card-title { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="nav-brand" href="../index.html">
+      <div class="nav-brand-icon">🏛️</div>
+      <span class="nav-brand-name">數位服務處</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="../index.html">首頁</a>
+      <a class="nav-link active" href="achievements.html">政績專區</a>
+      <a class="nav-link" href="../index.html#page-inspections" onclick="window.location='../index.html';return false;">現場會勘</a>
+      <a class="nav-link" href="../index.html#page-interpellations" onclick="window.location='../index.html';return false;">國會質詢</a>
+      <a class="nav-link" href="../index.html#page-proposals" onclick="window.location='../index.html';return false;">國會提案</a>
+      <a class="nav-link nav-cta" href="../form.html">＋ 我要陳情</a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a class="nav-link" href="../index.html">🏠 首頁</a>
+    <a class="nav-link active" href="achievements.html">🏆 政績專區</a>
+    <a class="nav-link" href="../form.html">＋ 我要陳情</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="ach-hero">
+  <div class="ach-hero-tag">🏆 服務成果公開透明</div>
+  <h1>政績專區</h1>
+  <p>從立法到服務，每一項成果都是對市民承諾的具體實現。<br>公開透明，讓政績有跡可循。</p>
+</div>
+
+<!-- ══ 篩選 Tab ══ -->
+<div class="filter-wrap">
+  <div class="filter-tabs" id="filterTabs">
+    <button class="ftab active" data-type="">全部</button>
+    <button class="ftab" data-type="立法成果">立法成果</button>
+    <button class="ftab" data-type="選民服務">選民服務</button>
+    <button class="ftab" data-type="會勘">會勘</button>
+    <button class="ftab" data-type="質詢">質詢</button>
+    <button class="ftab" data-type="提案">提案</button>
+    <button class="ftab" data-type="活動">活動</button>
+    <button class="ftab" data-type="其他">其他</button>
+  </div>
+</div>
+
+<!-- ══ 時間軸主體 ══ -->
+<div class="timeline-wrap">
+  <div class="timeline" id="timeline">
+    <!-- 骨架屏 -->
+    <div class="skeleton-list" id="skeletonList">
+      <div class="skeleton-item">
+        <div class="skeleton-card" style="margin-right:26px;"><div class="skeleton-cover"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line med"></div><div class="skeleton-line"></div></div></div>
+        <div class="skeleton-dot-wrap"><div class="skeleton-dot"></div></div>
+        <div></div>
+      </div>
+      <div class="skeleton-item">
+        <div></div>
+        <div class="skeleton-dot-wrap"><div class="skeleton-dot"></div></div>
+        <div class="skeleton-card" style="margin-left:26px;"><div class="skeleton-cover"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line med"></div><div class="skeleton-line"></div></div></div>
+      </div>
+      <div class="skeleton-item">
+        <div class="skeleton-card" style="margin-right:26px;"><div class="skeleton-cover"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line"></div></div></div>
+        <div class="skeleton-dot-wrap"><div class="skeleton-dot"></div></div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 載入更多 sentinel -->
+  <div id="loadSentinel" class="load-sentinel" style="display:none;">
+    <div class="load-spinner"></div>
+  </div>
+  <div id="allLoaded" class="all-loaded" style="display:none;">— 已顯示全部政績 —</div>
+</div>
+
+<!-- ══ Lightbox ══ -->
+<div class="lightbox" id="lightbox" onclick="Lightbox.closeOnBackdrop(event)">
+  <button class="lb-close" onclick="Lightbox.close()">✕</button>
+  <img class="lightbox-img" id="lbImg" src="" alt="政績圖片">
+  <div class="lightbox-controls">
+    <button class="lb-btn" onclick="Lightbox.prev()">‹</button>
+    <span class="lb-counter" id="lbCounter">1 / 1</span>
+    <button class="lb-btn" onclick="Lightbox.next()">›</button>
+  </div>
+</div>
+
+<!-- ══ Toast ══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+  <div class="footer-brand">🏛️ 數位服務處</div>
+  <div class="footer-sub">數位透明 · 為民服務 · 每件問題都有人跟進</div>
+  <div class="footer-social">
+    <a class="footer-social-card" href="https://lin.ee/Q9cWSP5" target="_blank">💬 LINE 官方帳號</a>
+  </div>
+  <div class="footer-copy">© 2025 數位服務處 · All rights reserved.</div>
+</footer>
+
+<script>
+/* ════════════════════════════════════════
+   政績專區 — 前台邏輯
+   ════════════════════════════════════════ */
+
+const WEBHOOK = 'https://drwu.zeabur.app/webhook/leyidemo';
+
+// ── 狀態
+let _state = {
+  page: 1,
+  limit: 10,
+  type: '',
+  loading: false,
+  allLoaded: false,
+  items: [],
+};
+
+// ── Lightbox
+const Lightbox = {
+  _imgs: [],
+  _idx: 0,
+  open(imgs, idx = 0) {
+    this._imgs = imgs;
+    this._idx  = idx;
+    this._render();
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  },
+  close() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  },
+  closeOnBackdrop(e) {
+    if (e.target === document.getElementById('lightbox')) this.close();
+  },
+  prev() { this._idx = (this._idx - 1 + this._imgs.length) % this._imgs.length; this._render(); },
+  next() { this._idx = (this._idx + 1) % this._imgs.length; this._render(); },
+  _render() {
+    document.getElementById('lbImg').src = this._imgs[this._idx];
+    document.getElementById('lbCounter').textContent = `${this._idx + 1} / ${this._imgs.length}`;
+  }
+};
+
+// 鍵盤支援
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowLeft')  Lightbox.prev();
+  if (e.key === 'ArrowRight') Lightbox.next();
+  if (e.key === 'Escape')     Lightbox.close();
+});
+
+// ── Toast
+function showToast(msg, duration = 2800) {
+  const el = document.createElement('div');
+  el.className = 'toast-msg';
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .3s';
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+// ── 篩選 Tab
+document.getElementById('filterTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.ftab');
+  if (!btn) return;
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _state.type = btn.dataset.type;
+  resetAndLoad();
+});
+
+// ── 重置並重新載入
+function resetAndLoad() {
+  _state.page = 1;
+  _state.allLoaded = false;
+  _state.items = [];
+  document.getElementById('timeline').querySelectorAll('.tl-item').forEach(el => el.remove());
+  document.getElementById('skeletonList').style.display = '';
+  document.getElementById('loadSentinel').style.display = 'none';
+  document.getElementById('allLoaded').style.display = 'none';
+  fetchAchievements();
+}
+
+// ── 取得資料
+async function fetchAchievements() {
+  if (_state.loading || _state.allLoaded) return;
+  _state.loading = true;
+
+  try {
+    const params = new URLSearchParams({
+      page:  _state.page,
+      limit: _state.limit,
+      type:  _state.type,
+    });
+    const res  = await fetch(`${WEBHOOK}/achievements?${params}`);
+    const data = await res.json();
+
+    if (data.success && data.items?.length) {
+      document.getElementById('skeletonList').style.display = 'none';
+      renderItems(data.items);
+      _state.items.push(...data.items);
+      _state.page++;
+
+      if (_state.page > data.totalPages || data.items.length < _state.limit) {
+        _state.allLoaded = true;
+        document.getElementById('loadSentinel').style.display = 'none';
+        if (_state.items.length > 0) {
+          document.getElementById('allLoaded').style.display = 'block';
+        }
+      } else {
+        document.getElementById('loadSentinel').style.display = 'flex';
+      }
+    } else {
+      document.getElementById('skeletonList').style.display = 'none';
+      if (_state.items.length === 0) {
+        document.getElementById('timeline').insertAdjacentHTML('beforeend',
+          `<div style="text-align:center;padding:80px 20px;color:var(--color-text-muted);font-size:15px;">
+            <div style="font-size:48px;margin-bottom:16px;">🏆</div>
+            <div>目前尚無${_state.type ? '「' + _state.type + '」類型的' : ''}政績資料</div>
+           </div>`);
+      }
+      _state.allLoaded = true;
+    }
+  } catch (err) {
+    console.error('[Achievements] fetch error:', err);
+    document.getElementById('skeletonList').style.display = 'none';
+    document.getElementById('timeline').insertAdjacentHTML('beforeend',
+      `<div style="text-align:center;padding:60px 20px;color:var(--color-text-muted);">
+        <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
+        <div>資料載入失敗，請稍後再試</div>
+        <button onclick="resetAndLoad()" style="margin-top:16px;padding:8px 20px;background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius-full);cursor:pointer;font-size:14px;">重新載入</button>
+       </div>`);
+  } finally {
+    _state.loading = false;
+  }
+}
+
+// ── 日期格式化
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+function fmtYear(iso) {
+  if (!iso) return '';
+  return new Date(iso).getFullYear() + '';
+}
+
+// ── 渲染卡片
+function renderItems(items) {
+  const tl = document.getElementById('timeline');
+  const currentCount = tl.querySelectorAll('.tl-item').length;
+
+  items.forEach((item, i) => {
+    const idx    = currentCount + i;
+    const liked  = !!localStorage.getItem(`achievement_liked_${item.id}`);
+    const isPinned = item.isPinned;
+    const imgs   = [item.coverImage, ...(item.images || [])].filter(Boolean);
+    const thumbs = imgs.slice(0, 3);
+    const extraCount = imgs.length - 3;
+
+    // 封面
+    const coverHtml = item.coverImage
+      ? `<img class="ach-card-cover" src="${item.coverImage}" alt="${item.title}" loading="lazy">`
+      : `<div class="ach-card-cover-placeholder">🏆</div>`;
+
+    // 縮圖列（僅當有額外圖片時）
+    let thumbsHtml = '';
+    if (item.images?.length) {
+      thumbsHtml = `<div class="ach-thumbs">`;
+      thumbs.forEach((url, ti) => {
+        thumbsHtml += `<img class="ach-thumb" src="${url}" alt="附圖 ${ti+1}" loading="lazy" onclick="Lightbox.open(${JSON.stringify(imgs)}, ${ti})">`;
+      });
+      if (extraCount > 0) {
+        thumbsHtml += `<div class="ach-thumb-more" onclick="Lightbox.open(${JSON.stringify(imgs)}, 3)">+${extraCount}</div>`;
+      }
+      thumbsHtml += `</div>`;
+    }
+
+    // 標籤
+    const tagsHtml = item.tags?.length
+      ? `<div class="ach-tags">${item.tags.map(t => `<span class="ach-tag">#${t}</span>`).join('')}</div>`
+      : '';
+
+    const html = `
+      <div class="tl-item" id="ach-${item.id}" data-id="${item.id}">
+        ${idx % 2 === 0 ? `
+          <div class="ach-card">${coverHtml}
+            <div class="ach-card-body">
+              <div class="ach-meta">
+                ${isPinned ? `<span class="ach-badge pinned-badge">🔖 重點</span>` : ''}
+                <span class="ach-badge">${item.type || '其他'}</span>
+                <span class="ach-date-sm">${item.date || ''}</span>
+              </div>
+              <div class="ach-card-title">${item.title}</div>
+              <div class="ach-card-content">${item.content || ''}</div>
+              ${tagsHtml}${thumbsHtml}
+            </div>
+            <div class="ach-card-footer">
+              <button class="ach-like-btn ${liked ? 'liked' : ''}"
+                      onclick="handleLike(this, '${item.id}')"
+                      ${liked ? 'disabled' : ''}>
+                <span class="like-heart">❤</span>
+                <span class="like-count">${item.likes || 0}</span>
+              </button>
+              <div class="ach-share-wrap">
+                <button class="ach-share-btn" onclick="toggleShare(this, '${item.id}', event)">
+                  <span>↗</span> 分享
+                </button>
+                <div class="share-popover">
+                  <a class="share-option" href="#" onclick="shareLine('${item.id}');return false;">💚 LINE</a>
+                  <a class="share-option" href="#" onclick="shareFb('${item.id}');return false;">📘 Facebook</a>
+                  <a class="share-option" href="#" onclick="shareIg('${item.id}');return false;">📸 Instagram</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-circle ${isPinned ? 'pinned' : ''}"></div></div>
+          <div class="tl-date">
+            <div>${fmtDate(item.date)}</div>
+            <div class="tl-date-year">${fmtYear(item.date)}</div>
+          </div>
+        ` : `
+          <div class="tl-date">
+            <div>${fmtDate(item.date)}</div>
+            <div class="tl-date-year">${fmtYear(item.date)}</div>
+          </div>
+          <div class="tl-dot"><div class="tl-dot-circle ${isPinned ? 'pinned' : ''}"></div></div>
+          <div class="ach-card">${coverHtml}
+            <div class="ach-card-body">
+              <div class="ach-meta">
+                ${isPinned ? `<span class="ach-badge pinned-badge">🔖 重點</span>` : ''}
+                <span class="ach-badge">${item.type || '其他'}</span>
+                <span class="ach-date-sm">${item.date || ''}</span>
+              </div>
+              <div class="ach-card-title">${item.title}</div>
+              <div class="ach-card-content">${item.content || ''}</div>
+              ${tagsHtml}${thumbsHtml}
+            </div>
+            <div class="ach-card-footer">
+              <button class="ach-like-btn ${liked ? 'liked' : ''}"
+                      onclick="handleLike(this, '${item.id}')"
+                      ${liked ? 'disabled' : ''}>
+                <span class="like-heart">❤</span>
+                <span class="like-count">${item.likes || 0}</span>
+              </button>
+              <div class="ach-share-wrap">
+                <button class="ach-share-btn" onclick="toggleShare(this, '${item.id}', event)">
+                  <span>↗</span> 分享
+                </button>
+                <div class="share-popover">
+                  <a class="share-option" href="#" onclick="shareLine('${item.id}');return false;">💚 LINE</a>
+                  <a class="share-option" href="#" onclick="shareFb('${item.id}');return false;">📘 Facebook</a>
+                  <a class="share-option" href="#" onclick="shareIg('${item.id}');return false;">📸 Instagram</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `}
+      </div>`;
+
+    tl.insertAdjacentHTML('beforeend', html);
+
+    // Intersection Observer for card animation
+    const el = document.getElementById(`ach-${item.id}`);
+    if (el) cardObserver.observe(el);
+  });
+}
+
+// ── 卡片進場動畫
+const cardObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      cardObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+// ── 無限捲動 sentinel
+const sentinelObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting && !_state.loading && !_state.allLoaded) {
+    fetchAchievements();
+  }
+}, { threshold: 0.1 });
+sentinelObserver.observe(document.getElementById('loadSentinel'));
+
+// ── 按讚
+async function handleLike(btn, id) {
+  const key = `achievement_liked_${id}`;
+  if (localStorage.getItem(key)) return;
+
+  btn.disabled = true;
+  try {
+    const res  = await fetch(`${WEBHOOK}/achievements/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem(key, '1');
+      btn.classList.add('liked');
+
+      const countEl = btn.querySelector('.like-count');
+      const newCount = data.likes ?? ((parseInt(countEl.textContent) || 0) + 1);
+      countEl.textContent = newCount;
+
+      // 浮現 +1 動畫
+      const float = document.createElement('span');
+      float.className = 'like-float';
+      float.textContent = '+1';
+      btn.appendChild(float);
+      setTimeout(() => float.remove(), 600);
+    } else {
+      btn.disabled = false;
+    }
+  } catch (e) {
+    console.error('[Like] error:', e);
+    btn.disabled = false;
+  }
+}
+
+// ── 分享
+function getShareUrl(id) {
+  return `${location.origin}${location.pathname}#achievement-${id}`;
+}
+function toggleShare(btn, id, e) {
+  e.stopPropagation();
+  const popover = btn.nextElementSibling;
+  // 關閉其他所有開啟的 popover
+  document.querySelectorAll('.share-popover.open').forEach(p => {
+    if (p !== popover) p.classList.remove('open');
+  });
+  popover.classList.toggle('open');
+}
+// 點擊其他地方關閉 popover
+document.addEventListener('click', () => {
+  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
+});
+
+function shareLine(id) {
+  const url = encodeURIComponent(getShareUrl(id));
+  window.open(`https://social-plugins.line.me/lineit/share?url=${url}`, '_blank');
+  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
+}
+function shareFb(id) {
+  const url = encodeURIComponent(getShareUrl(id));
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
+}
+async function shareIg(id) {
+  const url = getShareUrl(id);
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('連結已複製，請貼到 IG 限動 ✨');
+  } catch {
+    showToast('複製連結：' + url);
+  }
+  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
+}
+
+// ── Hamburger
+document.getElementById('hamburgerBtn').addEventListener('click', () => {
+  document.getElementById('mobileNav').classList.toggle('open');
+});
+
+// ── 頁面初始化
+fetchAchievements();
+
+// ── URL hash 跳轉到指定政績
+window.addEventListener('load', () => {
+  const hash = location.hash;
+  if (hash && hash.startsWith('#achievement-')) {
+    const id = hash.replace('#achievement-', '');
+    const waitForEl = setInterval(() => {
+      const el = document.getElementById(`ach-${id}`);
+      if (el) {
+        clearInterval(waitForEl);
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 200);
+  }
+});
+</script>
+</body>
+</html>

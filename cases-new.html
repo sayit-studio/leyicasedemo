@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增案件 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🏛️</div>
+      <div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item active" data-page="cases-new" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button>
+    </div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn btn-sm" onclick="history.back()">← 返回</button>
+        <div>
+          <div class="topbar-title">新增案件</div>
+          <div class="topbar-subtitle">手動建立（適用電話陳情）</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="submitCase()">📋 建立案件</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <!-- 成功提示 -->
+      <div id="successBox" style="display:none;" class="neu-card section-gap" style="border-left:4px solid var(--success);">
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:48px;margin-bottom:12px;">✅</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">案件已建立成功！</div>
+          <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">案件編號：<strong id="newCaseId" style="color:var(--primary-dark);font-family:monospace;"></strong></div>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button class="btn btn-primary" onclick="goToNew()">查看案件詳情</button>
+            <button class="btn" onclick="resetForm()">再建立一筆</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="formWrap">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+          <!-- 案件資訊 -->
+          <div class="neu-card">
+            <div class="card-title"><span class="card-icon">📋</span>案件資訊</div>
+
+            <div class="form-group">
+              <label class="form-label">案件類型 <span class="req">*</span></label>
+              <select class="neu-select" id="caseType">
+                <option value="">請選擇案件類型</option>
+                <option>交通運輸</option><option>公共設施</option><option>衛福勞動</option>
+                <option>文教科技</option><option>環境建管</option><option>警消政風</option>
+                <option>市政議題</option><option>里鄰事務</option><option>其他服務</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">案件標題 <span class="req">*</span></label>
+              <input type="text" class="neu-input" id="caseTitle" placeholder="簡短描述問題（例：北屯路路燈故障）" maxlength="50">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">案件區域 <span class="req">*</span></label>
+              <select class="neu-select" id="caseArea">
+                <option value="">請選擇區域</option>
+                <option>中區</option><option>東區</option><option>西區</option><option>南區</option><option>北區</option>
+                <option>西屯區</option><option>南屯區</option><option>北屯區</option><option>豐原區</option>
+                <option>東勢區</option><option>大甲區</option><option>清水區</option><option>沙鹿區</option>
+                <option>梧棲區</option><option>后里區</option><option>神岡區</option><option>潭子區</option>
+                <option>大雅區</option><option>新社區</option><option>石岡區</option><option>外埔區</option>
+                <option>大安區</option><option>烏日區</option><option>大肚區</option><option>龍井區</option>
+                <option>霧峰區</option><option>太平區</option><option>大里區</option><option>和平區</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">案件內容 <span class="req">*</span></label>
+              <textarea class="neu-textarea" id="caseContent" rows="6"
+                        placeholder="詳細描述問題，包含地點、時間、事件經過等…" oninput="countChars()"></textarea>
+              <div style="font-size:11px;color:var(--text-light);text-align:right;margin-top:4px;" id="charCount">0 字</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">初始狀態</label>
+              <select class="neu-select" id="initStatus">
+                <option value="待受理">待受理</option>
+                <option value="處理中">處理中</option>
+              </select>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;">
+              <label class="form-label" style="margin:0">立即公開</label>
+              <div class="neu-toggle" id="pubToggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+
+          <!-- 陳情人資料 -->
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div class="neu-card">
+              <div class="card-title"><span class="card-icon">👤</span>陳情人資料</div>
+
+              <div class="form-group">
+                <label class="form-label">姓名 <span class="req">*</span></label>
+                <input type="text" class="neu-input" id="name" placeholder="陳情人姓名">
+              </div>
+              <div class="form-group">
+                <label class="form-label">手機號碼 <span class="req">*</span></label>
+                <input type="tel" class="neu-input" id="phone" placeholder="09xxxxxxxx" maxlength="10">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email <span style="font-weight:400;color:var(--text-light);">（選填）</span></label>
+                <input type="email" class="neu-input" id="email" placeholder="your@email.com">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">聯絡地址 <span style="font-weight:400;color:var(--text-light);">（選填）</span></label>
+                <input type="text" class="neu-input" id="address" placeholder="若問題與地址相關，建議填寫">
+              </div>
+            </div>
+
+            <!-- 備註提示 -->
+            <div class="neu-card" style="background:var(--primary-pale);box-shadow:var(--neu-in-sm);">
+              <div style="font-size:13px;line-height:1.8;color:var(--primary-dark);">
+                <strong>📌 說明</strong><br>
+                此功能用於幕僚代替電話陳情的市民手動建立案件。<br>
+                建立後系統自動產生案件編號，並記錄建立者資訊。<br>
+                可在案件詳情中繼續編輯回覆與狀態。
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast-wrap"></div>
+
+<script src="js/admin.js"></script>
+<script>
+Auth.require('staff');
+let _newCaseId = null;
+
+function countChars() {
+  const len = document.getElementById('caseContent').value.length;
+  document.getElementById('charCount').textContent = len + ' 字';
+}
+
+async function submitCase() {
+  const caseType    = document.getElementById('caseType').value;
+  const caseTitle   = document.getElementById('caseTitle').value.trim();
+  const caseArea    = document.getElementById('caseArea').value;
+  const caseContent = document.getElementById('caseContent').value.trim();
+  const name        = document.getElementById('name').value.trim();
+  const phone       = document.getElementById('phone').value.trim();
+  const email       = document.getElementById('email').value.trim();
+  const address     = document.getElementById('address').value.trim();
+  const initStatus  = document.getElementById('initStatus').value;
+  const isPublic    = document.getElementById('pubToggle').classList.contains('on');
+
+  // 驗證
+  if (!caseType)            { toast.warn('請選擇案件類型'); return; }
+  if (!caseTitle)           { toast.warn('請填寫案件標題'); return; }
+  if (!caseArea)            { toast.warn('請選擇案件區域'); return; }
+  if (caseContent.length < 10) { toast.warn('案件內容請至少填寫 10 字'); return; }
+  if (!name)                { toast.warn('請填寫陳情人姓名'); return; }
+  if (!/^09\d{8}$/.test(phone)) { toast.warn('手機號碼格式不正確（09開頭10碼）'); return; }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.warn('Email 格式不正確'); return; }
+
+  const r = await API.cases.create({
+    caseType, caseTitle, caseArea, caseContent,
+    name, phone, email, address,
+    status: initStatus, isPublic,
+    createdBy: Auth.getEmail(),
+  });
+
+  if (!r?.success) { toast.error('建立失敗，請重試'); return; }
+
+  _newCaseId = r.case?.id || r.caseId;
+  document.getElementById('newCaseId').textContent = r.case?.caseId || r.caseId || '—';
+  document.getElementById('formWrap').style.display  = 'none';
+  document.getElementById('successBox').style.display = '';
+  toast.success('案件建立成功！');
+}
+
+function goToNew() { window.location.href = `cases-detail.html?id=${_newCaseId}`; }
+function resetForm() {
+  document.getElementById('formWrap').style.display  = '';
+  document.getElementById('successBox').style.display = 'none';
+  document.querySelectorAll('input,textarea,select').forEach(el => el.value = '');
+  document.getElementById('pubToggle').classList.remove('on');
+  _newCaseId = null;
+}
+</script>
+</body>
+</html>

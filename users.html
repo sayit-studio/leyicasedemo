@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>帳號管理 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="brand-icon">🏛️</div><div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div></div>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarAvatar">A</div><div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item active" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div><div class="topbar-title">帳號管理</div><div class="topbar-subtitle">管理幕僚與管理員帳號</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="Modal.open('addUserModal')">＋ 新增帳號</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>姓名</th><th>Email</th><th>角色</th><th>建立時間</th><th>最後登入</th><th style="width:100px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="userTbody">
+            <tr><td colspan="6"><div class="loading-row"><div class="spinner"></div>載入中…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 新增帳號 Modal -->
+<div class="modal-backdrop" id="addUserModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">新增帳號</span>
+      <button class="modal-close" onclick="Modal.close('addUserModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">姓名 <span class="req">*</span></label>
+        <input type="text" class="neu-input" id="nu-name" placeholder="帳號持有人姓名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span class="req">*</span></label>
+        <input type="email" class="neu-input" id="nu-email" placeholder="登入用 Email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">初始密碼 <span class="req">*</span></label>
+        <input type="password" class="neu-input" id="nu-pw" placeholder="至少 8 碼">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">角色</label>
+        <select class="neu-select" id="nu-role">
+          <option value="staff">幕僚（一般操作）</option>
+          <option value="admin">管理員（含私密資料、帳號管理）</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="Modal.close('addUserModal')">取消</button>
+      <button class="btn btn-primary" onclick="addUser()">建立帳號</button>
+    </div>
+  </div>
+</div>
+
+<!-- 編輯角色 Modal -->
+<div class="modal-backdrop" id="editUserModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">編輯帳號</span>
+      <button class="modal-close" onclick="Modal.close('editUserModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="eu-id">
+      <div class="form-group">
+        <label class="form-label">姓名</label>
+        <input type="text" class="neu-input" id="eu-name">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">角色</label>
+        <select class="neu-select" id="eu-role">
+          <option value="staff">幕僚</option>
+          <option value="admin">管理員</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="Modal.close('editUserModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveUser()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap"></div>
+<script src="js/admin.js"></script>
+<script>
+Auth.require('admin');
+
+const ROLE_LABEL = { staff:'幕僚', admin:'管理員', super_admin:'最高管理員' };
+const ROLE_COLOR = { staff:'var(--primary-pale)', admin:'var(--warning-pale)', super_admin:'var(--danger-pale)' };
+const ROLE_TC    = { staff:'var(--primary-dark)', admin:'var(--warning)', super_admin:'var(--danger)' };
+
+async function loadUsers() {
+  const data = await API.users.list();
+  const tbody = document.getElementById('userTbody');
+  if (!data?.users?.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">尚無帳號</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.users.map(u => `
+    <tr>
+      <td style="font-weight:600;">${u.name||'—'}</td>
+      <td style="font-size:13px;color:var(--text-muted);">${u.email||'—'}</td>
+      <td>
+        <span style="background:${ROLE_COLOR[u.role]||'var(--bg-dark)'};color:${ROLE_TC[u.role]||'var(--text-muted)'};
+          padding:3px 12px;border-radius:var(--r-full);font-size:11px;font-weight:700;">
+          ${ROLE_LABEL[u.role]||u.role}
+        </span>
+      </td>
+      <td style="font-size:12px;color:var(--text-muted)">${DateUtil.fmt(u.createdAt)}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${DateUtil.fmt(u.lastLogin)||'未曾登入'}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          ${u.role !== 'super_admin' ? `<button class="btn btn-icon btn-sm" onclick="openEdit('${u.id}','${u.name}','${u.role}')" title="編輯">✏️</button>` : ''}
+          ${u.role !== 'super_admin' ? `<button class="btn btn-icon btn-sm" style="color:var(--danger)" onclick="deleteUser('${u.id}','${u.name}')" title="刪除">🗑</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function addUser() {
+  const name  = document.getElementById('nu-name').value.trim();
+  const email = document.getElementById('nu-email').value.trim();
+  const pw    = document.getElementById('nu-pw').value;
+  const role  = document.getElementById('nu-role').value;
+  if (!name||!email||!pw) { toast.warn('請填寫所有必填欄位'); return; }
+  if (pw.length < 8)      { toast.warn('密碼至少 8 碼'); return; }
+  const r = await API.users.create({ name, email, password: pw, role });
+  if (r?.success) { toast.success('帳號建立成功'); Modal.close('addUserModal'); loadUsers(); }
+  else toast.error(r?.message || '建立失敗');
+}
+
+function openEdit(id, name, role) {
+  document.getElementById('eu-id').value   = id;
+  document.getElementById('eu-name').value = name;
+  document.getElementById('eu-role').value = role;
+  Modal.open('editUserModal');
+}
+async function saveUser() {
+  const id   = document.getElementById('eu-id').value;
+  const name = document.getElementById('eu-name').value.trim();
+  const role = document.getElementById('eu-role').value;
+  const r = await API.users.update(id, { name, role });
+  if (r?.success) { toast.success('帳號已更新'); Modal.close('editUserModal'); loadUsers(); }
+  else toast.error('更新失敗');
+}
+
+function deleteUser(id, name) {
+  Modal.confirm(`確認刪除帳號「${name}」`, '刪除後此帳號將無法登入，確定刪除嗎？', async () => {
+    const r = await API.users.delete(id);
+    if (r?.success) { toast.success('帳號已刪除'); loadUsers(); }
+    else toast.error('刪除失敗');
+  });
+}
+
+loadUsers();
+</script>
+</body>
+</html>

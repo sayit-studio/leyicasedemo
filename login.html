@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登入 — 市民服務平台管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap');
+:root {
+  --bg:#EEF0F5; --bg-dark:#E4E6ED; --bg-light:#F8F9FC;
+  --neu-out:6px 6px 16px #D0D2DA,-6px -6px 16px #FFFFFF;
+  --neu-out-sm:3px 3px 8px #D0D2DA,-3px -3px 8px #FFFFFF;
+  --neu-out-lg:12px 12px 32px #C8CAD2,-12px -12px 32px #FFFFFF;
+  --neu-in:inset 4px 4px 10px #D0D2DA,inset -4px -4px 10px #FFFFFF;
+  --neu-in-sm:inset 2px 2px 6px #D0D2DA,inset -2px -2px 6px #FFFFFF;
+  --primary:#7B9FE0; --primary-dark:#5A7EC4; --primary-pale:#EAF0FB;
+  --primary-glow:rgba(123,159,224,0.25);
+  --danger:#EF8080;
+  --text:#3D4561; --text-muted:#8890AA; --text-light:#B0B8CC;
+  --r:16px; --r-lg:24px; --r-xl:32px; --r-full:9999px;
+  --font-display:'Zen Maru Gothic','Noto Sans TC',sans-serif;
+  --font-body:'Noto Sans TC',sans-serif;
+  --t:0.25s; --ease:cubic-bezier(0.25,0.46,0.45,0.94);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 背景裝飾 */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(circle 400px at 10% 20%, rgba(123,159,224,0.10) 0%, transparent 60%),
+    radial-gradient(circle 300px at 90% 80%, rgba(110,203,168,0.08) 0%, transparent 60%),
+    radial-gradient(circle 250px at 80% 10%, rgba(245,185,122,0.07) 0%, transparent 60%);
+}
+
+.login-wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 440px;
+}
+
+/* 品牌區 */
+.login-brand {
+  text-align: center; margin-bottom: 32px;
+  animation: fadeUp .6s var(--ease) both;
+}
+.brand-logo {
+  width: 72px; height: 72px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 36px; margin-bottom: 14px;
+  box-shadow: var(--neu-out-lg);
+}
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px;
+}
+.brand-sub { font-size: 13px; color: var(--text-muted); }
+
+/* 登入卡片 */
+.login-card {
+  background: var(--bg); border-radius: var(--r-xl);
+  box-shadow: var(--neu-out-lg);
+  padding: 36px 32px;
+  animation: fadeUp .6s .1s var(--ease) both;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(24px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.login-card h2 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px;
+}
+.login-card p {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 28px;
+}
+
+/* 表單 */
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block; font-size: 12px; font-weight: 700;
+  color: var(--text-muted); letter-spacing: 0.05em;
+  margin-bottom: 8px; text-transform: uppercase;
+}
+.input-wrap { position: relative; }
+.input-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 16px; pointer-events: none;
+}
+.neu-input {
+  width: 100%; padding: 13px 16px 13px 44px;
+  background: var(--bg); border: none; border-radius: var(--r);
+  box-shadow: var(--neu-in);
+  font-size: 14px; color: var(--text);
+  transition: box-shadow var(--t);
+  font-family: var(--font-body);
+}
+.neu-input:focus { outline: none; box-shadow: var(--neu-in-sm), 0 0 0 3px var(--primary-glow); }
+.neu-input::placeholder { color: var(--text-light); }
+
+.pw-toggle {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  font-size: 16px; color: var(--text-muted);
+  padding: 4px; transition: color var(--t);
+}
+.pw-toggle:hover { color: var(--primary-dark); }
+
+/* 記住我 */
+.login-options {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 6px 0 24px;
+}
+.remember-wrap {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+.neu-checkbox {
+  width: 18px; height: 18px; border-radius: 5px;
+  background: var(--bg); box-shadow: var(--neu-in-sm);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--t);
+}
+.neu-checkbox.checked { box-shadow: var(--neu-in-sm); }
+.neu-checkbox.checked::after { content: '✓'; font-size: 12px; color: var(--primary-dark); font-weight: 700; }
+.remember-label { font-size: 13px; color: var(--text-muted); }
+.forgot-link { font-size: 13px; color: var(--primary-dark); font-weight: 600; cursor: pointer; }
+.forgot-link:hover { text-decoration: underline; }
+
+/* 按鈕 */
+.btn-login {
+  width: 100%; padding: 14px;
+  border-radius: var(--r); border: none; cursor: pointer;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; font-size: 15px; font-weight: 700;
+  font-family: var(--font-body);
+  box-shadow: 4px 4px 14px rgba(90,126,196,0.45), -2px -2px 8px rgba(255,255,255,0.70);
+  transition: all var(--t); display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-login:hover { box-shadow: 6px 6px 20px rgba(90,126,196,0.55), -3px -3px 12px rgba(255,255,255,0.80); transform: translateY(-1px); }
+.btn-login:active { transform: translateY(0); box-shadow: inset 2px 2px 6px rgba(0,0,0,0.2); }
+.btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-login.loading .spinner { display: block; }
+.btn-login.loading .btn-text { display: none; }
+
+/* 分隔線 */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 22px 0; color: var(--text-light); font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--bg-dark);
+  box-shadow: 0 1px 0 #fff;
+}
+
+/* Google 登入 */
+.btn-google {
+  width: 100%; padding: 13px;
+  border-radius: var(--r); border: none; cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--neu-out-sm);
+  font-size: 14px; font-weight: 600; color: var(--text);
+  font-family: var(--font-body);
+  transition: all var(--t);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn-google:hover { box-shadow: var(--neu-out); }
+.btn-google:active { box-shadow: var(--neu-in-sm); }
+.google-icon { width: 20px; height: 20px; }
+
+/* 錯誤訊息 */
+.error-msg {
+  display: none;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(239,128,128,0.12);
+  border-radius: var(--r);
+  box-shadow: inset 2px 2px 6px rgba(239,128,128,0.15);
+  font-size: 13px; color: #B05050;
+  display: flex; align-items: center; gap: 8px;
+}
+.error-msg.show { display: flex; animation: fadeUp .3s var(--ease); }
+
+/* 版本標 */
+.login-footer {
+  text-align: center; margin-top: 24px;
+  font-size: 11px; color: var(--text-light);
+  animation: fadeUp .6s .2s var(--ease) both;
+}
+
+/* 浮動泡泡裝飾 */
+.deco-bubble {
+  position: fixed; border-radius: 50%;
+  background: rgba(255,255,255,0.40);
+  box-shadow: inset 2px 2px 8px rgba(255,255,255,0.80), 4px 4px 12px rgba(208,210,218,0.60);
+  pointer-events: none; animation: floatBubble linear infinite;
+}
+.deco-bubble:nth-child(1) { width:120px;height:120px; top:8%;  left:6%;  animation-duration:8s;  animation-delay:0s; }
+.deco-bubble:nth-child(2) { width: 60px;height: 60px; top:70%; left:4%;  animation-duration:6s;  animation-delay:2s; }
+.deco-bubble:nth-child(3) { width:100px;height:100px; top:15%; right:5%; animation-duration:10s; animation-delay:1s; }
+.deco-bubble:nth-child(4) { width: 40px;height: 40px; top:80%; right:8%; animation-duration:7s;  animation-delay:3s; }
+@keyframes floatBubble {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-20px); }
+}
+</style>
+</head>
+<body>
+
+<!-- 裝飾氣泡 -->
+<div class="deco-bubble"></div>
+<div class="deco-bubble"></div>
+<div class="deco-bubble"></div>
+<div class="deco-bubble"></div>
+
+<div class="login-wrap">
+
+  <!-- 品牌 -->
+  <div class="login-brand">
+    <div class="brand-logo">🏛️</div>
+    <div class="brand-title">市民服務平台</div>
+    <div class="brand-sub">管理後台系統 · Admin Console</div>
+  </div>
+
+  <!-- 登入卡片 -->
+  <div class="login-card">
+    <h2>歡迎回來</h2>
+    <p>請登入您的帳號以存取管理後台</p>
+
+    <!-- 錯誤提示 -->
+    <div class="error-msg" id="errorMsg">
+      <span>⚠️</span>
+      <span id="errorText">帳號或密碼不正確，請重新輸入。</span>
+    </div>
+
+    <!-- 帳號 -->
+    <div class="form-group">
+      <label class="form-label">Email 帳號</label>
+      <div class="input-wrap">
+        <span class="input-icon">✉️</span>
+        <input type="email" class="neu-input" id="loginEmail"
+               placeholder="your@email.com" autocomplete="email">
+      </div>
+    </div>
+
+    <!-- 密碼 -->
+    <div class="form-group">
+      <label class="form-label">密碼</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input type="password" class="neu-input" id="loginPw"
+               placeholder="••••••••" autocomplete="current-password">
+        <button class="pw-toggle" onclick="togglePw()" id="pwToggle" type="button">👁</button>
+      </div>
+    </div>
+
+    <!-- 選項 -->
+    <div class="login-options">
+      <div class="remember-wrap" onclick="toggleRemember()">
+        <div class="neu-checkbox" id="rememberBox"></div>
+        <span class="remember-label">記住我</span>
+      </div>
+      <span class="forgot-link">忘記密碼？</span>
+    </div>
+
+    <!-- 登入按鈕 -->
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">
+      <div class="spinner"></div>
+      <span class="btn-text">登入後台</span>
+    </button>
+
+    <div class="divider">或使用</div>
+
+    <!-- Google SSO -->
+    <button class="btn-google" onclick="doGoogleLogin()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      使用 Google 帳號登入
+    </button>
+  </div>
+
+  <div class="login-footer">
+    市民服務平台管理後台 v2.0 &nbsp;·&nbsp; 僅限授權人員使用
+  </div>
+
+</div>
+
+<script>
+// ── 設定（實際部署時替換為真實 API）
+const API_BASE = './api';  // Next.js API Routes
+
+// ── 記住我
+let _remember = false;
+function toggleRemember() {
+  _remember = !_remember;
+  document.getElementById('rememberBox').classList.toggle('checked', _remember);
+}
+
+// ── 顯示/隱藏密碼
+let _pwVisible = false;
+function togglePw() {
+  _pwVisible = !_pwVisible;
+  const input = document.getElementById('loginPw');
+  input.type = _pwVisible ? 'text' : 'password';
+  document.getElementById('pwToggle').textContent = _pwVisible ? '🙈' : '👁';
+}
+
+// ── 顯示錯誤
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  document.getElementById('errorText').textContent = msg;
+  el.classList.add('show');
+}
+function clearError() {
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+// ── 登入邏輯
+async function doLogin() {
+  clearError();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+
+  if (!email) { showError('請輸入 Email 帳號。'); return; }
+  if (!pw)    { showError('請輸入密碼。'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  try {
+    // ── 實際部署時對應 NextAuth credentials provider
+    const res  = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw, remember: _remember }),
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      showError(data.message || '帳號或密碼不正確，請重新輸入。');
+      return;
+    }
+
+    // 儲存 token
+    const storage = _remember ? localStorage : sessionStorage;
+    storage.setItem('admin_token', data.token);
+    storage.setItem('admin_role',  data.role);
+    storage.setItem('admin_name',  data.name);
+    storage.setItem('admin_email', data.email);
+    storage.setItem('client_id',   data.clientId || '');
+
+    // 跳轉到對應頁面
+    const dest = data.role === 'super_admin' ? 'super-admin.html' : 'dashboard.html';
+    window.location.href = dest;
+
+  } catch(e) {
+    showError('連線失敗，請稍後再試。');
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+}
+
+// ── Google SSO
+function doGoogleLogin() {
+  // 實際部署時對應 NextAuth Google provider
+  window.location.href = `${API_BASE}/auth/google`;
+}
+
+// ── Enter 鍵登入
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ── 檢查已登入
+(function checkExisting() {
+  const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+  const role  = localStorage.getItem('admin_role')  || sessionStorage.getItem('admin_role');
+  if (token) {
+    const dest = role === 'super_admin' ? 'super-admin.html' : 'dashboard.html';
+    window.location.href = dest;
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>國會質詢 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="brand-icon">🏛️</div><div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div></div>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarAvatar">A</div><div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label">政績版功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('inspections')"><span class="nav-icon">🏗️</span><span class="nav-label">現場會勘</span></div>
+      <div class="nav-item active" onclick="Sidebar.navigate('interpellations')"><span class="nav-icon">🎤</span><span class="nav-label">國會質詢</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('proposals')"><span class="nav-icon">📜</span><span class="nav-label">國會提案</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div><div class="topbar-title">國會質詢管理</div><div class="topbar-subtitle" id="totalCount">載入中…</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openAdd()">＋ 新增質詢紀錄</button>
+        <button class="topbar-btn" onclick="load()">🔄</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <div class="filter-row">
+        <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="搜尋質詢標題…" oninput="debounce()"></div>
+        <select class="neu-select" style="width:160px;" id="targetFilter" onchange="load()">
+          <option value="">全部對象</option>
+          <option>行政院</option><option>內政部</option><option>財政部</option><option>教育部</option>
+          <option>交通部</option><option>衛福部</option><option>經濟部</option><option>其他部會</option>
+        </select>
+      </div>
+
+      <div class="table-wrap section-gap">
+        <table class="data-table">
+          <thead>
+            <tr><th>質詢標題</th><th>質詢對象</th><th>質詢日期</th><th>影片</th><th>公開</th><th style="width:100px;">操作</th></tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="6"><div class="loading-row"><div class="spinner"></div>載入中…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 新增/編輯 Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">新增質詢紀錄</span>
+      <button class="modal-close" onclick="Modal.close('editModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="grid-2" style="gap:16px;">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">質詢標題 <span class="req">*</span></label>
+          <input type="text" class="neu-input" id="e-title" placeholder="質詢議題名稱">
+        </div>
+        <div class="form-group">
+          <label class="form-label">質詢日期 <span class="req">*</span></label>
+          <input type="date" class="neu-input" id="e-date" style="padding-left:16px;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">質詢對象</label>
+          <select class="neu-select" id="e-target">
+            <option>行政院</option><option>內政部</option><option>財政部</option><option>教育部</option>
+            <option>交通部</option><option>衛福部</option><option>經濟部</option><option>其他部會</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">質詢摘要</label>
+          <textarea class="neu-textarea" id="e-summary" rows="4" placeholder="公開說明，市民可見…"></textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;margin:0;">
+          <label class="form-label">影片連結（YouTube 或其他平台）</label>
+          <input type="url" class="neu-input" id="e-video" placeholder="https://youtube.com/watch?v=…">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+        <label class="form-label" style="margin:0;">對外公開</label>
+        <div class="neu-toggle" id="e-pub" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="Modal.close('editModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveRecord()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap"></div>
+<script src="js/admin.js"></script>
+<script>
+Auth.require('staff');
+let _search='', _page=1, _timer, _editId=null;
+
+function debounce() { clearTimeout(_timer); _timer=setTimeout(()=>{_search=document.getElementById('searchInput').value.trim();_page=1;load();},400); }
+
+async function load() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '<tr><td colspan="6"><div class="loading-row"><div class="spinner"></div>載入中…</div></td></tr>';
+  const params = {page:_page,limit:20};
+  if (_search) params.q = _search;
+  const t = document.getElementById('targetFilter').value;
+  if (t) params.target = t;
+
+  const data = await API.interpellations.list(params);
+  document.getElementById('totalCount').textContent = `共 ${data?.total||0} 筆質詢紀錄`;
+  if (!data?.items?.length) { tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🎤</div><div class="empty-title">尚無質詢紀錄</div></div></td></tr>'; return; }
+
+  tbody.innerHTML = data.items.map(item => `
+    <tr>
+      <td style="font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.title||'—'}</td>
+      <td><span style="font-size:12px;background:var(--info-pale);color:var(--info);padding:3px 10px;border-radius:var(--r-full);font-weight:600;">${item.target||'—'}</span></td>
+      <td style="font-size:13px;color:var(--text-muted);white-space:nowrap;">${DateUtil.fmt(item.date)}</td>
+      <td>${item.videoUrl ? `<a href="${item.videoUrl}" target="_blank" class="btn btn-sm" style="font-size:11px;">▶ 觀看</a>` : '<span style="color:var(--text-light);font-size:12px;">無</span>'}</td>
+      <td>
+        <div class="neu-toggle ${item.isPublic?'on':''}" onclick="quickPub('${item.id}',${item.isPublic},this)"
+             style="width:36px;height:20px;" title="${item.isPublic?'已公開':'未公開'}"></div>
+      </td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-icon btn-sm" onclick="openEdit('${item.id}')">✏️</button>
+          ${Auth.isAdmin()?`<button class="btn btn-icon btn-sm" style="color:var(--danger)" onclick="del('${item.id}')">🗑</button>`:''}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function quickPub(id,cur,el) {
+  const r = await API.interpellations.update(id,{isPublic:!cur});
+  if(r?.success) el.classList.toggle('on',!cur); else toast.error('操作失敗');
+}
+
+function openAdd() {
+  _editId=null;
+  document.getElementById('modalTitle').textContent='新增質詢紀錄';
+  ['e-title','e-summary','e-video'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('e-pub').classList.remove('on');
+  Modal.open('editModal');
+}
+
+async function openEdit(id) {
+  _editId=id;
+  document.getElementById('modalTitle').textContent='編輯質詢紀錄';
+  const data = await API.get(`/interpellations/${id}`);
+  if(data?.item){
+    const i=data.item;
+    document.getElementById('e-title').value   =i.title  ||'';
+    document.getElementById('e-date').value    =i.date?.split('T')[0]||'';
+    document.getElementById('e-target').value  =i.target ||'行政院';
+    document.getElementById('e-summary').value =i.summary||'';
+    document.getElementById('e-video').value   =i.videoUrl||'';
+    document.getElementById('e-pub').classList.toggle('on',!!i.isPublic);
+  }
+  Modal.open('editModal');
+}
+
+async function saveRecord() {
+  const body={
+    title:    document.getElementById('e-title').value.trim(),
+    date:     document.getElementById('e-date').value,
+    target:   document.getElementById('e-target').value,
+    summary:  document.getElementById('e-summary').value.trim(),
+    videoUrl: document.getElementById('e-video').value.trim(),
+    isPublic: document.getElementById('e-pub').classList.contains('on'),
+  };
+  if(!body.title||!body.date){toast.warn('請填寫標題與日期');return;}
+  const r=_editId?await API.interpellations.update(_editId,body):await API.interpellations.create(body);
+  if(r?.success){toast.success(_editId?'已更新':'已新增');Modal.close('editModal');load();}
+  else toast.error('操作失敗');
+}
+
+function del(id){
+  Modal.confirm('確認刪除','確定要刪除這筆質詢紀錄嗎？',async()=>{
+    const r=await API.interpellations.delete(id);
+    if(r?.success){toast.success('已刪除');load();}else toast.error('刪除失敗');
+  });
+}
+
+load();
+</script>
+</body>
+</html>

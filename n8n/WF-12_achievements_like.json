@@ -1,0 +1,179 @@
+{
+  "name": "WF-12 政績按讚 (leyidemo)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leyidemo/achievements/like",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c2b3d4e5-0001-4002-8002-b2c3d4e5f6a7",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "leyidemo-achievements-like"
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.body.id }}",
+          "mode": "id"
+        },
+        "simplifyOutput": false
+      },
+      "id": "c2b3d4e5-0002-4002-8002-b2c3d4e5f6a7",
+      "name": "Notion 取得目前按讚數",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ════════════════════════════════════════\n// WF-12 政績按讚 — 取得目前數值 +1\n// Notion Simplify: OFF（走完整路徑）\n// ════════════════════════════════════════\n\nconst page       = $input.first().json;\nconst props      = page.properties || {};\n\n// 目前按讚數（Notion number 欄位）\nconst currentLikes = props['按讚數']?.number ?? 0;\nconst newLikes     = currentLikes + 1;\n\n// Page ID（從 Notion response 取得）\nconst pageId = page.id;\n\nreturn [\n  {\n    json: {\n      pageId,\n      newLikes,\n    }\n  }\n];\n"
+      },
+      "id": "c2b3d4e5-0003-4002-8002-b2c3d4e5f6a7",
+      "name": "Code 計算 likes + 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.pageId }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "按讚數",
+              "type": "number",
+              "numberValue": "={{ $json.newLikes }}"
+            }
+          ]
+        },
+        "simplifyOutput": false
+      },
+      "id": "c2b3d4e5-0004-4002-8002-b2c3d4e5f6a7",
+      "name": "Notion 更新按讚數",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 回傳格式化結果\nconst newLikes = $('Code 計算 likes + 1').first().json.newLikes;\nreturn [\n  {\n    json: {\n      success: true,\n      likes:   newLikes,\n    }\n  }\n];\n"
+      },
+      "id": "c2b3d4e5-0005-4002-8002-b2c3d4e5f6a7",
+      "name": "Code 準備回傳",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "c2b3d4e5-0006-4002-8002-b2c3d4e5f6a7",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Notion 取得目前按讚數",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion 取得目前按讚數": {
+      "main": [
+        [
+          {
+            "node": "Code 計算 likes + 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code 計算 likes + 1": {
+      "main": [
+        [
+          {
+            "node": "Notion 更新按讚數",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion 更新按讚數": {
+      "main": [
+        [
+          {
+            "node": "Code 準備回傳",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code 準備回傳": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateId": "WF-12",
+    "instanceId": "leyidemo"
+  },
+  "tags": [
+    { "name": "leyidemo" },
+    { "name": "achievements" },
+    { "name": "政績版" }
+  ]
+}

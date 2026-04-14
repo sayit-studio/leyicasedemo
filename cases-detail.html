@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案件詳情 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+<style>
+.detail-grid { display:grid; grid-template-columns:1fr 380px; gap:24px; }
+.section-title { font-family:var(--font-display); font-size:14px; font-weight:700; color:var(--text-muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border-inner); }
+.info-row { display:flex; gap:8px; padding:10px 0; border-bottom:1px solid var(--border-inner); font-size:14px; }
+.info-row:last-child { border-bottom:none; }
+.info-key { font-weight:600; color:var(--text-muted); min-width:100px; flex-shrink:0; }
+.info-val { color:var(--text); flex:1; }
+.log-item { padding:10px 0; border-bottom:1px solid var(--border-inner); font-size:13px; }
+.log-item:last-child { border-bottom:none; }
+.log-time { font-size:11px; color:var(--text-light); margin-top:2px; }
+</style>
+</head>
+<body>
+<div class="admin-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🏛️</div>
+      <div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item active" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button>
+    </div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn btn-sm" onclick="history.back()">← 返回</button>
+        <div>
+          <div class="topbar-title" id="pageTitle">案件詳情</div>
+          <div class="topbar-subtitle" id="caseIdLabel">載入中…</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 儲存變更</button>
+        <button class="topbar-btn" id="deleteBtn" onclick="doDelete()" title="刪除案件" style="color:var(--danger)">🗑</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <div id="loadingState" class="loading-row"><div class="spinner"></div>載入案件資料…</div>
+      <div id="mainGrid" class="detail-grid" style="display:none;">
+
+        <!-- 左欄：可編輯區 -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- 案件狀態 & 公開設定 -->
+          <div class="neu-card">
+            <div class="section-title">狀態設定</div>
+            <div class="grid-2" style="gap:16px;">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">案件狀態</label>
+                <select class="neu-select" id="caseStatus" onchange="onStatusChange()">
+                  <option value="待受理">待受理</option>
+                  <option value="處理中">處理中</option>
+                  <option value="追蹤中">追蹤中</option>
+                  <option value="已結案">已結案</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">結案日期</label>
+                <input type="date" class="neu-input" id="closedDate" style="padding-left:16px;">
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+              <label class="form-label" style="margin:0">對外公開</label>
+              <div class="neu-toggle" id="pubToggle" onclick="togglePub(this)"></div>
+              <span style="font-size:13px;color:var(--text-muted);" id="pubLabel">未公開</span>
+            </div>
+            <div style="margin-top:14px;">
+              <button class="btn btn-primary btn-sm" onclick="saveStatusAndNotify()" style="gap:6px;">
+                📣 儲存狀態並通知市民
+              </button>
+              <span style="font-size:12px;color:var(--text-muted);margin-left:8px;">將自動推播 LINE 通知</span>
+            </div>
+          </div>
+
+          <!-- 公開摘要 -->
+          <div class="neu-card">
+            <div class="section-title">公開摘要</div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">對市民顯示的說明</label>
+              <textarea class="neu-textarea" id="publicSummary" rows="4"
+                        placeholder="請填寫對外公開的案件說明，市民查詢時可見…"></textarea>
+            </div>
+          </div>
+
+          <!-- 結果回覆 -->
+          <div class="neu-card">
+            <div class="section-title">結果回覆</div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">最終結果回覆</label>
+              <textarea class="neu-textarea" id="replyContent" rows="5"
+                        placeholder="填寫案件處理結果，市民查詢案件編號時可看到此回覆…"></textarea>
+            </div>
+          </div>
+
+          <!-- 改善前圖片 -->
+          <div class="neu-card">
+            <div class="section-title">改善前圖片</div>
+            <div class="img-upload-zone" id="beforeZone" onclick="beforeUploader._pickFile()">
+              <div class="upload-icon">📷</div>
+              <div class="upload-hint">點擊或拖放圖片到此區域<br>支援 JPG、PNG、WebP，每張限 10MB</div>
+            </div>
+            <div class="img-preview-grid" id="beforePreview"></div>
+          </div>
+
+          <!-- 改善後圖片 -->
+          <div class="neu-card">
+            <div class="section-title">改善後圖片</div>
+            <div class="img-upload-zone" id="afterZone" onclick="afterUploader._pickFile()">
+              <div class="upload-icon">✅</div>
+              <div class="upload-hint">點擊或拖放圖片到此區域<br>支援 JPG、PNG、WebP，每張限 10MB</div>
+            </div>
+            <div class="img-preview-grid" id="afterPreview"></div>
+          </div>
+
+        </div>
+
+        <!-- 右欄：唯讀資訊 -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- 基本資訊 -->
+          <div class="neu-card">
+            <div class="section-title">基本資訊</div>
+            <div class="info-row"><span class="info-key">案件編號</span><span class="info-val" id="d-caseId" style="font-family:monospace;font-size:13px;"></span></div>
+            <div class="info-row"><span class="info-key">案件標題</span><span class="info-val" id="d-title"></span></div>
+            <div class="info-row"><span class="info-key">案件類型</span><span class="info-val" id="d-type"></span></div>
+            <div class="info-row"><span class="info-key">案件區域</span><span class="info-val" id="d-area"></span></div>
+            <div class="info-row"><span class="info-key">登錄日期</span><span class="info-val" id="d-created"></span></div>
+            <div class="info-row"><span class="info-key">最後編輯</span><span class="info-val" id="d-edited"></span></div>
+          </div>
+
+          <!-- 原始陳情內容 -->
+          <div class="neu-card">
+            <div class="section-title">原始陳情內容</div>
+            <div id="d-content" style="font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;"></div>
+          </div>
+
+          <!-- 陳情人資料（Admin only）-->
+          <div class="neu-card" id="privateCard" style="display:none;">
+            <div class="section-title">陳情人資料 <span style="font-size:11px;color:var(--danger);font-weight:700;">私密</span></div>
+            <div class="info-row"><span class="info-key">姓名</span><span class="info-val" id="d-name"></span></div>
+            <div class="info-row"><span class="info-key">手機</span><span class="info-val" id="d-phone"></span></div>
+            <div class="info-row"><span class="info-key">Email</span><span class="info-val" id="d-email"></span></div>
+            <div class="info-row"><span class="info-key">地址</span><span class="info-val" id="d-address"></span></div>
+          </div>
+
+          <!-- 操作紀錄 -->
+          <div class="neu-card">
+            <div class="section-title">操作紀錄</div>
+            <div id="logList"><div class="loading-row"><div class="spinner"></div></div></div>
+          </div>
+
+        </div>
+      </div><!-- /mainGrid -->
+    </div>
+  </div>
+</div>
+<div class="toast-wrap"></div>
+
+<script src="js/admin.js"></script>
+<script>
+Auth.require('staff');
+
+// 取得案件 ID
+const params = new URLSearchParams(window.location.search);
+const CASE_ID = params.get('id');
+if (!CASE_ID) { toast.error('未指定案件 ID'); setTimeout(()=>history.back(),1500); }
+
+let _caseData = null;
+let _isPub    = false;
+let beforeUploader, afterUploader;
+
+// ── 載入案件
+async function loadCase() {
+  const data = await API.cases.get(CASE_ID);
+  if (!data?.success) { toast.error('載入案件失敗'); return; }
+  _caseData = data.case;
+  renderCase(_caseData);
+}
+
+function renderCase(c) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('mainGrid').style.display = 'grid';
+
+  document.getElementById('pageTitle').textContent = c.title || '案件詳情';
+  document.getElementById('caseIdLabel').textContent = c.caseId || '';
+
+  // 基本資訊
+  document.getElementById('d-caseId').textContent   = c.caseId   || '—';
+  document.getElementById('d-title').textContent    = c.title    || '—';
+  document.getElementById('d-type').textContent     = c.caseType || '—';
+  document.getElementById('d-area').textContent     = c.caseArea || '—';
+  document.getElementById('d-created').textContent  = DateUtil.fmtFull(c.createdAt);
+  document.getElementById('d-edited').textContent   = DateUtil.fmtFull(c.updatedAt);
+  document.getElementById('d-content').textContent  = c.originalContent || '（無內容）';
+
+  // 可編輯欄位
+  document.getElementById('caseStatus').value = c.status || '待受理';
+  if (c.closedDate) document.getElementById('closedDate').value = c.closedDate.split('T')[0];
+  document.getElementById('publicSummary').value = c.publicSummary || '';
+  document.getElementById('replyContent').value  = c.replyContent  || '';
+
+  // 公開 toggle
+  _isPub = c.isPublic || false;
+  document.getElementById('pubToggle').classList.toggle('on', _isPub);
+  document.getElementById('pubLabel').textContent = _isPub ? '已公開' : '未公開';
+
+  // 結案日期自動填（已結案時）
+  onStatusChange();
+
+  // 私密資料（Admin+）
+  if (Auth.isAdmin()) {
+    document.getElementById('privateCard').style.display = '';
+    document.getElementById('d-name').textContent    = c.name    || '—';
+    document.getElementById('d-phone').textContent   = c.phone   || '—';
+    document.getElementById('d-email').textContent   = c.email   || '—';
+    document.getElementById('d-address').textContent = c.address || '—';
+  }
+
+  // 刪除按鈕
+  if (!Auth.isAdmin()) document.getElementById('deleteBtn').style.display = 'none';
+
+  // 圖片上傳器
+  beforeUploader = new ImageUploader({ zoneId:'beforeZone', previewId:'beforePreview', caseId:CASE_ID, type:'before' });
+  afterUploader  = new ImageUploader({ zoneId:'afterZone',  previewId:'afterPreview',  caseId:CASE_ID, type:'after' });
+
+  // 既有圖片填入預覽
+  if (c.beforeImages?.length) {
+    beforeUploader.images = c.beforeImages.map(url=>({url,loading:false}));
+    beforeUploader._renderPreview();
+  }
+  if (c.afterImages?.length) {
+    afterUploader.images = c.afterImages.map(url=>({url,loading:false}));
+    afterUploader._renderPreview();
+  }
+
+  // 操作紀錄
+  renderLogs(c.logs || []);
+}
+
+function renderLogs(logs) {
+  const el = document.getElementById('logList');
+  if (!logs.length) { el.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">尚無操作紀錄</div>'; return; }
+  el.innerHTML = logs.slice().reverse().map(l => `
+    <div class="log-item">
+      <div style="font-weight:600;">${l.action || '狀態變更'} → <strong>${l.value||''}</strong></div>
+      <div class="log-time">${DateUtil.fmtFull(l.at)} · ${l.by || '系統'}</div>
+    </div>`).join('');
+}
+
+// ── 狀態變更（自動填結案日期）
+function onStatusChange() {
+  const s = document.getElementById('caseStatus').value;
+  if (s === '已結案' && !document.getElementById('closedDate').value) {
+    document.getElementById('closedDate').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+// ── 公開切換
+function togglePub(el) {
+  _isPub = !_isPub;
+  el.classList.toggle('on', _isPub);
+  document.getElementById('pubLabel').textContent = _isPub ? '已公開' : '未公開';
+}
+
+// ── 儲存狀態 + 通知
+async function saveStatusAndNotify() {
+  const status     = document.getElementById('caseStatus').value;
+  const closedDate = document.getElementById('closedDate').value;
+  const isPublic   = _isPub;
+
+  const body = { status, isPublic };
+  if (closedDate) body.closedDate = closedDate;
+
+  const r = await API.cases.update(CASE_ID, body);
+  if (!r?.success) { toast.error('儲存失敗'); return; }
+
+  // 觸發 LINE 通知
+  const nr = await API.cases.notify(CASE_ID, { status });
+  toast.success(nr?.success ? '狀態已儲存，LINE 通知已推播 ✓' : '狀態已儲存（LINE 通知發送失敗）');
+}
+
+// ── 儲存全部
+async function saveAll() {
+  const body = {
+    status:        document.getElementById('caseStatus').value,
+    closedDate:    document.getElementById('closedDate').value || null,
+    isPublic:      _isPub,
+    publicSummary: document.getElementById('publicSummary').value.trim(),
+    replyContent:  document.getElementById('replyContent').value.trim(),
+    beforeImages:  beforeUploader?.getUrls() || [],
+    afterImages:   afterUploader?.getUrls()  || [],
+  };
+  const r = await API.cases.update(CASE_ID, body);
+  if (r?.success) toast.success('所有變更已儲存 ✓');
+  else            toast.error('儲存失敗，請重試');
+}
+
+// ── 刪除案件
+function doDelete() {
+  if (!Auth.isAdmin()) { toast.warn('需要管理員權限'); return; }
+  Modal.confirm('確認刪除案件', '此操作不可復原，確定要刪除此案件嗎？', async () => {
+    const r = await API.cases.delete(CASE_ID);
+    if (r?.success) { toast.success('案件已刪除'); setTimeout(()=>Sidebar.navigate('cases'),1200); }
+    else toast.error('刪除失敗');
+  });
+}
+
+loadCase();
+</script>
+</body>
+</html>

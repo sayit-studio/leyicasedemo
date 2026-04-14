@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政績專區管理 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../admin.css">
+<style>
+/* ── 政績卡片網格 */
+#cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.ach-admin-card {
+  background: var(--bg-light);
+  box-shadow: var(--neu-out);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: box-shadow var(--t), transform var(--t);
+}
+.ach-admin-card:hover {
+  box-shadow: var(--neu-out-lg);
+  transform: translateY(-2px);
+}
+.ach-admin-cover {
+  width: 100%; height: 160px;
+  object-fit: cover;
+  background: var(--bg-dark);
+  display: block;
+}
+.ach-admin-cover-ph {
+  width: 100%; height: 160px;
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; color: var(--text-light);
+}
+.ach-admin-body { padding: 16px; }
+.ach-admin-meta {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.ach-admin-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: var(--r-full);
+  background: var(--primary-pale); color: var(--primary-dark);
+}
+.ach-admin-badge.pinned {
+  background: linear-gradient(90deg, #F5B97A 0%, #F5D97A 100%);
+  color: #7A4500;
+}
+.ach-admin-title {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ach-admin-sub {
+  font-size: 12px; color: var(--text-muted); margin-bottom: 10px;
+  display: flex; gap: 12px; align-items: center;
+}
+.ach-admin-likes {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-muted);
+}
+
+/* ── 操作列 */
+.ach-admin-actions {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-inner);
+  flex-wrap: wrap;
+}
+.action-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-muted);
+}
+.neu-toggle {
+  width: 38px; height: 20px; border-radius: 10px;
+  background: var(--bg-dark); box-shadow: var(--neu-in-sm);
+  position: relative; cursor: pointer; transition: background var(--t);
+  flex-shrink: 0;
+}
+.neu-toggle::after {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--text-light); box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+  transition: transform var(--t), background var(--t);
+}
+.neu-toggle.on { background: var(--success); }
+.neu-toggle.on::after { transform: translateX(18px); background: #fff; }
+
+.action-btns { display: flex; gap: 6px; margin-left: auto; }
+.btn-icon {
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  background: var(--bg); box-shadow: var(--neu-out-sm);
+  border: none; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--t-fast);
+}
+.btn-icon:hover { box-shadow: var(--neu-in-sm); }
+.btn-icon.danger:hover { background: var(--danger-pale); }
+
+/* ── tag input */
+.tag-input-wrap {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  min-height: 42px;
+  background: var(--bg); box-shadow: var(--neu-in-sm);
+  border-radius: var(--r-sm); padding: 6px 12px;
+}
+.tag-chip {
+  background: var(--primary-pale); color: var(--primary-dark);
+  font-size: 12px; padding: 2px 8px; border-radius: var(--r-full);
+  display: flex; align-items: center; gap: 4px;
+}
+.tag-chip button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--text-muted); padding: 0; line-height: 1;
+}
+.tag-input-inner {
+  border: none; background: transparent; outline: none;
+  font-family: var(--font-body); font-size: 13px; color: var(--text);
+  min-width: 80px; flex: 1;
+}
+/* Cloudinary uploader zone */
+.cloud-upload-zone {
+  border: 2px dashed var(--border-inner);
+  border-radius: var(--r);
+  padding: 24px; text-align: center; cursor: pointer;
+  transition: all var(--t);
+  background: var(--bg);
+}
+.cloud-upload-zone:hover,
+.cloud-upload-zone.dragover {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+}
+.cloud-upload-icon { font-size: 32px; margin-bottom: 8px; }
+.cloud-upload-hint { font-size: 13px; color: var(--text-muted); }
+
+.multi-preview {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+}
+.multi-preview-item {
+  position: relative; width: 80px; height: 64px;
+  border-radius: var(--r-sm); overflow: hidden;
+  box-shadow: var(--neu-out-sm);
+}
+.multi-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.multi-preview-del {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(0,0,0,.5); color: #fff; border: none; cursor: pointer;
+  border-radius: 50%; width: 18px; height: 18px; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── 封面預覽 */
+.cover-preview-wrap { position: relative; display: inline-block; }
+.cover-preview-img {
+  width: 100%; max-height: 160px; object-fit: cover;
+  border-radius: var(--r-sm); display: block;
+  box-shadow: var(--neu-out-sm);
+}
+.cover-preview-del {
+  position: absolute; top: 6px; right: 6px;
+  background: rgba(0,0,0,.5); color: #fff; border: none; cursor: pointer;
+  border-radius: 50%; width: 24px; height: 24px; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🏛️</div>
+      <div class="brand-text">
+        <div class="brand-name">市民服務平台</div>
+        <div class="brand-role">Admin Console</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarUserName">載入中…</div>
+        <span class="user-tag" id="sidebarUserTag">幕僚</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" data-page="dashboard" onclick="Sidebar.navigate('dashboard')">
+        <span class="nav-icon">📊</span><span class="nav-label">儀表板</span>
+      </div>
+      <div class="nav-item" data-page="cases" onclick="Sidebar.navigate('cases')">
+        <span class="nav-icon">📋</span><span class="nav-label">案件管理</span>
+      </div>
+      <div class="nav-item" data-page="cases-new" onclick="Sidebar.navigate('cases-new')">
+        <span class="nav-icon">✏️</span><span class="nav-label">新增案件</span>
+      </div>
+      <div class="nav-group-label">政績版功能</div>
+      <div class="nav-item active" data-page="achievements" onclick="Sidebar.navigate('achievements')">
+        <span class="nav-icon">🏆</span><span class="nav-label">政績專區</span>
+      </div>
+      <div class="nav-item" data-page="inspections" onclick="Sidebar.navigate('inspections')">
+        <span class="nav-icon">🏗️</span><span class="nav-label">現場會勘</span>
+      </div>
+      <div class="nav-item" data-page="interpellations" onclick="Sidebar.navigate('interpellations')">
+        <span class="nav-icon">🎤</span><span class="nav-label">國會質詢</span>
+      </div>
+      <div class="nav-item" data-page="proposals" onclick="Sidebar.navigate('proposals')">
+        <span class="nav-icon">📜</span><span class="nav-label">國會提案</span>
+      </div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" data-page="users" onclick="Sidebar.navigate('users')" data-role="admin">
+        <span class="nav-icon">👥</span><span class="nav-label">帳號管理</span>
+      </div>
+      <div class="nav-item" data-page="settings" onclick="Sidebar.navigate('settings')" data-role="admin">
+        <span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span>
+      </div>
+      <div class="nav-item" data-page="super-admin" onclick="Sidebar.navigate('super-admin')" data-role="super_admin">
+        <span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-toggle" onclick="Sidebar.toggle()">
+        <span class="toggle-icon">◀</span>
+        <span class="toggle-label">收合選單</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main-content" id="mainContent">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">政績專區管理</div>
+        <div class="topbar-subtitle" id="totalCount">載入中…</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openAdd()">＋ 新增政績</button>
+        <button class="topbar-btn" onclick="load()" title="重新整理">🔄</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <!-- 篩選列 -->
+      <div class="filter-row">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜尋政績名稱…" oninput="debounce()">
+        </div>
+        <select class="neu-select" style="width:140px;" id="typeFilter" onchange="load()">
+          <option value="">全部類型</option>
+          <option>立法成果</option>
+          <option>選民服務</option>
+          <option>會勘</option>
+          <option>質詢</option>
+          <option>提案</option>
+          <option>活動</option>
+          <option>其他</option>
+        </select>
+        <div class="filter-tab active" onclick="setPub(this,'')" data-pub="">全部</div>
+        <div class="filter-tab" onclick="setPub(this,'true')" data-pub="true">已公開</div>
+        <div class="filter-tab" onclick="setPub(this,'false')" data-pub="false">未公開</div>
+      </div>
+
+      <!-- 卡片式列表 -->
+      <div id="cardGrid">
+        <div class="loading-row" style="grid-column:1/-1;"><div class="spinner"></div>載入中…</div>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div><!-- /main-content -->
+</div><!-- /admin-shell -->
+
+<!-- ══ 新增/編輯 Modal ══ -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">新增政績</span>
+      <button class="modal-close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+
+      <div class="grid-2" style="gap:16px;">
+        <!-- 政績名稱 -->
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">政績名稱 <span class="req">*</span></label>
+          <input type="text" class="neu-input" id="e-title" placeholder="請輸入政績名稱">
+        </div>
+
+        <!-- 政績類型 -->
+        <div class="form-group">
+          <label class="form-label">政績類型 <span class="req">*</span></label>
+          <select class="neu-select" id="e-type">
+            <option value="">請選擇類型</option>
+            <option>立法成果</option>
+            <option>選民服務</option>
+            <option>會勘</option>
+            <option>質詢</option>
+            <option>提案</option>
+            <option>活動</option>
+            <option>其他</option>
+          </select>
+        </div>
+
+        <!-- 成果日期 -->
+        <div class="form-group">
+          <label class="form-label">成果日期</label>
+          <input type="date" class="neu-input" id="e-date" style="padding-left:16px;">
+        </div>
+
+        <!-- 重要程度 -->
+        <div class="form-group">
+          <label class="form-label">重要程度</label>
+          <select class="neu-select" id="e-importance">
+            <option value="一般">一般</option>
+            <option value="重點">置頂重點</option>
+          </select>
+        </div>
+
+        <!-- 是否公開 -->
+        <div class="form-group" style="display:flex;align-items:center;gap:12px;padding-top:24px;">
+          <label class="form-label" style="margin:0;">對外公開</label>
+          <div class="neu-toggle" id="e-pub" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <!-- 政績內容 -->
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">政績內容</label>
+          <textarea class="neu-textarea" id="e-content" rows="5"
+                    placeholder="詳細說明政績成果、過程與影響…"></textarea>
+        </div>
+
+        <!-- 標籤 -->
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">標籤</label>
+          <div class="tag-input-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+            <input type="text" class="tag-input-inner" id="tagInput"
+                   placeholder="輸入標籤後按 Enter 或逗號"
+                   onkeydown="handleTagKey(event)">
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">按 Enter 或逗號新增標籤</div>
+        </div>
+
+        <!-- 封面圖 -->
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">封面圖（單張）</label>
+          <div id="coverPreviewWrap" style="display:none;margin-bottom:10px;">
+            <div class="cover-preview-wrap">
+              <img id="coverPreviewImg" class="cover-preview-img" src="" alt="封面圖">
+              <button class="cover-preview-del" onclick="removeCover()">✕</button>
+            </div>
+          </div>
+          <div class="cloud-upload-zone" id="coverZone"
+               onclick="_coverUploader.pickFile()"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault();this.classList.remove('dragover');_coverUploader.handleFiles(event.dataTransfer.files)">
+            <div class="cloud-upload-icon">🖼️</div>
+            <div class="cloud-upload-hint">點擊或拖放封面圖（JPG/PNG/WebP，限 10MB）</div>
+          </div>
+        </div>
+
+        <!-- 附圖 -->
+        <div class="form-group" style="grid-column:1/-1;margin:0;">
+          <label class="form-label">附圖（多張）</label>
+          <div class="cloud-upload-zone" id="imagesZone"
+               onclick="_imagesUploader.pickFile()"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault();this.classList.remove('dragover');_imagesUploader.handleFiles(event.dataTransfer.files)">
+            <div class="cloud-upload-icon">📷</div>
+            <div class="cloud-upload-hint">點擊或拖放附圖（可多張）</div>
+          </div>
+          <div class="multi-preview" id="imagesPreview"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeEdit()">取消</button>
+      <button class="btn btn-primary" onclick="saveRecord()">
+        <span id="saveBtnLabel">儲存</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap"></div>
+<script src="../admin.js"></script>
+<script>
+/* ════════════════════════════════════════
+   政績專區管理後台 — 頁面邏輯
+   ════════════════════════════════════════ */
+
+Auth.require('staff');
+
+// 延伸 API 物件（政績）
+API.achievements = {
+  list(params = {}) {
+    return API.get('/achievements?' + new URLSearchParams(params));
+  },
+  create(data)      { return API.post('/achievements', data); },
+  update(id, data)  { return API.patch(`/achievements/${id}`, data); },
+  delete(id)        { return API.delete(`/achievements/${id}`); },
+};
+
+// ── 狀態
+let _pub = '', _search = '', _page = 1, _timer;
+let _tags = [];           // 目前 Modal 的標籤陣列
+let _coverUrl   = null;   // 封面圖 URL
+let _imagesUrls = [];     // 附圖 URL 陣列
+let _coverUploader, _imagesUploader;
+
+// ── CloudinaryUploader（輕量封裝，不依賴 caseId）
+class CloudinaryUploader {
+  constructor({ onUpload, multiple = false }) {
+    this._onUpload = onUpload;
+    this._multiple = multiple;
+  }
+  pickFile() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.multiple = this._multiple;
+    input.onchange = e => this.handleFiles(e.target.files);
+    input.click();
+  }
+  async handleFiles(files) {
+    for (const file of files) {
+      if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+        toast.warn(`不支援的格式：${file.name}`); continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.warn(`檔案過大（限 10MB）：${file.name}`); continue;
+      }
+      await this._upload(file);
+    }
+  }
+  async _upload(file) {
+    // 走後台 API 上傳至 Cloudinary（透過後端中繼）
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('imageType', 'achievement');
+    try {
+      const res = await fetch(ADMIN_CONFIG.API_BASE + '/images/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${Auth.getToken()}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (data.success) {
+        this._onUpload(data.secure_url);
+        toast.success('圖片上傳成功');
+      } else {
+        toast.error('圖片上傳失敗，請重試');
+      }
+    } catch {
+      toast.error('上傳時發生錯誤，請重試');
+    }
+  }
+}
+
+// ── 初始化上傳器
+function initUploaders() {
+  _coverUploader = new CloudinaryUploader({
+    multiple: false,
+    onUpload(url) {
+      _coverUrl = url;
+      document.getElementById('coverPreviewImg').src = url;
+      document.getElementById('coverPreviewWrap').style.display = '';
+      document.getElementById('coverZone').style.display = 'none';
+    },
+  });
+  _imagesUploader = new CloudinaryUploader({
+    multiple: true,
+    onUpload(url) {
+      _imagesUrls.push(url);
+      renderImagesPreview();
+    },
+  });
+}
+
+function removeCover() {
+  _coverUrl = null;
+  document.getElementById('coverPreviewWrap').style.display = 'none';
+  document.getElementById('coverZone').style.display = '';
+}
+
+function renderImagesPreview() {
+  const wrap = document.getElementById('imagesPreview');
+  wrap.innerHTML = _imagesUrls.map((url, i) => `
+    <div class="multi-preview-item">
+      <img src="${url}" alt="附圖 ${i+1}">
+      <button class="multi-preview-del" onclick="_removeImg(${i})">✕</button>
+    </div>`).join('');
+  window._removeImg = (i) => {
+    _imagesUrls.splice(i, 1);
+    renderImagesPreview();
+  };
+}
+
+// ── 標籤處理
+function handleTagKey(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.replace(',', '').trim();
+    if (val && !_tags.includes(val)) {
+      _tags.push(val);
+      renderTags();
+    }
+    e.target.value = '';
+  } else if (e.key === 'Backspace' && !e.target.value && _tags.length) {
+    _tags.pop();
+    renderTags();
+  }
+}
+function renderTags() {
+  const wrap = document.getElementById('tagWrap');
+  // 清除舊 chips，保留 input
+  wrap.querySelectorAll('.tag-chip').forEach(el => el.remove());
+  const input = document.getElementById('tagInput');
+  _tags.forEach((tag, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `${tag} <button onclick="_removeTag(${i})">✕</button>`;
+    wrap.insertBefore(chip, input);
+  });
+  window._removeTag = (i) => { _tags.splice(i, 1); renderTags(); };
+}
+
+// ── 防抖搜尋
+function debounce() {
+  clearTimeout(_timer);
+  _timer = setTimeout(() => {
+    _search = document.getElementById('searchInput').value.trim();
+    _page = 1;
+    load();
+  }, 400);
+}
+
+// ── 篩選 pub
+function setPub(btn, val) {
+  document.querySelectorAll('[data-pub]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _pub = val;
+  _page = 1;
+  load();
+}
+
+// ── 載入列表
+async function load() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = `<div class="loading-row" style="grid-column:1/-1;"><div class="spinner"></div>載入中…</div>`;
+
+  const params = { page: _page, limit: 20 };
+  if (_search) params.search = _search;
+  if (_pub !== '') params.isPublic = _pub;
+  if (document.getElementById('typeFilter').value)
+    params.type = document.getElementById('typeFilter').value;
+
+  const data = await API.achievements.list(params);
+  if (!data) return;
+
+  document.getElementById('totalCount').textContent = `共 ${data.total ?? 0} 筆政績`;
+
+  if (!data.items?.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);">
+      <div style="font-size:40px;margin-bottom:12px;">🏆</div>
+      <div>目前尚無政績資料</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = data.items.map(item => renderCard(item)).join('');
+
+  // 分頁
+  const pager = new TablePager({ containerId: 'cardGrid', paginationId: 'pagination', perPage: 20 });
+  pager.currentPage = _page;
+  pager.render(data.total, data.totalPages);
+  pager.onPageChange = (p) => { _page = p; load(); };
+}
+
+// ── 渲染單張卡片
+function renderCard(item) {
+  const isPinned  = item.isPinned || item.importance === '重點';
+  const isPublic  = item.isPublic !== false;
+  const coverHtml = item.coverImage
+    ? `<img class="ach-admin-cover" src="${item.coverImage}" alt="${item.title}" loading="lazy">`
+    : `<div class="ach-admin-cover-ph">🏆</div>`;
+
+  return `
+    <div class="ach-admin-card">
+      ${coverHtml}
+      <div class="ach-admin-body">
+        <div class="ach-admin-meta">
+          ${isPinned ? `<span class="ach-admin-badge pinned">🔖 重點</span>` : ''}
+          <span class="ach-admin-badge">${item.type || '其他'}</span>
+        </div>
+        <div class="ach-admin-title">${item.title}</div>
+        <div class="ach-admin-sub">
+          <span>📅 ${item.date || '—'}</span>
+          <span class="ach-admin-likes">❤ ${item.likes || 0}</span>
+          <span class="badge badge-${isPublic ? 'closed' : 'pending'}">${isPublic ? '公開' : '未公開'}</span>
+        </div>
+      </div>
+      <div class="ach-admin-actions">
+        <div class="action-toggle">
+          <span style="font-size:11px;">公開</span>
+          <div class="neu-toggle ${isPublic ? 'on' : ''}"
+               onclick="togglePublic('${item.id}', this)"
+               title="${isPublic ? '點擊取消公開' : '點擊公開'}"></div>
+        </div>
+        <div class="action-toggle" style="margin-left:8px;">
+          <span style="font-size:11px;">置頂</span>
+          <div class="neu-toggle ${isPinned ? 'on' : ''}"
+               onclick="togglePin('${item.id}', this)"
+               title="${isPinned ? '取消置頂' : '設為置頂'}"></div>
+        </div>
+        <div class="action-btns">
+          <button class="btn-icon" onclick="openEdit('${item.id}')" title="編輯">✏️</button>
+          <button class="btn-icon danger" onclick="confirmDelete('${item.id}', '${item.title.replace(/'/g, "\\'")}')">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── 切換公開狀態
+async function togglePublic(id, toggleEl) {
+  const isOn = toggleEl.classList.contains('on');
+  const data = await API.achievements.update(id, { isPublic: !isOn });
+  if (data?.success) {
+    toggleEl.classList.toggle('on');
+    toast.success(isOn ? '已設為未公開' : '已設為公開');
+  } else {
+    toast.error('操作失敗，請重試');
+  }
+}
+
+// ── 切換置頂
+async function togglePin(id, toggleEl) {
+  const isOn = toggleEl.classList.contains('on');
+  const data = await API.achievements.update(id, { importance: isOn ? '一般' : '重點' });
+  if (data?.success) {
+    toggleEl.classList.toggle('on');
+    toast.success(isOn ? '已取消置頂' : '已設為置頂重點');
+  } else {
+    toast.error('操作失敗，請重試');
+  }
+}
+
+// ── 刪除
+function confirmDelete(id, title) {
+  Modal.confirm(
+    '確認刪除',
+    `確定要刪除「${title}」？此操作無法復原。`,
+    async () => {
+      const data = await API.achievements.delete(id);
+      if (data?.success) {
+        toast.success('已刪除');
+        load();
+      } else {
+        toast.error('刪除失敗，請重試');
+      }
+    }
+  );
+}
+
+// ── 開啟新增 Modal
+function openAdd() {
+  document.getElementById('modalTitle').textContent = '新增政績';
+  document.getElementById('editId').value = '';
+  document.getElementById('e-title').value = '';
+  document.getElementById('e-type').value = '';
+  document.getElementById('e-date').value = '';
+  document.getElementById('e-content').value = '';
+  document.getElementById('e-importance').value = '一般';
+  document.getElementById('e-pub').classList.remove('on');
+  _tags = [];
+  renderTags();
+  _coverUrl = null;
+  _imagesUrls = [];
+  document.getElementById('coverPreviewWrap').style.display = 'none';
+  document.getElementById('coverZone').style.display = '';
+  renderImagesPreview();
+  Modal.open('editModal');
+}
+
+// ── 開啟編輯 Modal
+async function openEdit(id) {
+  document.getElementById('modalTitle').textContent = '編輯政績';
+  const data = await API.get(`/achievements/${id}`);
+  if (!data) return;
+  const item = data.item || data;
+
+  document.getElementById('editId').value        = id;
+  document.getElementById('e-title').value       = item.title || '';
+  document.getElementById('e-type').value        = item.type  || '';
+  document.getElementById('e-date').value        = item.date  || '';
+  document.getElementById('e-content').value     = item.content || '';
+  document.getElementById('e-importance').value  = item.importance || '一般';
+  if (item.isPublic) document.getElementById('e-pub').classList.add('on');
+  else               document.getElementById('e-pub').classList.remove('on');
+
+  _tags = Array.isArray(item.tags) ? [...item.tags] : [];
+  renderTags();
+
+  _coverUrl = item.coverImage || null;
+  if (_coverUrl) {
+    document.getElementById('coverPreviewImg').src = _coverUrl;
+    document.getElementById('coverPreviewWrap').style.display = '';
+    document.getElementById('coverZone').style.display = 'none';
+  } else {
+    document.getElementById('coverPreviewWrap').style.display = 'none';
+    document.getElementById('coverZone').style.display = '';
+  }
+
+  _imagesUrls = Array.isArray(item.images) ? [...item.images] : [];
+  renderImagesPreview();
+
+  Modal.open('editModal');
+}
+
+// ── 關閉 Modal
+function closeEdit() { Modal.close('editModal'); }
+
+// ── 儲存
+async function saveRecord() {
+  const id      = document.getElementById('editId').value;
+  const title   = document.getElementById('e-title').value.trim();
+  const type    = document.getElementById('e-type').value;
+
+  if (!title) { toast.warn('請輸入政績名稱'); return; }
+  if (!type)  { toast.warn('請選擇政績類型'); return; }
+
+  const payload = {
+    title,
+    type,
+    date:       document.getElementById('e-date').value,
+    content:    document.getElementById('e-content').value.trim(),
+    importance: document.getElementById('e-importance').value,
+    isPublic:   document.getElementById('e-pub').classList.contains('on'),
+    tags:       _tags,
+    coverImage: _coverUrl,
+    images:     _imagesUrls,
+  };
+
+  const label = document.getElementById('saveBtnLabel');
+  label.textContent = '儲存中…';
+
+  const data = id
+    ? await API.achievements.update(id, payload)
+    : await API.achievements.create(payload);
+
+  label.textContent = '儲存';
+
+  if (data?.success) {
+    toast.success(id ? '已更新政績' : '已新增政績');
+    closeEdit();
+    load();
+  } else {
+    toast.error('儲存失敗，請重試');
+  }
+}
+
+// ── 頁面初始化
+document.addEventListener('DOMContentLoaded', () => {
+  initUploaders();
+  load();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案件管理 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+
+  <!-- SIDEBAR（共用，同 dashboard） -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🏛️</div>
+      <div class="brand-text">
+        <div class="brand-name">市民服務平台</div>
+        <div class="brand-role">Admin Console</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarUserName">載入中…</div>
+        <span class="user-tag" id="sidebarUserTag">幕僚</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" data-page="dashboard" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item active" data-page="cases" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" data-page="cases-new" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" data-page="users" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" data-page="settings" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" data-page="super-admin" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-toggle" onclick="Sidebar.toggle()">
+        <span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">案件管理</div>
+        <div class="topbar-subtitle" id="totalCount">載入中…</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="Sidebar.navigate('cases-new')">＋ 新增案件</button>
+        <button class="topbar-btn" onclick="loadCases()" title="重新整理">🔄</button>
+        <button class="topbar-btn" id="exportBtn" onclick="exportCSV()" title="匯出 CSV">📥</button>
+        <button class="topbar-btn" onclick="Auth.logout()" title="登出">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+
+      <!-- 篩選列 -->
+      <div class="neu-card section-gap" style="padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <!-- 搜尋 -->
+          <div class="search-bar" style="flex:1;min-width:200px;max-width:320px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜尋案件編號、標題、陳情人…"
+                   oninput="debounceSearch()">
+          </div>
+
+          <!-- 狀態篩選 -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="statusTabs">
+            <button class="filter-tab active" data-status="" onclick="setStatus(this,'')">全部</button>
+            <button class="filter-tab" data-status="待受理" onclick="setStatus(this,'待受理')">⏸ 待受理</button>
+            <button class="filter-tab" data-status="處理中" onclick="setStatus(this,'處理中')">▶ 處理中</button>
+            <button class="filter-tab" data-status="追蹤中" onclick="setStatus(this,'追蹤中')">👁 追蹤中</button>
+            <button class="filter-tab" data-status="已結案" onclick="setStatus(this,'已結案')">✓ 已結案</button>
+          </div>
+
+          <!-- 類型 & 是否公開 -->
+          <select class="neu-select" style="width:140px;" id="typeFilter" onchange="applyFilter()">
+            <option value="">全部類型</option>
+            <option>交通運輸</option><option>公共設施</option><option>衛福勞動</option>
+            <option>文教科技</option><option>環境建管</option><option>警消政風</option>
+            <option>市政議題</option><option>里鄰事務</option><option>其他服務</option>
+          </select>
+          <select class="neu-select" style="width:120px;" id="pubFilter" onchange="applyFilter()">
+            <option value="">公開狀態</option>
+            <option value="true">已公開</option>
+            <option value="false">未公開</option>
+          </select>
+
+          <!-- 批次操作（勾選後出現） -->
+          <div id="batchBar" style="display:none;align-items:center;gap:8px;margin-left:auto;">
+            <span style="font-size:13px;color:var(--text-muted)">已選 <strong id="selectedCount">0</strong> 件</span>
+            <button class="btn btn-sm" onclick="batchSetStatus('處理中')">→ 處理中</button>
+            <button class="btn btn-sm" onclick="batchSetStatus('已結案')">→ 結案</button>
+            <button class="btn btn-sm" onclick="batchTogglePublic(true)">公開</button>
+            <button class="btn btn-sm" onclick="batchTogglePublic(false)">隱藏</button>
+            <button class="btn btn-sm" style="color:var(--danger)" id="batchDelBtn" onclick="batchDelete()">刪除</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div class="table-wrap section-gap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:40px;">
+                <input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)">
+              </th>
+              <th>案件編號</th>
+              <th>標題</th>
+              <th>類型</th>
+              <th>區域</th>
+              <th>狀態</th>
+              <th>公開</th>
+              <th>登錄日期</th>
+              <th style="width:100px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="caseTbody">
+            <tr><td colspan="9"><div class="loading-row"><div class="spinner"></div>載入中…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+
+    </div>
+  </div>
+</div>
+<div class="toast-wrap"></div>
+
+<script src="js/admin.js"></script>
+<script>
+Auth.require('staff');
+if (!Auth.isAdmin()) document.getElementById('exportBtn').style.display = 'none';
+
+// ── 狀態
+let _page = 1, _status = '', _type = '', _pub = '', _search = '';
+let _selectedIds = new Set();
+let _searchTimer;
+const pager = new TablePager({ containerId:'caseTbody', paginationId:'pagination', perPage:20 });
+pager.onPageChange = p => { _page = p; loadCases(); };
+
+function debounceSearch() {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => { _page=1; _search=document.getElementById('searchInput').value.trim(); loadCases(); }, 400);
+}
+
+function setStatus(btn, val) {
+  document.querySelectorAll('#statusTabs .filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _status = val; _page = 1; loadCases();
+}
+
+function applyFilter() {
+  _type = document.getElementById('typeFilter').value;
+  _pub  = document.getElementById('pubFilter').value;
+  _page = 1; loadCases();
+}
+
+// ── 載入案件
+async function loadCases() {
+  const tbody = document.getElementById('caseTbody');
+  tbody.innerHTML = '<tr><td colspan="9"><div class="loading-row"><div class="spinner"></div>載入中…</div></td></tr>';
+  _selectedIds.clear(); updateBatchBar();
+
+  const params = { page: _page, limit: 20 };
+  if (_status) params.status   = _status;
+  if (_type)   params.category = _type;
+  if (_pub)    params.public   = _pub;
+  if (_search) params.q        = _search;
+
+  const data = await API.cases.list(params);
+  if (!data) return;
+
+  document.getElementById('totalCount').textContent = `共 ${data.total || 0} 件`;
+
+  if (!data.items || !data.items.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">沒有符合條件的案件</div></div></td></tr>`;
+    pager.render(0,0); return;
+  }
+
+  tbody.innerHTML = data.items.map(item => `
+    <tr>
+      <td><input type="checkbox" class="row-check" value="${item.id}" onchange="toggleRowCheck(this)"></td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text-muted)">${item.caseId||'—'}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;">
+        <a href="cases-detail.html?id=${item.id}" style="color:var(--text);text-decoration:none;"
+           onmouseover="this.style.color='var(--primary-dark)'" onmouseout="this.style.color='var(--text)'">
+          ${escHtml(item.title||'—')}
+        </a>
+      </td>
+      <td><span style="font-size:12px;background:var(--primary-pale);color:var(--primary-dark);padding:3px 10px;border-radius:var(--r-full);font-weight:600;">${item.caseType||'—'}</span></td>
+      <td style="font-size:13px;color:var(--text-muted)">${item.caseArea||'—'}</td>
+      <td>${Status.badge(item.status)}</td>
+      <td>
+        <div class="neu-toggle ${item.isPublic?'on':''}" onclick="togglePublic('${item.id}',${item.isPublic},this)"
+             title="${item.isPublic?'已公開（點擊隱藏）':'未公開（點擊公開）'}"></div>
+      </td>
+      <td style="font-size:12px;color:var(--text-muted);white-space:nowrap">${DateUtil.fmt(item.createdAt)}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <a href="cases-detail.html?id=${item.id}" class="btn btn-icon btn-sm" title="編輯">✏️</a>
+          ${Auth.isAdmin() ? `<button class="btn btn-icon btn-sm" onclick="deleteCase('${item.id}')" title="刪除" style="color:var(--danger)">🗑</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+
+  pager.render(data.total, data.totalPages);
+}
+
+// ── 公開切換
+async function togglePublic(id, current, el) {
+  const next = !current;
+  const data = await API.cases.update(id, { isPublic: next });
+  if (data?.success) {
+    el.classList.toggle('on', next);
+    toast.success(next ? '已設為公開' : '已設為不公開');
+  } else { toast.error('操作失敗'); }
+}
+
+// ── 刪除
+function deleteCase(id) {
+  if (!Auth.isAdmin()) { toast.warn('需要管理員權限'); return; }
+  Modal.confirm('確認刪除案件', '此操作不可復原，確定要刪除這筆案件嗎？', async () => {
+    const r = await API.cases.delete(id);
+    if (r?.success) { toast.success('案件已刪除'); loadCases(); }
+    else toast.error('刪除失敗');
+  });
+}
+
+// ── 勾選
+function toggleCheckAll(el) {
+  document.querySelectorAll('.row-check').forEach(cb => {
+    cb.checked = el.checked;
+    el.checked ? _selectedIds.add(cb.value) : _selectedIds.delete(cb.value);
+  });
+  updateBatchBar();
+}
+function toggleRowCheck(el) {
+  el.checked ? _selectedIds.add(el.value) : _selectedIds.delete(el.value);
+  updateBatchBar();
+}
+function updateBatchBar() {
+  const bar = document.getElementById('batchBar');
+  const cnt = document.getElementById('selectedCount');
+  const has = _selectedIds.size > 0;
+  bar.style.display = has ? 'flex' : 'none';
+  if (cnt) cnt.textContent = _selectedIds.size;
+  if (!Auth.isAdmin()) document.getElementById('batchDelBtn').style.display = 'none';
+}
+
+// ── 批次操作
+async function batchSetStatus(status) {
+  if (!_selectedIds.size) return;
+  let ok = 0;
+  for (const id of _selectedIds) {
+    const r = await API.cases.update(id, { status });
+    if (r?.success) ok++;
+  }
+  toast.success(`已更新 ${ok} 件狀態為「${status}」`);
+  loadCases();
+}
+async function batchTogglePublic(pub) {
+  if (!_selectedIds.size) return;
+  let ok = 0;
+  for (const id of _selectedIds) {
+    const r = await API.cases.update(id, { isPublic: pub });
+    if (r?.success) ok++;
+  }
+  toast.success(`已更新 ${ok} 件公開狀態`);
+  loadCases();
+}
+async function batchDelete() {
+  if (!Auth.isAdmin()) { toast.warn('需要管理員權限'); return; }
+  Modal.confirm(`確認刪除 ${_selectedIds.size} 件案件`, '此操作不可復原！', async () => {
+    let ok = 0;
+    for (const id of _selectedIds) {
+      const r = await API.cases.delete(id);
+      if (r?.success) ok++;
+    }
+    toast.success(`已刪除 ${ok} 件`);
+    loadCases();
+  });
+}
+
+// ── 匯出
+async function exportCSV() {
+  if (!Auth.isAdmin()) { toast.warn('需要管理員權限'); return; }
+  toast.info('準備匯出…');
+  const data = await API.cases.list({ limit: 9999 });
+  if (!data?.items) { toast.error('匯出失敗'); return; }
+  const headers = ['案件編號','標題','類型','區域','狀態','是否公開','建立時間','結案日期'];
+  const rows = data.items.map(i => [i.caseId,i.title,i.caseType,i.caseArea,i.status,i.isPublic?'是':'否',DateUtil.fmt(i.createdAt),i.closedDate||'']);
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cases_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast.success('匯出成功');
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+loadCases();
+</script>
+</body>
+</html>

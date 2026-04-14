@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>現場會勘 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="brand-icon">🏛️</div><div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div></div>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarAvatar">A</div><div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label">政績版功能</div>
+      <div class="nav-item active" onclick="Sidebar.navigate('inspections')"><span class="nav-icon">🏗️</span><span class="nav-label">現場會勘</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('interpellations')"><span class="nav-icon">🎤</span><span class="nav-label">國會質詢</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('proposals')"><span class="nav-icon">📜</span><span class="nav-label">國會提案</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div><div class="topbar-title">現場會勘管理</div><div class="topbar-subtitle" id="totalCount">載入中…</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openAdd()">＋ 新增會勘紀錄</button>
+        <button class="topbar-btn" onclick="load()" title="重新整理">🔄</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <div class="filter-row">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜尋會勘標題、地點…" oninput="debounce()">
+        </div>
+        <select class="neu-select" style="width:140px;" id="typeFilter" onchange="load()">
+          <option value="">全部類型</option>
+          <option>交通</option><option>環境</option><option>公共設施</option><option>其他</option>
+        </select>
+        <div class="filter-tab active" onclick="setPub(this,'')" data-pub="">全部</div>
+        <div class="filter-tab" onclick="setPub(this,'true')" data-pub="true">已公開</div>
+        <div class="filter-tab" onclick="setPub(this,'false')" data-pub="false">未公開</div>
+      </div>
+
+      <!-- 卡片式列表 -->
+      <div id="cardGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+        <div class="loading-row" style="grid-column:1/-1;"><div class="spinner"></div>載入中…</div>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 新增/編輯 Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">新增會勘紀錄</span>
+      <button class="modal-close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="grid-2" style="gap:16px;">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">會勘標題 <span class="req">*</span></label>
+          <input type="text" class="neu-input" id="e-title" placeholder="會勘事件名稱">
+        </div>
+        <div class="form-group">
+          <label class="form-label">會勘日期 <span class="req">*</span></label>
+          <input type="date" class="neu-input" id="e-date" style="padding-left:16px;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">會勘類型</label>
+          <select class="neu-select" id="e-type">
+            <option>交通</option><option>環境</option><option>公共設施</option><option>其他</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">會勘地點</label>
+          <input type="text" class="neu-input" id="e-location" placeholder="地址或地名">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">公開摘要</label>
+          <textarea class="neu-textarea" id="e-summary" rows="4" placeholder="對外公開的說明內容…"></textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;margin:0;">
+          <label class="form-label">現場照片</label>
+          <div class="img-upload-zone" id="inspZone"><div class="upload-icon">📷</div><div class="upload-hint">點擊或拖放照片</div></div>
+          <div class="img-preview-grid" id="inspPreview"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+        <label class="form-label" style="margin:0;">對外公開</label>
+        <div class="neu-toggle" id="e-pub" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeEdit()">取消</button>
+      <button class="btn btn-primary" onclick="saveRecord()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap"></div>
+<script src="js/admin.js"></script>
+<script>
+Auth.require('staff');
+let _pub = '', _search = '', _page = 1, _timer;
+let _uploader;
+
+function debounce() {
+  clearTimeout(_timer);
+  _timer = setTimeout(() => { _search = document.getElementById('searchInput').value.trim(); _page=1; load(); }, 400);
+}
+function setPub(btn, val) {
+  document.querySelectorAll('[data-pub]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); _pub = val; _page=1; load();
+}
+
+async function load() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '<div class="loading-row" style="grid-column:1/-1;"><div class="spinner"></div>載入中…</div>';
+  const params = { page:_page, limit:12 };
+  if (_pub)    params.public   = _pub;
+  if (_search) params.q        = _search;
+  const t = document.getElementById('typeFilter').value;
+  if (t) params.type = t;
+
+  const data = await API.inspections.list(params);
+  document.getElementById('totalCount').textContent = `共 ${data?.total||0} 筆會勘紀錄`;
+
+  if (!data?.items?.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🏗️</div><div class="empty-title">尚無會勘紀錄</div></div>';
+    return;
+  }
+  grid.innerHTML = data.items.map(item => `
+    <div class="neu-card" style="cursor:pointer;transition:box-shadow .2s;" onmouseenter="this.style.boxShadow='var(--neu-out-lg)'" onmouseleave="this.style.boxShadow='var(--neu-out)'">
+      ${item.photos?.[0] ? `<img src="${item.photos[0]}" alt="會勘照片" style="width:100%;height:160px;object-fit:cover;border-radius:var(--r) var(--r) 0 0;margin:-24px -24px 16px;width:calc(100% + 48px);">` : ''}
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);background:var(--primary-pale);color:var(--primary-dark);">${item.type||'其他'}</span>
+        <div class="neu-toggle ${item.isPublic?'on':''}" onclick="quickToggle('${item.id}',${item.isPublic},this);event.stopPropagation();" style="width:36px;height:20px;" title="${item.isPublic?'已公開':'未公開'}"></div>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">${DateUtil.fmt(item.date)}</span>
+      </div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px;">${item.title||'—'}</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">${item.location||''}</div>
+      ${item.summary ? `<div style="font-size:13px;line-height:1.7;color:var(--text);margin-bottom:12px;">${item.summary.slice(0,80)}${item.summary.length>80?'…':''}</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:auto;">
+        <button class="btn btn-sm" onclick="openEdit('${item.id}');event.stopPropagation();" style="flex:1;">✏️ 編輯</button>
+        ${Auth.isAdmin()?`<button class="btn btn-sm" onclick="del('${item.id}');event.stopPropagation();" style="color:var(--danger);">🗑</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+async function quickToggle(id, cur, el) {
+  const r = await API.inspections.update(id, { isPublic: !cur });
+  if (r?.success) el.classList.toggle('on', !cur);
+  else toast.error('操作失敗');
+}
+
+let _editId = null;
+function openAdd() {
+  _editId = null;
+  document.getElementById('modalTitle').textContent = '新增會勘紀錄';
+  ['e-title','e-location','e-summary'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('e-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('e-pub').classList.remove('on');
+  document.getElementById('editId').value = '';
+  _uploader = new ImageUploader({zoneId:'inspZone',previewId:'inspPreview',caseId:'insp_new',type:'before'});
+  Modal.open('editModal');
+}
+
+async function openEdit(id) {
+  const data = await API.inspections.get ? API.inspections.get(id) : null;
+  _editId = id;
+  document.getElementById('modalTitle').textContent = '編輯會勘紀錄';
+  if (data?.item) {
+    const i = data.item;
+    document.getElementById('e-title').value    = i.title    || '';
+    document.getElementById('e-date').value     = i.date?.split('T')[0] || '';
+    document.getElementById('e-type').value     = i.type     || '其他';
+    document.getElementById('e-location').value = i.location || '';
+    document.getElementById('e-summary').value  = i.summary  || '';
+    document.getElementById('e-pub').classList.toggle('on', !!i.isPublic);
+    _uploader = new ImageUploader({zoneId:'inspZone',previewId:'inspPreview',caseId:id,type:'before'});
+    if (i.photos?.length) { _uploader.images = i.photos.map(u=>({url:u,loading:false})); _uploader._renderPreview(); }
+  }
+  Modal.open('editModal');
+}
+function closeEdit() { Modal.close('editModal'); }
+
+async function saveRecord() {
+  const body = {
+    title:    document.getElementById('e-title').value.trim(),
+    date:     document.getElementById('e-date').value,
+    type:     document.getElementById('e-type').value,
+    location: document.getElementById('e-location').value.trim(),
+    summary:  document.getElementById('e-summary').value.trim(),
+    isPublic: document.getElementById('e-pub').classList.contains('on'),
+    photos:   _uploader?.getUrls() || [],
+  };
+  if (!body.title || !body.date) { toast.warn('請填寫標題與日期'); return; }
+  const r = _editId
+    ? await API.inspections.update(_editId, body)
+    : await API.inspections.create(body);
+  if (r?.success) { toast.success(_editId?'已更新':'已新增'); closeEdit(); load(); }
+  else toast.error('操作失敗');
+}
+
+function del(id) {
+  Modal.confirm('確認刪除', '確定要刪除這筆會勘紀錄嗎？', async () => {
+    const r = await API.inspections.delete(id);
+    if (r?.success) { toast.success('已刪除'); load(); } else toast.error('刪除失敗');
+  });
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系統設定 — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="brand-icon">🏛️</div><div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div></div>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarAvatar">A</div><div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item active" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div><div class="topbar-title">系統設定</div><div class="topbar-subtitle">Webhook、LINE、靜態數字設定</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="saveAll()">💾 儲存所有設定</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+      <div id="loadingWrap" class="loading-row"><div class="spinner"></div>載入設定…</div>
+      <div id="settingsWrap" style="display:none;display:flex;flex-direction:column;gap:24px;">
+
+        <!-- Webhook 設定 -->
+        <div class="neu-card">
+          <div class="card-title"><span class="card-icon">🔗</span>Webhook 端點設定</div>
+          <div style="margin-bottom:14px;padding:12px 16px;background:var(--primary-pale);border-radius:var(--r-sm);font-size:13px;color:var(--primary-dark);">
+            ⚠️ 變更 Webhook 路徑後，前端網站的 config.js 也需要同步更新。
+          </div>
+
+          <div class="grid-2" style="gap:18px;">
+            <div class="form-group">
+              <label class="form-label">n8n 基礎網址</label>
+              <input type="url" class="neu-input" id="s-n8nBase" placeholder="https://xxx.zeabur.app">
+            </div>
+            <div class="form-group">
+              <label class="form-label">客戶識別碼 (prefix)</label>
+              <input type="text" class="neu-input" id="s-prefix" placeholder="transparentcafe">
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label class="form-label">自動產生的 Webhook 路徑</label>
+            <div style="display:grid;gap:8px;" id="webhookPaths">
+              <!-- 動態產生 -->
+            </div>
+          </div>
+
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">
+              <button class="btn btn-sm" onclick="testWebhooks()" style="float:right;">🧪 測試所有端點</button>
+              Webhook 連通測試
+            </label>
+            <div id="testResults" style="display:none;margin-top:10px;display:grid;gap:8px;"></div>
+          </div>
+        </div>
+
+        <!-- LINE 設定 -->
+        <div class="neu-card">
+          <div class="card-title"><span class="card-icon">💬</span>LINE 通知設定</div>
+          <div class="grid-2" style="gap:18px;">
+            <div class="form-group">
+              <label class="form-label">LINE Channel Token</label>
+              <input type="password" class="neu-input" id="s-lineToken" placeholder="Channel Access Token">
+            </div>
+            <div class="form-group">
+              <label class="form-label">LINE Channel Secret</label>
+              <input type="password" class="neu-input" id="s-lineSecret" placeholder="Channel Secret">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">幕僚群組 ID（逾期警示用）</label>
+            <input type="text" class="neu-input" id="s-lineGroupId" placeholder="C開頭的群組 ID">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">LINE 官方帳號連結</label>
+            <input type="url" class="neu-input" id="s-lineUrl" placeholder="https://lin.ee/xxxxxx">
+          </div>
+        </div>
+
+        <!-- Notion 設定 -->
+        <div class="neu-card">
+          <div class="card-title"><span class="card-icon">📁</span>Notion 資料庫設定</div>
+          <div class="grid-2" style="gap:18px;">
+            <div class="form-group">
+              <label class="form-label">案件主資料庫 ID</label>
+              <input type="text" class="neu-input" id="s-dbCases" placeholder="32 碼 Database ID" maxlength="36">
+            </div>
+            <div class="form-group">
+              <label class="form-label">系統模式</label>
+              <select class="neu-select" id="s-mode" onchange="onModeChange()">
+                <option value="transparent">純透明版（數據分析）</option>
+                <option value="achievement">政績版（曾咨耀型）</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 政績版額外資料庫 -->
+          <div id="achievementDB" style="display:none;">
+            <div style="margin-bottom:12px;padding:10px 14px;background:var(--warning-pale);border-radius:var(--r-sm);font-size:13px;color:var(--amber);">
+              政績版需要額外的 Notion 資料庫
+            </div>
+            <div class="grid-2" style="gap:18px;">
+              <div class="form-group">
+                <label class="form-label">網站設定庫 ID</label>
+                <input type="text" class="neu-input" id="s-dbConfig" placeholder="32 碼 ID">
+              </div>
+              <div class="form-group">
+                <label class="form-label">現場會勘資料庫 ID</label>
+                <input type="text" class="neu-input" id="s-dbInspections" placeholder="32 碼 ID">
+              </div>
+              <div class="form-group">
+                <label class="form-label">國會質詢資料庫 ID</label>
+                <input type="text" class="neu-input" id="s-dbInterpellations" placeholder="32 碼 ID">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">國會提案資料庫 ID</label>
+                <input type="text" class="neu-input" id="s-dbProposals" placeholder="32 碼 ID">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 政績版靜態數字 -->
+        <div class="neu-card" id="staticStatsCard" style="display:none;">
+          <div class="card-title"><span class="card-icon">🔢</span>靜態統計數字（政績版）</div>
+          <div style="margin-bottom:14px;font-size:13px;color:var(--text-muted);">
+            以下數字無法從 Notion 即時抓取，請幕僚手動維護。
+          </div>
+          <div class="grid-2" style="gap:18px;">
+            <div class="form-group">
+              <label class="form-label">現場會勘次數</label>
+              <input type="number" class="neu-input" id="s-inspCount" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">國會質詢次數</label>
+              <input type="number" class="neu-input" id="s-interCount" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">國會提案次數</label>
+              <input type="number" class="neu-input" id="s-propCount" min="0" placeholder="0">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">服務開始日期</label>
+              <input type="date" class="neu-input" id="s-startDate" style="padding-left:16px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Cloudinary -->
+        <div class="neu-card">
+          <div class="card-title"><span class="card-icon">🖼️</span>圖片 CDN（Cloudinary）</div>
+          <div class="grid-2" style="gap:18px;">
+            <div class="form-group">
+              <label class="form-label">Cloud Name</label>
+              <input type="text" class="neu-input" id="s-cdnName" placeholder="your-cloud-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <input type="text" class="neu-input" id="s-cdnKey" placeholder="API Key">
+            </div>
+            <div class="form-group" style="margin:0;grid-column:1/-1;">
+              <label class="form-label">API Secret</label>
+              <input type="password" class="neu-input" id="s-cdnSecret" placeholder="API Secret">
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /settingsWrap -->
+    </div>
+  </div>
+</div>
+<div class="toast-wrap"></div>
+<script src="js/admin.js"></script>
+<script>
+Auth.require('admin');
+
+const ENDPOINTS = ['stats','list','query','submit','dashboard','notify'];
+
+function onModeChange() {
+  const isAch = document.getElementById('s-mode').value === 'achievement';
+  document.getElementById('achievementDB').style.display   = isAch ? '' : 'none';
+  document.getElementById('staticStatsCard').style.display = isAch ? '' : 'none';
+}
+
+function renderWebhookPaths() {
+  const base   = document.getElementById('s-n8nBase').value.trim().replace(/\/$/, '');
+  const prefix = document.getElementById('s-prefix').value.trim();
+  if (!base || !prefix) {
+    document.getElementById('webhookPaths').innerHTML = '<div style="font-size:13px;color:var(--text-light);">填寫上方兩欄後自動產生</div>';
+    return;
+  }
+  document.getElementById('webhookPaths').innerHTML = ENDPOINTS.map(ep => `
+    <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:var(--r-sm);box-shadow:var(--neu-in-sm);padding:8px 14px;">
+      <span style="font-size:11px;font-weight:700;color:var(--primary-dark);min-width:60px;text-transform:uppercase;">${ep}</span>
+      <span style="font-family:monospace;font-size:12px;color:var(--text-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+        ${base}/webhook/${prefix}/${ep}
+      </span>
+      <button class="btn btn-sm" onclick="copyPath('${base}/webhook/${prefix}/${ep}')" style="padding:4px 10px;font-size:11px;">複製</button>
+    </div>`).join('');
+}
+
+document.getElementById('s-n8nBase').addEventListener('input', renderWebhookPaths);
+document.getElementById('s-prefix').addEventListener('input',  renderWebhookPaths);
+
+function copyPath(path) {
+  navigator.clipboard.writeText(path).then(() => toast.info('已複製：' + path.split('/').slice(-2).join('/')));
+}
+
+async function testWebhooks() {
+  const base   = document.getElementById('s-n8nBase').value.trim().replace(/\/$/,'');
+  const prefix = document.getElementById('s-prefix').value.trim();
+  if (!base || !prefix) { toast.warn('請先填寫 n8n 基礎網址與 prefix'); return; }
+
+  const box = document.getElementById('testResults');
+  box.style.display = 'grid';
+  box.innerHTML = '<div class="loading-row"><div class="spinner"></div>測試中…</div>';
+
+  const results = await Promise.all(ENDPOINTS.map(async ep => {
+    const url = `${base}/webhook/${prefix}/${ep}`;
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 5000);
+      const res = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(timer);
+      return { ep, ok: res.ok, status: res.status };
+    } catch(e) {
+      return { ep, ok: false, status: e.name === 'AbortError' ? 'Timeout' : 'Error' };
+    }
+  }));
+
+  box.innerHTML = results.map(r => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:${r.ok?'var(--success-pale)':'var(--danger-pale)'};border-radius:var(--r-sm);">
+      <span style="font-size:16px;">${r.ok?'✅':'❌'}</span>
+      <span style="font-weight:600;font-size:13px;min-width:80px;">${r.ep}</span>
+      <span style="font-size:12px;color:var(--text-muted);">${r.ok?'連通正常':'無法連線 ('+r.status+')'}</span>
+    </div>`).join('');
+}
+
+async function loadSettings() {
+  const data = await API.settings.get();
+  document.getElementById('loadingWrap').style.display  = 'none';
+  document.getElementById('settingsWrap').style.display = 'flex';
+
+  if (!data?.settings) return;
+  const s = data.settings;
+  const set = (id, val) => { const el = document.getElementById(id); if(el && val !== undefined) el.value = val; };
+
+  set('s-n8nBase',   s.n8nBase);
+  set('s-prefix',    s.prefix);
+  set('s-lineToken', s.lineToken);
+  set('s-lineSecret',s.lineSecret);
+  set('s-lineGroupId',s.lineGroupId);
+  set('s-lineUrl',   s.lineUrl);
+  set('s-dbCases',   s.dbCases);
+  set('s-mode',      s.systemMode);
+  set('s-dbConfig',  s.dbConfig);
+  set('s-dbInspections',    s.dbInspections);
+  set('s-dbInterpellations',s.dbInterpellations);
+  set('s-dbProposals',      s.dbProposals);
+  set('s-inspCount',  s.inspectionsCount);
+  set('s-interCount', s.interpellationsCount);
+  set('s-propCount',  s.proposalsCount);
+  set('s-startDate',  s.serviceStartDate);
+  set('s-cdnName',    s.cloudinaryName);
+  set('s-cdnKey',     s.cloudinaryKey);
+  set('s-cdnSecret',  s.cloudinarySecret);
+
+  onModeChange();
+  renderWebhookPaths();
+
+  // 儲存到 localStorage 供其他頁面使用
+  if (s.systemMode) localStorage.setItem('system_mode', s.systemMode);
+}
+
+async function saveAll() {
+  const get = id => document.getElementById(id)?.value?.trim() || '';
+  const body = {
+    n8nBase:    get('s-n8nBase'),
+    prefix:     get('s-prefix'),
+    lineToken:  get('s-lineToken'),
+    lineSecret: get('s-lineSecret'),
+    lineGroupId:get('s-lineGroupId'),
+    lineUrl:    get('s-lineUrl'),
+    dbCases:    get('s-dbCases'),
+    systemMode: get('s-mode'),
+    dbConfig:              get('s-dbConfig'),
+    dbInspections:         get('s-dbInspections'),
+    dbInterpellations:     get('s-dbInterpellations'),
+    dbProposals:           get('s-dbProposals'),
+    inspectionsCount:      parseInt(get('s-inspCount'))||0,
+    interpellationsCount:  parseInt(get('s-interCount'))||0,
+    proposalsCount:        parseInt(get('s-propCount'))||0,
+    serviceStartDate:      get('s-startDate'),
+    cloudinaryName:        get('s-cdnName'),
+    cloudinaryKey:         get('s-cdnKey'),
+    cloudinarySecret:      get('s-cdnSecret'),
+  };
+
+  const r = await API.settings.update(body);
+  if (r?.success) {
+    localStorage.setItem('system_mode', body.systemMode);
+    toast.success('設定已儲存 ✓');
+  } else {
+    toast.error('儲存失敗，請重試');
+  }
+}
+
+loadSettings();
+</script>
+</body>
+</html>

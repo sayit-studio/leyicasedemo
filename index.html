@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數位服務處｜市民陳情服務平台</title>
+
+<!-- SEO -->
+<meta name="description" content="公開透明的市民陳情平台，線上登錄陳情、即時查詢案件進度，每件問題都有人跟進處理。">
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="數位服務處｜市民陳情服務平台">
+<meta property="og:description" content="公開透明的市民陳情平台，線上登錄陳情、即時查詢案件進度。">
+<meta property="og:image"       content="./og-image.png">
+<meta property="og:locale"      content="zh_TW">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#" onclick="showPage('home');return false;">
+      <div class="nav-brand-icon">🏛️</div>
+      <span class="nav-brand-name">數位服務處</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link active" href="#" onclick="showPage('home');return false;">首頁</a>
+      <a class="nav-link" href="#" onclick="showPage('list');return false;">陳情登錄</a>
+      <a class="nav-link" href="#" onclick="showPage('query');return false;">案件查詢</a>
+      <a class="nav-link" href="#" onclick="showPage('inspections');return false;">現場會勘</a>
+      <a class="nav-link" href="#" onclick="showPage('interpellations');return false;">國會質詢</a>
+      <a class="nav-link" href="#" onclick="showPage('proposals');return false;">國會提案</a>
+      <a class="nav-link" href="#" onclick="showPage('faq');return false;">常見問題</a>
+      <a class="nav-link nav-cta" href="form.html">＋ 我要陳情</a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a class="nav-link" href="#" onclick="showPage('home');return false;">🏠 首頁</a>
+    <a class="nav-link" href="#" onclick="showPage('list');return false;">📋 陳情登錄</a>
+    <a class="nav-link" href="#" onclick="showPage('query');return false;">🔍 案件查詢</a>
+    <a class="nav-link" href="#" onclick="showPage('inspections');return false;">🏗️ 現場會勘</a>
+    <a class="nav-link" href="#" onclick="showPage('interpellations');return false;">🎤 國會質詢</a>
+    <a class="nav-link" href="#" onclick="showPage('proposals');return false;">📜 國會提案</a>
+    <a class="nav-link" href="#" onclick="showPage('faq');return false;">❓ 常見問題</a>
+    <a class="nav-link nav-cta" href="form.html">＋ 我要陳情</a>
+  </div>
+</nav>
+
+<!-- ═══════════ HOME ═══════════ -->
+<section class="page-section active" id="page-home">
+
+  <!-- HERO -->
+  <div class="hero-unit">
+    <div class="hero-deco hero-deco-1"></div>
+    <div class="hero-deco hero-deco-2"></div>
+    <div class="hero-deco hero-deco-3"></div>
+    <div class="hero-deco hero-deco-4"></div>
+
+    <div class="hero-body">
+      <div class="hero-badge">🏛️ 數位透明・為民服務</div>
+      <h1 class="hero-title">
+        數位時代的<br>
+        <span class="accent">市民服務新標準</span>
+      </h1>
+      <p class="hero-sub">
+        透過數位化陳情平台，每一件市民的問題都將被看見、被追蹤、被解決。<br>
+        公開透明，讓服務有跡可循。
+      </p>
+      <div class="hero-btns">
+        <a href="form.html" class="btn-primary">🏛️ 立即陳情</a>
+        <a href="#" class="btn-outline" onclick="showPage('query');return false;">🔍 查詢進度</a>
+      </div>
+
+      <!-- 統計卡片 — 政績版 -->
+      <div class="stats-grid">
+
+        <!-- 主角：累積服務件數 -->
+        <div class="stat-card stat-hero" onclick="openModal('totalPetitions')" tabindex="0">
+          <div class="stat-hero-num">
+            <span class="stat-num skeleton" id="stat-total">—</span>
+            <span class="stat-num-unit">件</span>
+          </div>
+          <div class="stat-hero-msg">
+            <div class="stat-label">累積服務件數</div>
+            <div class="stat-hero-desc" id="stat-total-desc">資料載入中…</div>
+          </div>
+          <div class="stat-hint">點擊了解更多</div>
+        </div>
+
+        <!-- 配角 5 張 -->
+        <div class="stat-card" onclick="openModal('inspections')" tabindex="0">
+          <div class="stat-label">現場會勘次數</div>
+          <span class="stat-num skeleton" id="stat-insp">—</span>
+          <div class="stat-unit">次</div>
+          <div class="stat-hint">點擊了解更多</div>
+        </div>
+
+        <div class="stat-card" onclick="openModal('interpellations')" tabindex="0">
+          <div class="stat-label">國會質詢次數</div>
+          <span class="stat-num skeleton" id="stat-inter">—</span>
+          <div class="stat-unit">次</div>
+          <div class="stat-hint">點擊了解更多</div>
+        </div>
+
+        <div class="stat-card" onclick="openModal('proposals')" tabindex="0">
+          <div class="stat-label">國會提案次數</div>
+          <span class="stat-num skeleton" id="stat-prop">—</span>
+          <div class="stat-unit">次</div>
+          <div class="stat-hint">點擊了解更多</div>
+        </div>
+
+        <div class="stat-card" onclick="openModal('avgDays')" tabindex="0">
+          <div class="stat-label">平均回覆天數</div>
+          <span class="stat-num skeleton" id="stat-avg">—</span>
+          <div class="stat-unit">天</div>
+          <div class="stat-hint">點擊了解更多</div>
+        </div>
+
+        <div class="stat-card" onclick="openModal('topType')" tabindex="0">
+          <div class="stat-label">最多陳情類型</div>
+          <span class="stat-num skeleton" id="stat-top"
+                style="font-size:clamp(16px,2.5vw,22px);letter-spacing:0;">—</span>
+          <div class="stat-unit" id="stat-top-rate">—%</div>
+          <div class="stat-hint">點擊了解更多</div>
+        </div>
+
+      </div><!-- /stats-grid -->
+    </div><!-- /hero-body -->
+
+    <!-- 彈窗 -->
+    <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-big-num" id="modalNum"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-desc" id="modalDesc"></div>
+      </div>
+    </div>
+
+  </div><!-- /hero-unit -->
+
+  <!-- 儀表板 -->
+  <div class="dashboard-section">
+    <div class="section-wrap">
+      <div class="section-title">案件處理儀表板</div>
+      <div class="dashboard-grid">
+
+        <div class="dash-card">
+          <div class="dash-card-title">
+            <span>案件趨勢（新增 vs 結案）</span>
+            <div class="dash-tabs">
+              <button class="dash-tab active" data-period="7d">近7日</button>
+              <button class="dash-tab" data-period="30d">近一個月</button>
+              <button class="dash-tab" data-period="90d">近三個月</button>
+            </div>
+          </div>
+          <div class="bar-legend">
+            <span class="legend-dot legend-new"></span>新增
+            <span class="legend-dot legend-closed" style="margin-left:12px;"></span>結案
+          </div>
+          <div class="bar-chart" id="barChart"><div class="chart-loading">載入中…</div></div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-title"><span>當月案件處理量</span></div>
+          <div class="month-stats" id="monthStats">
+            <div class="month-stat-row"><span class="month-stat-label">本月新增</span><span class="month-stat-num" id="ms-new">—</span></div>
+            <div class="month-stat-row"><span class="month-stat-label">本月結案</span><span class="month-stat-num" id="ms-closed">—</span></div>
+            <div class="month-stat-row"><span class="month-stat-label">處理中</span><span class="month-stat-num" id="ms-progress">—</span></div>
+            <div class="month-progress-wrap"><div class="month-progress-bar" id="msProgressBar" style="width:0%"></div></div>
+            <div class="month-progress-label" id="msProgressLabel">結案率 0%</div>
+          </div>
+        </div>
+
+        <div class="dash-card dash-card-full">
+          <div class="dash-card-title"><span>案件類別比例</span></div>
+          <div class="pie-wrap">
+            <div class="pie-canvas-wrap">
+              <canvas id="pieChart" width="220" height="220"></canvas>
+            </div>
+            <div class="pie-legend" id="pieLegend"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 陳情流程 -->
+  <div class="flow-section">
+    <div class="section-wrap">
+      <div class="section-title" style="text-align:center;">如何提出陳情？</div>
+      <p style="text-align:center;font-size:15px;color:var(--color-text-muted);margin-bottom:40px;margin-top:-16px;">四個步驟，讓您的問題被看見、被解決</p>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="flow-num">01</div><div class="flow-icon">📝</div><div class="flow-step-title">填寫陳情表單</div><div class="flow-step-desc">說明問題地點、類型與詳細內容，留下聯絡資料方便後續溝通。</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-num">02</div><div class="flow-icon">🎫</div><div class="flow-step-title">取得案件編號</div><div class="flow-step-desc">送出後系統自動產生專屬案件編號，請截圖保存以便查詢進度。</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-num">03</div><div class="flow-icon">⚙️</div><div class="flow-step-title">幕僚受理追蹤</div><div class="flow-step-desc">專人審核案件並轉交相關單位，每個處理階段都會更新紀錄。</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><div class="flow-num">04</div><div class="flow-icon">✅</div><div class="flow-step-title">結果通知回覆</div><div class="flow-step-desc">案件處理完成後，公開說明及結果回覆將同步更新在查詢頁面。</div></div>
+      </div>
+      <div class="flow-cta">
+        <div>
+          <div class="flow-cta-title">有問題？加入官方 LINE 隨時諮詢</div>
+          <div class="flow-cta-desc">服務團隊將在工作時間內盡速回覆您的問題與需求。</div>
+        </div>
+        <a href="https://lin.ee/Q9cWSP5" target="_blank" class="flow-line-btn">💬 加入 LINE 官方帳號</a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════ 陳情登錄 ═══════════ -->
+<section class="page-section" id="page-list">
+  <div style="max-width:1100px;margin:0 auto;">
+    <h2 class="section-title">公開案件一覽</h2>
+    <div class="filter-bar">
+      <div class="cat-tabs">
+        <button class="cat-tab active" onclick="setCat(this,'')">全部</button>
+        <button class="cat-tab" onclick="setCat(this,'交通運輸')">交通運輸</button>
+        <button class="cat-tab" onclick="setCat(this,'公共設施')">公共設施</button>
+        <button class="cat-tab" onclick="setCat(this,'衛福勞動')">衛福勞動</button>
+        <button class="cat-tab" onclick="setCat(this,'文教科技')">文教科技</button>
+        <button class="cat-tab" onclick="setCat(this,'環境建管')">環境建管</button>
+        <button class="cat-tab" onclick="setCat(this,'警消政風')">警消政風</button>
+        <button class="cat-tab" onclick="setCat(this,'市政議題')">市政議題</button>
+        <button class="cat-tab" onclick="setCat(this,'里鄰事務')">里鄰事務</button>
+        <button class="cat-tab" onclick="setCat(this,'其他服務')">其他服務</button>
+      </div>
+      <select class="status-select" id="statusFilter" onchange="setStatus()">
+        <option value="">全部狀態</option>
+        <option value="待受理">待受理</option>
+        <option value="處理中">處理中</option>
+        <option value="追蹤中">追蹤中</option>
+        <option value="已結案">已結案</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table class="petition-table">
+        <thead><tr><th>案件編號</th><th>類型</th><th>標題</th><th>登錄日期</th><th>狀態</th></tr></thead>
+        <tbody id="petitionTbody"><tr><td colspan="5"><div class="loading-row"><div class="loading-spinner"></div>載入中…</div></td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</section>
+
+<!-- ═══════════ 案件查詢 ═══════════ -->
+<section class="page-section" id="page-query">
+  <div style="max-width:680px;margin:0 auto;">
+    <h2 class="section-title" style="text-align:center;margin-bottom:24px;">輸入編號查詢進度</h2>
+    <div class="query-card">
+      <h2>查詢您的陳情案件</h2>
+      <p>送出陳情後，您會收到一組專屬案件編號<br>輸入編號即可查詢目前辦理進度與回覆</p>
+      <div class="query-input-wrap">
+        <input type="text" class="query-input" id="queryInput"
+               placeholder="請輸入案件編號（例：SVC-20250101-0001）"
+               autocomplete="off" autocapitalize="characters">
+        <button class="query-btn" id="queryBtn" onclick="queryCase()">
+          <div class="spinner"></div><span class="btn-label">查詢</span>
+        </button>
+      </div>
+      <div class="query-error" id="queryError"></div>
+      <div class="query-result" id="queryResult">
+        <div class="qr-row"><span class="qr-key">案件編號</span><span class="qr-val" id="qr-id"></span></div>
+        <div class="qr-row"><span class="qr-key">案件標題</span><span class="qr-val" id="qr-title"></span></div>
+        <div class="qr-row"><span class="qr-key">案件類型</span><span class="qr-val" id="qr-type"></span></div>
+        <div class="qr-row"><span class="qr-key">案件區域</span><span class="qr-val" id="qr-area"></span></div>
+        <div class="qr-row"><span class="qr-key">登錄日期</span><span class="qr-val" id="qr-date"></span></div>
+        <div class="qr-row"><span class="qr-key">目前狀態</span><span class="qr-val"><span class="badge" id="qr-status"></span></span></div>
+        <div class="qr-row"><span class="qr-key">辦理說明</span><span class="qr-val qr-text" id="qr-summary"></span></div>
+        <div id="qr-reply-wrap" style="display:none;"><div class="qr-row"><span class="qr-key">結果回覆</span><span class="qr-val qr-text" id="qr-reply"></span></div></div>
+        <div id="qr-images-wrap" style="display:none;margin-top:12px;"><div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px;font-weight:700;">相關圖片</div><div class="qr-images" id="qr-images"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 現場會勘 ═══════════ -->
+<section class="page-section" id="page-inspections">
+  <div style="max-width:1100px;margin:0 auto;">
+    <h2 class="section-title">現場會勘紀錄</h2>
+    <p style="color:var(--color-text-muted);margin-bottom:32px;font-size:15px;">親赴現場實地了解問題，以第一手資訊為民眾發聲。</p>
+    <div class="record-grid" id="inspGrid">
+      <div class="loading-row"><div class="loading-spinner"></div>載入中…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 國會質詢 ═══════════ -->
+<section class="page-section" id="page-interpellations">
+  <div style="max-width:1100px;margin:0 auto;">
+    <h2 class="section-title">國會質詢紀錄</h2>
+    <p style="color:var(--color-text-muted);margin-bottom:32px;font-size:15px;">在立法院積極質詢各部會，將市民的聲音帶上最高立法殿堂。</p>
+    <div class="record-grid" id="interGrid">
+      <div class="loading-row"><div class="loading-spinner"></div>載入中…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 國會提案 ═══════════ -->
+<section class="page-section" id="page-proposals">
+  <div style="max-width:1100px;margin:0 auto;">
+    <h2 class="section-title">國會提案紀錄</h2>
+    <p style="color:var(--color-text-muted);margin-bottom:32px;font-size:15px;">積極推動立法，以制度化方式解決市民問題。</p>
+    <div class="record-grid" id="propGrid">
+      <div class="loading-row"><div class="loading-spinner"></div>載入中…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 常見問題 ═══════════ -->
+<section class="page-section" id="page-faq">
+  <div style="max-width:720px;margin:0 auto;">
+    <h2 class="section-title" style="text-align:center;margin-bottom:24px;">您可能想知道的事</h2>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>🏛️ 什麼是數位服務處？</span><span class="arrow">▾</span></div><div class="faq-a">這是一個公開透明的市民陳情服務平台，讓每一件市民的問題都能被看見、被追蹤、被解決。</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>📝 如何提出陳情？</span><span class="arrow">▾</span></div><div class="faq-a">點選「我要陳情」按鈕，填寫問題類型、標題與詳細內容，留下聯絡資料後送出即可。</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>🔍 如何查詢陳情進度？</span><span class="arrow">▾</span></div><div class="faq-a">點選「案件查詢」，輸入您的案件編號（格式：SVC-YYYYMMDD-XXXX）即可查看目前辦理狀態。</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>⏱️ 案件一般需要多久處理？</span><span class="arrow">▾</span></div><div class="faq-a">視案件性質及主管機關時程而定，一般案件約 7–14 個工作天，緊急案件會優先處理。</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>🔒 我的個人資料會被保護嗎？</span><span class="arrow">▾</span></div><div class="faq-a">是的。您的個人資料依《個人資料保護法》嚴格保管，不會外流或用於其他用途。</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>💬 可以透過 LINE 聯繫嗎？</span><span class="arrow">▾</span></div><div class="faq-a">可以！加入我們的 LINE 官方帳號，服務團隊將在工作時間內盡速回覆您的問題。<br><br><a href="https://lin.ee/Q9cWSP5" target="_blank" style="color:#06C755;font-weight:700;">💬 加入 LINE 官方帳號</a></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="site-footer">
+  <div class="footer-brand">🏛️ 數位服務處</div>
+  <div class="footer-sub">數位透明 · 為民服務 · 每件問題都有人跟進</div>
+  <div class="footer-social">
+    <a class="footer-social-card" href="https://lin.ee/Q9cWSP5" target="_blank">💬 LINE 官方帳號</a>
+  </div>
+  <div class="footer-copy">© 2025 數位服務處 · All rights reserved.</div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

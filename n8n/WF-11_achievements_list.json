@@ -1,0 +1,148 @@
+{
+  "name": "WF-11 政績列表 (leyidemo)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "leyidemo/achievements",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b1a2c3d4-0001-4001-8001-a1b2c3d4e5f6",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "leyidemo-achievements-list"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "DB-06-政績資料庫-請填入實際-Notion-DB-ID",
+          "mode": "id"
+        },
+        "returnAll": false,
+        "limit": 100,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "是否公開",
+              "condition": "checkbox",
+              "checkboxValue": true
+            }
+          ]
+        },
+        "sort": {
+          "sortRules": [
+            {
+              "key": "重要程度",
+              "direction": "descending"
+            },
+            {
+              "key": "成果日期",
+              "direction": "descending"
+            }
+          ]
+        },
+        "options": {
+          "downloadFiles": false
+        },
+        "simplifyOutput": false
+      },
+      "id": "b1a2c3d4-0002-4001-8001-a1b2c3d4e5f6",
+      "name": "Notion 查詢 DB-06 政績",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ════════════════════════════════════════\n// WF-11 政績列表 — 格式化 + 分頁\n// Notion Simplify: OFF（走完整路徑）\n// ════════════════════════════════════════\n\n// 取得 query params\nconst query    = $('Webhook').first().json.query || {};\nconst page     = parseInt(query.page  ?? '1');\nconst limit    = parseInt(query.limit ?? '10');\nconst typeFilter = (query.type || '').trim();\n\n// 原始 Notion items\nconst rawItems = $input.all();\n\n// ── 格式化函式\nfunction formatItem(item) {\n  const props = item.json.properties || {};\n\n  // 政績名稱\n  const title = props['政績名稱']?.title?.[0]?.plain_text ?? '';\n\n  // 政績類型\n  const type = props['政績類型']?.select?.name ?? '';\n\n  // 政績內容（取第一個 rich_text 塊；多塊時串接）\n  const contentBlocks = props['政績內容']?.rich_text ?? [];\n  const content = contentBlocks.map(b => b.plain_text).join('');\n\n  // 成果日期\n  const date = props['成果日期']?.date?.start ?? '';\n\n  // 主圖片（優先 file URL，fallback external URL）\n  const coverFiles = props['主圖片']?.files ?? [];\n  const coverImage = coverFiles[0]?.file?.url\n                  || coverFiles[0]?.external?.url\n                  || null;\n\n  // 附圖（多張）\n  const imagesFiles = props['附圖']?.files ?? [];\n  const images = imagesFiles.map(f => f?.file?.url || f?.external?.url).filter(Boolean);\n\n  // 按讚數\n  const likes = props['按讚數']?.number ?? 0;\n\n  // 是否公開\n  const isPublic = props['是否公開']?.checkbox ?? false;\n\n  // 重要程度（置頂判斷）\n  const importance = props['重要程度']?.select?.name ?? '一般';\n  const isPinned   = importance === '重點';\n\n  // 標籤\n  const tags = (props['標籤']?.multi_select ?? []).map(t => t.name);\n\n  // Notion Page ID\n  const id = item.json.id;\n\n  return { id, title, type, content, date, coverImage, images, likes, isPublic, isPinned, importance, tags };\n}\n\n// ── 格式化所有項目\nlet items = rawItems.map(formatItem);\n\n// ── 類型篩選\nif (typeFilter) {\n  items = items.filter(i => i.type === typeFilter);\n}\n\n// ── 分頁\nconst total      = items.length;\nconst totalPages = Math.max(1, Math.ceil(total / limit));\nconst safePage   = Math.min(Math.max(page, 1), totalPages);\nconst start      = (safePage - 1) * limit;\nconst pageItems  = items.slice(start, start + limit);\n\n// ── 輸出\nreturn [\n  {\n    json: {\n      success:    true,\n      items:      pageItems,\n      total,\n      page:       safePage,\n      totalPages,\n    }\n  }\n];\n"
+      },
+      "id": "b1a2c3d4-0003-4001-8001-a1b2c3d4e5f6",
+      "name": "Code 格式化 + 分頁",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "b1a2c3d4-0004-4001-8001-a1b2c3d4e5f6",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Notion 查詢 DB-06 政績",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion 查詢 DB-06 政績": {
+      "main": [
+        [
+          {
+            "node": "Code 格式化 + 分頁",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code 格式化 + 分頁": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateId": "WF-11",
+    "instanceId": "leyidemo"
+  },
+  "tags": [
+    { "name": "leyidemo" },
+    { "name": "achievements" },
+    { "name": "政績版" }
+  ]
+}

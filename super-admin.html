@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin — 管理後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="brand-icon">🏛️</div><div class="brand-text"><div class="brand-name">市民服務平台</div><div class="brand-role">Admin Console</div></div></div>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarAvatar">A</div><div class="user-info"><div class="user-name" id="sidebarUserName">載入中…</div><span class="user-tag" id="sidebarUserTag">幕僚</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">主要功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">儀表板</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases')"><span class="nav-icon">📋</span><span class="nav-label">案件管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('cases-new')"><span class="nav-icon">✏️</span><span class="nav-label">新增案件</span></div>
+      <div class="nav-group-label" data-role="admin">管理功能</div>
+      <div class="nav-item" onclick="Sidebar.navigate('users')" data-role="admin"><span class="nav-icon">👥</span><span class="nav-label">帳號管理</span></div>
+      <div class="nav-item" onclick="Sidebar.navigate('settings')" data-role="admin"><span class="nav-icon">⚙️</span><span class="nav-label">系統設定</span></div>
+      <div class="nav-item active" onclick="Sidebar.navigate('super-admin')" data-role="super_admin"><span class="nav-icon">🔑</span><span class="nav-label">Super Admin</span></div>
+    </nav>
+    <div class="sidebar-footer"><button class="sidebar-toggle" onclick="Sidebar.toggle()"><span class="toggle-icon">◀</span><span class="toggle-label">收合選單</span></button></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">🔑 Super Admin</div>
+        <div class="topbar-subtitle">跨客戶管理 · 僅限最高管理員存取</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="Modal.open('addClientModal')">＋ 新增客戶</button>
+        <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
+      </div>
+    </div>
+
+    <div class="page-area">
+
+      <!-- 摘要卡 -->
+      <div class="stats-row section-gap" id="saStats">
+        <div class="stat-card"><div class="stat-card-bg">🏢</div><div class="stat-label">客戶總數</div><div class="stat-num" id="sa-clients">—</div></div>
+        <div class="stat-card"><div class="stat-card-bg">📋</div><div class="stat-label">全平台案件</div><div class="stat-num" id="sa-cases">—</div></div>
+        <div class="stat-card"><div class="stat-card-bg">👥</div><div class="stat-label">帳號總數</div><div class="stat-num" id="sa-users">—</div></div>
+        <div class="stat-card"><div class="stat-card-bg">✅</div><div class="stat-label">整體結案率</div><div class="stat-num" id="sa-rate">—</div></div>
+      </div>
+
+      <!-- 客戶列表 -->
+      <div class="neu-card section-gap">
+        <div class="card-title"><span class="card-icon">🏢</span>客戶管理</div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>客戶名稱</th><th>系統模式</th><th>Prefix</th>
+                <th>案件數</th><th>帳號數</th><th>建立日期</th><th style="width:130px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="clientTbody">
+              <tr><td colspan="7"><div class="loading-row"><div class="spinner"></div>載入中…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Webhook 全覽 -->
+      <div class="neu-card section-gap">
+        <div class="card-title"><span class="card-icon">🔗</span>Webhook 端點全覽</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+          所有客戶的 Webhook 端點一覽，點擊可複製。
+        </div>
+        <div id="webhookOverview">
+          <div class="loading-row"><div class="spinner"></div>載入中…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 新增客戶 Modal -->
+<div class="modal-backdrop" id="addClientModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <span class="modal-title">新增客戶</span>
+      <button class="modal-close" onclick="Modal.close('addClientModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2" style="gap:16px;">
+        <div class="form-group">
+          <label class="form-label">客戶名稱 <span class="req">*</span></label>
+          <input type="text" class="neu-input" id="nc-name" placeholder="例：市民解憂咖啡館">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prefix <span class="req">*</span></label>
+          <input type="text" class="neu-input" id="nc-prefix" placeholder="英文小寫，如 transparentcafe">
+        </div>
+        <div class="form-group">
+          <label class="form-label">系統模式</label>
+          <select class="neu-select" id="nc-mode">
+            <option value="transparent">純透明版</option>
+            <option value="achievement">政績版</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">n8n 基礎網址</label>
+          <input type="url" class="neu-input" id="nc-n8n" placeholder="https://xxx.zeabur.app">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notion 案件資料庫 ID</label>
+          <input type="text" class="neu-input" id="nc-dbCases" placeholder="32 碼 ID">
+        </div>
+        <div class="form-group">
+          <label class="form-label">LINE 官方帳號連結</label>
+          <input type="url" class="neu-input" id="nc-line" placeholder="https://lin.ee/xxx">
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border-inner);padding-top:16px;margin-top:4px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">初始管理員帳號</div>
+        <div class="grid-2" style="gap:16px;">
+          <div class="form-group">
+            <label class="form-label">管理員 Email <span class="req">*</span></label>
+            <input type="email" class="neu-input" id="nc-adminEmail" placeholder="admin@example.com">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">初始密碼 <span class="req">*</span></label>
+            <input type="password" class="neu-input" id="nc-adminPw" placeholder="至少 8 碼">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="Modal.close('addClientModal')">取消</button>
+      <button class="btn btn-primary" onclick="addClient()">建立客戶</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap"></div>
+<script src="js/admin.js"></script>
+<script>
+Auth.require('super_admin');
+
+async function loadAll() {
+  const data = await API.get('/super-admin/overview');
+  if (!data) return;
+
+  // 摘要數字
+  document.getElementById('sa-clients').textContent = data.clientCount || 0;
+  document.getElementById('sa-cases').textContent   = (data.totalCases||0).toLocaleString();
+  document.getElementById('sa-users').textContent   = data.totalUsers  || 0;
+  document.getElementById('sa-rate').textContent    = (data.overallRate||0) + '%';
+
+  // 客戶列表
+  const tbody = document.getElementById('clientTbody');
+  if (!data.clients?.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">尚無客戶</div></div></td></tr>';
+  } else {
+    tbody.innerHTML = data.clients.map(c => `
+      <tr>
+        <td style="font-weight:700;">${c.name||'—'}</td>
+        <td>
+          <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);
+            background:${c.mode==='achievement'?'var(--warning-pale)':'var(--primary-pale)'};
+            color:${c.mode==='achievement'?'var(--warning)':'var(--primary-dark)'};">
+            ${c.mode==='achievement'?'政績版':'純透明版'}
+          </span>
+        </td>
+        <td style="font-family:monospace;font-size:13px;">${c.prefix||'—'}</td>
+        <td>${(c.caseCount||0).toLocaleString()}</td>
+        <td>${c.userCount||0}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${DateUtil.fmt(c.createdAt)}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm" onclick="switchClient('${c.id}')">進入後台</button>
+            <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteClient('${c.id}','${c.name}')">刪除</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // Webhook 全覽
+  const wo = document.getElementById('webhookOverview');
+  if (!data.clients?.length) { wo.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">尚無客戶</div>'; return; }
+  wo.innerHTML = data.clients.map(c => `
+    <div style="margin-bottom:16px;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px;">${c.name} <span style="font-size:11px;color:var(--text-muted);font-family:monospace;">(${c.prefix})</span></div>
+      <div style="display:grid;gap:6px;">
+        ${['stats','list','query','submit','dashboard','notify'].map(ep => {
+          const url = `${c.n8nBase}/webhook/${c.prefix}/${ep}`;
+          return `<div style="display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:var(--r-sm);box-shadow:var(--neu-in-sm);padding:7px 12px;">
+            <span style="font-size:10px;font-weight:700;color:var(--primary-dark);min-width:64px;">${ep.toUpperCase()}</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--text-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${url}</span>
+            <button class="btn btn-sm" style="padding:3px 8px;font-size:11px;" onclick="navigator.clipboard.writeText('${url}').then(()=>toast.info('已複製'))">複製</button>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('<hr style="border:none;border-top:1px solid var(--border-inner);margin:16px 0;">');
+}
+
+async function addClient() {
+  const body = {
+    name:       document.getElementById('nc-name').value.trim(),
+    prefix:     document.getElementById('nc-prefix').value.trim().toLowerCase(),
+    systemMode: document.getElementById('nc-mode').value,
+    n8nBase:    document.getElementById('nc-n8n').value.trim(),
+    dbCases:    document.getElementById('nc-dbCases').value.trim(),
+    lineUrl:    document.getElementById('nc-line').value.trim(),
+    adminEmail: document.getElementById('nc-adminEmail').value.trim(),
+    adminPw:    document.getElementById('nc-adminPw').value,
+  };
+  if (!body.name || !body.prefix || !body.adminEmail || !body.adminPw) {
+    toast.warn('請填寫所有必填欄位'); return;
+  }
+  if (!/^[a-z0-9]+$/.test(body.prefix)) { toast.warn('Prefix 只能使用英文小寫和數字'); return; }
+  const r = await API.post('/super-admin/clients', body);
+  if (r?.success) { toast.success(`客戶「${body.name}」已建立成功`); Modal.close('addClientModal'); loadAll(); }
+  else toast.error(r?.message || '建立失敗');
+}
+
+async function switchClient(clientId) {
+  // 切換到該客戶的後台視角
+  sessionStorage.setItem('client_id', clientId);
+  Sidebar.navigate('dashboard');
+}
+
+function deleteClient(id, name) {
+  Modal.confirm(`確認刪除客戶「${name}」`, '此操作將刪除該客戶的所有設定與帳號（Notion 資料不受影響），確定刪除嗎？', async () => {
+    const r = await API.delete(`/super-admin/clients/${id}`);
+    if (r?.success) { toast.success('客戶已刪除'); loadAll(); }
+    else toast.error('刪除失敗');
+  });
+}
+
+loadAll();
+</script>
+</body>
+</html>
