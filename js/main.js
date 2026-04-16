@@ -240,17 +240,25 @@ function renderStackedBar(data) {
   const normalize = i => ({ label:i.label||'', newCount:i.newCount??i.count??0, closedCount:i.closedCount??i.closed??0 });
   const norm = items.map(normalize);
   const hasData = norm.some(i => i.newCount + i.closedCount > 0);
-  if (!items.length || !hasData) { chart.innerHTML = '<div class="chart-loading">此期間暫無案件資料</div>'; return; }
+  if (!items.length || !hasData) { chart.innerHTML = '<div class="chart-loading">???????????</div>'; return; }
   const maxVal = Math.max(...norm.map(i => i.newCount + i.closedCount), 1);
   chart.innerHTML = norm.map(item => {
     const nC = item.newCount, cC = item.closedCount, total = nC + cC;
     const totalPct = Math.round((total / maxVal) * 100);
     const newH    = total > 0 ? Math.round((nC / total) * 100) : 0;
     const closedH = total > 0 ? Math.round((cC / total) * 100) : 0;
-    return `<div class="bar-col"><div class="bar-track"><div class="bar-stacked" style="height:${Math.max(totalPct,2)}%" title="新增 ${nC} 件 / 結案 ${cC} 件"><div class="bar-seg-new" style="height:${newH}%"></div><div class="bar-seg-closed" style="height:${closedH}%"></div></div></div><div class="bar-label">${item.label}</div></div>`;
+    return `
+      <div class="bar-col">
+        <div class="bar-track">
+          <div class="bar-stacked" style="height:${Math.max(totalPct, 2)}%" title="?? ${nC} ? / ?? ${cC} ?" aria-label="${item.label} ?? ${nC} ???? ${cC} ?">
+            <div class="bar-seg-new" style="height:${newH}%"></div>
+            <div class="bar-seg-closed" style="height:${closedH}%"></div>
+          </div>
+        </div>
+        <div class="bar-label">${item.label}</div>
+      </div>`;
   }).join('');
 }
-
 function renderMonthStats(data) {
   const ms = data.monthStats || {};
   const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
