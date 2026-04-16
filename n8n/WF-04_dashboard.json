@@ -1,0 +1,143 @@
+{
+  "name": "WF-04 案件處理儀表板 leyicasedemo/dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "leyicasedemo/dashboard",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d4a2a7c0-1001-4a01-9001-leyidashboard01",
+      "name": "接收儀表板查詢",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "leyicasedemo-dashboard"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "343b3ad1d1cd800391f1ff4907635829",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "是否公開",
+              "condition": "checkbox",
+              "checkboxValue": true
+            }
+          ]
+        },
+        "sort": {
+          "sortRules": [
+            {
+              "key": "建立時間",
+              "direction": "descending"
+            }
+          ]
+        },
+        "options": {
+          "downloadFiles": false
+        },
+        "simplifyOutput": false
+      },
+      "id": "d4a2a7c0-1002-4a01-9001-leyidashboard02",
+      "name": "查詢 Notion demoDB_case",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $('接收儀表板查詢').first().json.query || {};\nconst period = ['7d', '30d', '90d'].includes(query.period) ? query.period : '7d';\nconst days = period === '90d' ? 90 : (period === '30d' ? 30 : 7);\nconst items = $input.all();\nconst now = new Date();\nconst today = new Date(now.getFullYear(), now.getMonth(), now.getDate());\nconst rangeStart = new Date(today);\nrangeStart.setDate(today.getDate() - days + 1);\nconst monthStart = new Date(now.getFullYear(), now.getMonth(), 1);\n\nfunction getString(prop) {\n  if (!prop) return '';\n  if (prop.type === 'title') return (prop.title || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'rich_text') return (prop.rich_text || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'select') return prop.select?.name || '';\n  if (prop.type === 'date') return prop.date?.start || '';\n  if (prop.type === 'created_time') return prop.created_time || '';\n  if (prop.type === 'last_edited_time') return prop.last_edited_time || '';\n  if (prop.type === 'checkbox') return prop.checkbox || false;\n  return '';\n}\n\nfunction asDate(value) {\n  if (!value) return null;\n  const d = new Date(value);\n  return Number.isNaN(d.getTime()) ? null : d;\n}\n\nfunction dateKey(date) {\n  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());\n  return d.toISOString().slice(0, 10);\n}\n\nfunction dateLabel(date) {\n  return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;\n}\n\nfunction normalizeCase(item) {\n  const props = item.json.properties || {};\n  return {\n    id: item.json.id,\n    caseId: getString(props['案件編號']),\n    title: getString(props['案件標題']),\n    type: getString(props['案件類型']) || '未分類',\n    area: getString(props['案件區域']) || '未填寫',\n    status: getString(props['案件狀態']) || '未設定',\n    createdAt: asDate(getString(props['建立時間']) || item.json.created_time),\n    closedAt: asDate(getString(props['結案日期']))\n  };\n}\n\nconst cases = items.map(normalizeCase).filter(item => item.createdAt);\n\nconst chartMap = new Map();\nfor (let i = 0; i < days; i++) {\n  const d = new Date(rangeStart);\n  d.setDate(rangeStart.getDate() + i);\n  chartMap.set(dateKey(d), { label: dateLabel(d), newCount: 0, closedCount: 0 });\n}\n\nconst monthStats = { newCount: 0, closedCount: 0, progressCount: 0 };\nconst typeCounts = {};\nconst areaCounts = {};\nconst statusCounts = {};\n\nfor (const c of cases) {\n  const createdDay = new Date(c.createdAt.getFullYear(), c.createdAt.getMonth(), c.createdAt.getDate());\n  const createdKey = dateKey(createdDay);\n  if (chartMap.has(createdKey)) chartMap.get(createdKey).newCount += 1;\n  if (createdDay >= monthStart) monthStats.newCount += 1;\n\n  if (c.closedAt) {\n    const closedDay = new Date(c.closedAt.getFullYear(), c.closedAt.getMonth(), c.closedAt.getDate());\n    const closedKey = dateKey(closedDay);\n    if (chartMap.has(closedKey)) chartMap.get(closedKey).closedCount += 1;\n    if (closedDay >= monthStart) monthStats.closedCount += 1;\n  }\n\n  if (c.status !== '已結案') monthStats.progressCount += 1;\n  typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;\n  areaCounts[c.area] = (areaCounts[c.area] || 0) + 1;\n  statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;\n}\n\nconst chart = Array.from(chartMap.values());\n\nreturn [{\n  json: {\n    success: true,\n    period,\n    days,\n    total: cases.length,\n    chart,\n    monthStats,\n    typeCounts,\n    areaCounts,\n    statusCounts,\n    updatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "d4a2a7c0-1003-4a01-9001-leyidashboard03",
+      "name": "計算儀表板資料",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "d4a2a7c0-1004-4a01-9001-leyidashboard04",
+      "name": "回傳儀表板結果",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "接收儀表板查詢": {
+      "main": [
+        [
+          {
+            "node": "查詢 Notion demoDB_case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "查詢 Notion demoDB_case": {
+      "main": [
+        [
+          {
+            "node": "計算儀表板資料",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "計算儀表板資料": {
+      "main": [
+        [
+          {
+            "node": "回傳儀表板結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateId": "WF-04",
+    "instanceId": "leyicasedemo"
+  },
+  "tags": [
+    { "name": "leyicasedemo" },
+    { "name": "dashboard" },
+    { "name": "陳情系統" }
+  ]
+}
