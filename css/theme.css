@@ -328,30 +328,42 @@ body::before {
 }
 
 .hero-btns {
-  display: flex; gap: 14px; flex-wrap: wrap;
-  justify-content: center; margin-bottom: 60px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(136px, 156px));
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  width: min(100%, 340px);
+  margin: 0 auto 56px;
 }
-.btn-primary {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff; font-size: 15px; font-weight: 800;
-  padding: 14px 32px; border-radius: var(--radius-full);
-  text-decoration: none;
-  box-shadow: 0 6px 24px rgba(168,90,16,0.38);
-  transition: all var(--transition); min-height: 52px;
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(168,90,16,0.48); }
+.btn-primary,
 .btn-outline {
   display: inline-flex; align-items: center; gap: 8px;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 20px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff; font-weight: 800;
+  box-shadow: 0 8px 22px rgba(168,90,16,0.24);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(168,90,16,0.34); }
+.btn-outline {
   background: var(--glass-bg2); backdrop-filter: blur(12px);
   color: var(--color-primary-dark);
-  font-size: 15px; font-weight: 700;
-  padding: 14px 32px; border-radius: var(--radius-full);
-  text-decoration: none;
+  font-weight: 800;
   border: 1.5px solid rgba(232,127,36,0.35);
-  transition: all var(--transition); min-height: 52px;
+  box-shadow: 0 6px 18px rgba(168,90,16,0.08);
 }
-.btn-outline:hover { background: rgba(255,255,255,0.95); transform: translateY(-2px); }
+.btn-outline:hover { background: rgba(255,255,255,0.95); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(168,90,16,0.14); }
 
 /* ── 統計卡片（英雄卡 + 5張） */
 .stats-grid {
@@ -730,8 +742,8 @@ body::before {
   .hero-unit { padding:60px 20px 72px; }
   .hero-title { font-size:32px; }
   .hero-sub   { font-size:15px; }
-  .hero-btns  { flex-direction:column;width:100%;max-width:320px; }
-  .btn-primary,.btn-outline { width:100%;justify-content:center; }
+  .hero-btns  { grid-template-columns:repeat(2,minmax(0,1fr));width:min(100%,360px);max-width:none;margin-bottom:44px;gap:10px; }
+  .btn-primary,.btn-outline { min-height:44px;padding:10px 12px;font-size:14px; }
   .stats-grid { grid-template-columns:repeat(2,1fr);gap:12px; }
   .stat-hero  { grid-column:1/-1;flex-direction:column;text-align:center; }
   .stat-hero-num .stat-num { font-size:56px; }
@@ -746,6 +758,8 @@ body::before {
 }
 @media (max-width: 480px) {
   .hero-title  { font-size:26px; }
+  .hero-btns   { width:100%;gap:9px; }
+  .btn-primary,.btn-outline { min-height:42px;font-size:13px;padding:9px 10px; }
   .stats-grid  { gap:10px; }
   .stat-num    { font-size:28px; }
 }
