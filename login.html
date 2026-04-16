@@ -298,6 +298,10 @@ body::before {
       <span class="btn-text">登入後台</span>
     </button>
 
+    <button class="btn-google" type="button" onclick="demoSuperAdminLogin()" style="margin-top:12px;">
+      Demo Super Admin 直接進入
+    </button>
+
     <div class="divider">或使用</div>
 
     <!-- Google SSO -->
@@ -365,23 +369,34 @@ function clearError() {
   document.getElementById('errorMsg').classList.remove('show');
 }
 
+function demoSuperAdminLogin() {
+  const storage = localStorage;
+  storage.setItem('admin_token', 'demo-super-admin-token');
+  storage.setItem('admin_role', 'super_admin');
+  storage.setItem('admin_name', 'Demo Super Admin');
+  storage.setItem('admin_email', 'superadmin@demo.local');
+  storage.setItem('client_id', 'leyicasedemo');
+  window.location.href = 'super-admin.html';
+}
+
 // ── 登入邏輯
 async function doLogin() {
   clearError();
   const email = document.getElementById('loginEmail').value.trim();
   const pw    = document.getElementById('loginPw').value;
+  const normalizedEmail = email.toLowerCase();
+  const normalizedPw = pw.trim();
 
   if (!email) { showError('請輸入 Email 帳號。'); return; }
   if (!pw)    { showError('請輸入密碼。'); return; }
 
-  if (email === 'superadmin@demo.local' && pw === 'demo2026') {
-    const storage = _remember ? localStorage : sessionStorage;
-    storage.setItem('admin_token', 'demo-super-admin-token');
-    storage.setItem('admin_role', 'super_admin');
-    storage.setItem('admin_name', 'Demo Super Admin');
-    storage.setItem('admin_email', email);
-    storage.setItem('client_id', 'leyicasedemo');
-    window.location.href = 'super-admin.html';
+  if (normalizedEmail === 'superadmin@demo.local' && normalizedPw === 'demo2026') {
+    demoSuperAdminLogin();
+    return;
+  }
+
+  if (normalizedEmail.endsWith('@demo.local')) {
+    showError('Demo 帳號請使用密碼 demo2026，或點「Demo Super Admin 直接進入」。');
     return;
   }
 
