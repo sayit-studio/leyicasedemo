@@ -1,10 +1,10 @@
 {
-  "name": "WF-12 政績按讚 (leyidemo)",
+  "name": "WF-12 政績按讚 (leyicasedemo)",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "leyidemo/achievements/like",
+        "path": "leyicasedemo/achievements/like",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -13,7 +13,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [240, 300],
-      "webhookId": "leyidemo-achievements-like"
+      "webhookId": "leyicasedemo-achievements-like"
     },
     {
       "parameters": {
@@ -169,11 +169,12 @@
   "pinData": {},
   "meta": {
     "templateId": "WF-12",
-    "instanceId": "leyidemo"
+    "instanceId": "leyicasedemo"
   },
   "tags": [
-    { "name": "leyidemo" },
+    { "name": "leyicasedemo" },
     { "name": "achievements" },
     { "name": "政績版" }
   ]
 }
+

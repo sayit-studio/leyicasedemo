@@ -4,7 +4,7 @@
    ════════════════════════════════════════ */
 
 const SITE_TEMPLATE_CONFIG = {
-  siteKey: 'leyidemo',
+  siteKey: 'leyicasedemo',
   systemMode: 'achievement',
 
   brand: {
@@ -20,7 +20,8 @@ const SITE_TEMPLATE_CONFIG = {
 
   integrations: {
     webhookBase: 'https://drwu.zeabur.app',
-    webhookPrefix: 'leyidemo',
+    webhookMode: 'webhook',
+    webhookPrefix: 'leyicasedemo',
     lineUrl: 'https://lin.ee/Q9cWSP5',
   },
 
@@ -99,9 +100,10 @@ const SITE_TEMPLATE_CONFIG = {
 const SITE_UTILS = {
   webhook(path = '') {
     const base = SITE_TEMPLATE_CONFIG.integrations.webhookBase.replace(/\/$/, '');
+    const mode = String(SITE_TEMPLATE_CONFIG.integrations.webhookMode || 'webhook').replace(/^\/|\/$/g, '');
     const prefix = SITE_TEMPLATE_CONFIG.integrations.webhookPrefix.replace(/^\/|\/$/g, '');
     const normalizedPath = String(path).replace(/^\/+/, '');
-    return normalizedPath ? `${base}/webhook/${prefix}/${normalizedPath}` : `${base}/webhook/${prefix}`;
+    return normalizedPath ? `${base}/${mode}/${prefix}/${normalizedPath}` : `${base}/${mode}/${prefix}`;
   },
 
   currentYear() {
@@ -124,6 +126,7 @@ const CONFIG = {
   HERO_FIGURE: SITE_TEMPLATE_CONFIG.content.heroFigure,
   LINE_URL: SITE_TEMPLATE_CONFIG.integrations.lineUrl,
   WEBHOOK_BASE: SITE_TEMPLATE_CONFIG.integrations.webhookBase,
+  WEBHOOK_MODE: SITE_TEMPLATE_CONFIG.integrations.webhookMode,
   WEBHOOK_PREFIX: SITE_TEMPLATE_CONFIG.integrations.webhookPrefix,
   NAV_ITEMS: SITE_TEMPLATE_CONFIG.navigation.publicItems,
   STAT_CARDS: [
