@@ -543,6 +543,193 @@
   line-height: 1.8;
   margin: 0;
 }
+.achievement-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.achievement-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  background: rgba(232,127,36,.10);
+  border: 1px solid rgba(232,127,36,.18);
+  color: var(--color-primary-dark);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+}
+.achievement-action {
+  margin-top: auto;
+  border: 0;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 11px 18px;
+  box-shadow: 0 10px 24px rgba(168,90,16,.22);
+}
+.service-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.service-keyword {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(232,127,36,.20);
+  color: var(--color-primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Detail modal */
+.detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(44,26,8,.52);
+  backdrop-filter: blur(12px);
+}
+.detail-modal.open { display: flex; }
+.detail-dialog {
+  width: min(960px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--color-bg);
+  border: 1px solid var(--border-solid);
+  border-radius: 30px;
+  box-shadow: 0 30px 80px rgba(44,26,8,.28);
+}
+.detail-cover {
+  position: relative;
+  height: min(360px, 42vw);
+  min-height: 220px;
+  background: var(--color-bg-dark);
+  overflow: hidden;
+}
+.detail-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.detail-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.88);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 900;
+}
+.detail-body { padding: 30px; }
+.detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.detail-pill {
+  border-radius: var(--radius-full);
+  background: var(--color-primary-pale);
+  color: var(--color-primary-dark);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 12px;
+}
+.detail-body h2 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 38px);
+  line-height: 1.25;
+  margin: 0 0 14px;
+  color: var(--color-text);
+}
+.detail-lead {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.85;
+  margin-bottom: 24px;
+}
+.detail-section {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  margin-top: 20px;
+}
+.detail-section h3 {
+  font-size: 16px;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+.detail-process {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.detail-process li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+}
+.detail-process li::before {
+  content: attr(data-step);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+.detail-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.detail-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.detail-video iframe,
+.detail-video .video-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 18px;
+  background: var(--color-bg-dark);
+}
+.detail-video .video-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
 
 /* Toast */
 .toast-container {
@@ -592,6 +779,10 @@
   .achievement-item-card { border-radius: 22px; }
   .achievement-content { padding: 18px; }
   .achievement-title { font-size: 19px; }
+  .detail-modal { padding: 12px; align-items: flex-end; }
+  .detail-dialog { border-radius: 24px 24px 0 0; max-height: 92vh; }
+  .detail-body { padding: 22px 18px 26px; }
+  .detail-gallery { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 769px) and (max-width: 1040px) {
@@ -629,9 +820,9 @@
 
 <!-- ══ HERO ══ -->
 <div class="ach-hero">
-  <div class="ach-hero-tag">🏆 服務成果公開透明</div>
+  <div class="ach-hero-tag">🏆 里民服務成果公開</div>
   <h1>政績專區</h1>
-  <p>從立法到服務，每一項成果都是對市民承諾的具體實現。<br>公開透明，讓政績有跡可循。</p>
+  <p>把里民反映的問題一件件記錄下來，從現場了解、協調處理到完成改善，讓每一項服務都看得見、查得到。</p>
 </div>
 
 <!-- ══ 政績項目牆 ══ -->
@@ -639,10 +830,30 @@
   <div class="achievement-wall-head">
     <span class="achievement-kicker">代表性服務事項</span>
     <h2>每一項政績，都是一件被完成的承諾</h2>
-    <p>第一版先以項目方式展示，不呈現類別，聚焦政績名稱、時間、內容與現場圖片。</p>
+    <p>里長服務最重要的是把生活裡的小問題處理好。從道路安全、親子活動、樂齡關懷到社區環境，每一件成果都來自里民的需要與現場的協調。</p>
+    <div class="service-keywords">
+      <span class="service-keyword">帶動社區</span>
+      <span class="service-keyword">親子互動</span>
+      <span class="service-keyword">樂齡互動</span>
+      <span class="service-keyword">道路安全</span>
+      <span class="service-keyword">校園守護</span>
+      <span class="service-keyword">環境改善</span>
+      <span class="service-keyword">鄰里照顧</span>
+    </div>
   </div>
   <div class="achievement-grid" id="achievementGrid"></div>
 </main>
+
+<!-- ══ Detail Modal ══ -->
+<div class="detail-modal" id="detailModal" onclick="AchievementDetail.closeOnBackdrop(event)">
+  <div class="detail-dialog">
+    <div class="detail-cover">
+      <img id="detailCover" src="" alt="">
+      <button class="detail-close" type="button" onclick="AchievementDetail.close()">✕</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </div>
+</div>
 
 <!-- ══ Lightbox ══ -->
 <div class="lightbox" id="lightbox" onclick="Lightbox.closeOnBackdrop(event)">
@@ -681,42 +892,96 @@ const ACHIEVEMENT_ITEMS = [
     title: '校園周邊通學步道改善',
     date: '2026-04-08',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-01.jpg`,
-    content: '針對學校周邊人行空間不足、接送動線混亂問題，協調相關單位完成標線重整、通學步道改善與路口安全提醒，讓家長接送與學童步行更安心。'
+    tags: ['教育', '學校', '道路安全', '親子友善'],
+    content: '針對學校周邊人行空間不足、接送動線混亂問題，協調相關單位完成標線重整、通學步道改善與路口安全提醒，讓家長接送與學童步行更安心。',
+    summary: '從家長反映到現場會勘，完成校園周邊動線改善，降低上下學時段行人與車流交錯風險。',
+    process: [
+      '接獲家長與導護志工反映，上下學時段人車交錯，步行空間不足。',
+      '邀集學校、交通與里內志工到場會勘，確認主要壅塞點與危險路口。',
+      '協調標線重整、提醒牌面與通學步道改善，並持續觀察放學時段動線。'
+    ],
+    images: [`${ACHIEVEMENT_IMAGE_BASE}achievement-01.jpg`, `${ACHIEVEMENT_IMAGE_BASE}achievement-02.jpg`],
+    videoUrl: ''
   },
   {
     id: 'achievement-02',
     title: '社區排水溝渠清淤與修繕',
     date: '2026-03-22',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-02.jpg`,
-    content: '接獲居民反映雨後積水與異味問題後，安排現場會勘並促成排水溝渠清淤、破損處修補與後續巡檢機制，降低汛期淹水風險。'
+    tags: ['排水', '環境改善', '防汛', '社區安全'],
+    content: '接獲居民反映雨後積水與異味問題後，安排現場會勘並促成排水溝渠清淤、破損處修補與後續巡檢機制，降低汛期淹水風險。',
+    summary: '把容易積水、產生異味的排水問題處理好，讓雨季前的社區更安心。',
+    process: [
+      '彙整居民回報的積水位置與異味熱點。',
+      '會同相關單位確認溝渠阻塞、破損與需巡檢區段。',
+      '完成清淤與修補後，建立後續巡查提醒。'
+    ],
+    images: [`${ACHIEVEMENT_IMAGE_BASE}achievement-02.jpg`, `${ACHIEVEMENT_IMAGE_BASE}achievement-03.jpg`],
+    videoUrl: ''
   },
   {
     id: 'achievement-03',
     title: '公園休憩設施更新',
     date: '2026-02-17',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-03.jpg`,
-    content: '協助改善公園座椅老舊、照明不足與兒童遊具安全疑慮，完成設施更新與環境整理，讓鄰里居民有更舒適的日常休憩空間。'
+    tags: ['公園', '親子互動', '樂齡互動', '公共設施'],
+    content: '協助改善公園座椅老舊、照明不足與兒童遊具安全疑慮，完成設施更新與環境整理，讓鄰里居民有更舒適的日常休憩空間。',
+    summary: '把公園維持好，就是讓孩子有地方玩、長輩有地方坐、鄰里有地方交流。',
+    process: [
+      '收集親子與長者對公園設施的使用意見。',
+      '現場拍照記錄座椅、遊具與地坪問題，分項列出優先修繕項目。',
+      '追蹤修繕進度，完成後安排里民回饋，作為後續改善依據。'
+    ],
+    images: [`${ACHIEVEMENT_IMAGE_BASE}achievement-03.jpg`, `${ACHIEVEMENT_IMAGE_BASE}achievement-04.jpg`],
+    videoUrl: ''
   },
   {
     id: 'achievement-04',
     title: '市場周邊交通動線整理',
     date: '2026-01-29',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-04.jpg`,
-    content: '針對市場尖峰時段人車交織與臨停問題，推動攤商卸貨區、行人穿越動線與交通提醒標示優化，改善採買環境與周邊通行安全。'
+    tags: ['交通', '市場', '行人安全', '道路'],
+    content: '針對市場尖峰時段人車交織與臨停問題，推動攤商卸貨區、行人穿越動線與交通提醒標示優化，改善採買環境與周邊通行安全。',
+    summary: '市場周邊每天都有採買人潮，整理動線能讓攤商、居民與行人都更安全。',
+    process: [
+      '整理攤商卸貨、臨停與行人穿越衝突點。',
+      '尖峰時段到場觀察人車交會狀況。',
+      '協調卸貨區、標示與行人提醒，降低市場周邊混亂。'
+    ],
+    images: [`${ACHIEVEMENT_IMAGE_BASE}achievement-04.jpg`, `${ACHIEVEMENT_IMAGE_BASE}achievement-05.jpg`],
+    videoUrl: ''
   },
   {
     id: 'achievement-05',
     title: '里民活動中心環境改善',
     date: '2025-12-18',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-05.jpg`,
-    content: '協調改善活動中心牆面滲水、照明老舊與公共使用空間不足問題，讓長者課程、社區會議與親子活動有更穩定的使用環境。'
+    tags: ['活動中心', '帶動社區', '樂齡課程', '親子活動'],
+    content: '協調改善活動中心牆面滲水、照明老舊與公共使用空間不足問題，讓長者課程、社區會議與親子活動有更穩定的使用環境。',
+    summary: '活動中心是里民共同使用的客廳，環境改善後，課程、會議與社區活動都能更穩定進行。',
+    process: [
+      '盤點活動中心牆面、燈具與公共空間使用問題。',
+      '依使用頻率排序改善項目，優先處理安全與照明。',
+      '完成改善後，重新安排長者課程與親子活動使用。'
+    ],
+    images: [`${ACHIEVEMENT_IMAGE_BASE}achievement-05.jpg`, `${ACHIEVEMENT_IMAGE_BASE}achievement-06.jpg`],
+    videoUrl: ''
   },
   {
     id: 'achievement-06',
     title: '巷弄照明與夜間安全提升',
     date: '2025-11-30',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-06.jpg`,
-    content: '彙整居民夜間通行安全需求，促成巷弄照明增設與故障燈具汰換，提升返家路線辨識度，減少夜間治安與交通死角。'
+    tags: ['照明', '治安', '道路', '鄰里安全'],
+    content: '彙整居民夜間通行安全需求，促成巷弄照明增設與故障燈具汰換，提升返家路線辨識度，減少夜間治安與交通死角。',
+    summary: '夜間安全感來自看得清楚、走得安心，巷弄照明是里民每天都會感受到的改善。',
+    process: [
+      '整理居民回報的夜間暗點與故障燈具位置。',
+      '現場確認燈具角度、照射範圍與行走動線。',
+      '協調增設與汰換後，回訪居民確認夜間通行感受。'
+    ],
+    images: [`${ACHIEVEMENT_IMAGE_BASE}achievement-06.jpg`, `${ACHIEVEMENT_IMAGE_BASE}achievement-01.jpg`],
+    videoUrl: ''
   }
 ];
 
@@ -749,11 +1014,60 @@ const Lightbox = {
 // 鍵盤支援
 document.addEventListener('keydown', e => {
   const lb = document.getElementById('lightbox');
-  if (!lb.classList.contains('open')) return;
-  if (e.key === 'ArrowLeft')  Lightbox.prev();
-  if (e.key === 'ArrowRight') Lightbox.next();
-  if (e.key === 'Escape')     Lightbox.close();
+  const detail = document.getElementById('detailModal');
+  if (lb.classList.contains('open')) {
+    if (e.key === 'ArrowLeft')  Lightbox.prev();
+    if (e.key === 'ArrowRight') Lightbox.next();
+    if (e.key === 'Escape')     Lightbox.close();
+    return;
+  }
+  if (detail.classList.contains('open') && e.key === 'Escape') AchievementDetail.close();
 });
+
+const AchievementDetail = {
+  open(id) {
+    const item = ACHIEVEMENT_ITEMS.find(entry => entry.id === id);
+    if (!item) return;
+    const images = item.images?.length ? item.images : [item.image];
+    document.getElementById('detailCover').src = item.image;
+    document.getElementById('detailCover').alt = item.title;
+    document.getElementById('detailBody').innerHTML = `
+      <div class="detail-meta">
+        <span class="detail-pill">${item.date}</span>
+        ${(item.tags || []).map(tag => `<span class="detail-pill">${tag}</span>`).join('')}
+      </div>
+      <h2>${item.title}</h2>
+      <p class="detail-lead">${item.summary || item.content}</p>
+      <div class="detail-section">
+        <h3>服務過程</h3>
+        <ul class="detail-process">
+          ${(item.process || []).map((step, idx) => `<li data-step="${idx + 1}">${step}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="detail-section">
+        <h3>現場圖片</h3>
+        <div class="detail-gallery">
+          ${images.map((img, idx) => `<img src="${img}" alt="${item.title} 圖片 ${idx + 1}" loading="lazy" onclick="Lightbox.open(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${idx})">`).join('')}
+        </div>
+      </div>
+      <div class="detail-section detail-video">
+        <h3>影片紀錄</h3>
+        ${item.videoUrl
+          ? `<iframe src="${item.videoUrl}" title="${item.title} 影片紀錄" allowfullscreen loading="lazy"></iframe>`
+          : `<div class="video-placeholder">Demo 影片欄位：可放會勘紀錄、活動花絮或成果說明影片</div>`}
+      </div>
+    `;
+    document.getElementById('detailModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  },
+  close() {
+    document.getElementById('detailModal').classList.remove('open');
+    document.body.style.overflow = '';
+  },
+  closeOnBackdrop(e) {
+    if (e.target === document.getElementById('detailModal')) this.close();
+  }
+};
 
 function renderAchievementItems(items) {
   const grid = document.getElementById('achievementGrid');
@@ -764,8 +1078,12 @@ function renderAchievementItems(items) {
       </div>
       <div class="achievement-content">
         <div class="achievement-date">${item.date}</div>
+        <div class="achievement-tags">
+          ${(item.tags || []).map(tag => `<span class="achievement-tag">${tag}</span>`).join('')}
+        </div>
         <h3 class="achievement-title">${item.title}</h3>
         <p class="achievement-desc">${item.content}</p>
+        <button class="achievement-action" type="button" onclick="AchievementDetail.open('${item.id}')">查看完整過程</button>
       </div>
     </article>
   `).join('');
