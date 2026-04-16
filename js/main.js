@@ -213,9 +213,52 @@ async function loadDashboard(period) {
 }
 
 function renderDashboard(data) {
-  renderStackedBar(data);
   renderMonthStats(data);
   renderPieChart(data);
+}
+
+async function loadRecentReplies() {
+  const wrap = document.getElementById('recentReplies');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="chart-loading">載入近期公開回覆中...</div>';
+  try {
+    const res = await fetch(WEBHOOK.LIST + '?page=1');
+    if (!res.ok) throw new Error('List webhook HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.success) throw new Error('List webhook returned success=false');
+    const items = (data.items || [])
+      .filter(item => item && (item.reply || item.summary || item.title))
+      .slice(0, 4);
+    renderRecentReplies(items);
+  } catch (e) {
+    console.warn('[recent replies] load failed:', e);
+    wrap.innerHTML = '<div class="chart-loading">近期公開回覆暫時無法載入</div>';
+  }
+}
+
+function renderRecentReplies(items) {
+  const wrap = document.getElementById('recentReplies');
+  if (!wrap) return;
+  if (!items.length) {
+    wrap.innerHTML = '<div class="chart-loading">目前尚無公開回覆案件</div>';
+    return;
+  }
+  wrap.innerHTML = items.map(item => {
+    const text = item.reply || item.summary || '案件已收件，相關單位處理中。';
+    const clipped = escHtml(text).slice(0, 72) + (text.length > 72 ? '...' : '');
+    return '<article class="recent-reply-item">'
+      + '<div class="recent-reply-meta">'
+      + '<span class="recent-reply-type">' + escHtml(item.caseType || '未分類') + '</span>'
+      + '<span class="recent-reply-status">' + escHtml(item.status || '處理中') + '</span>'
+      + '</div>'
+      + '<h4>' + escHtml(item.title || '未命名案件') + '</h4>'
+      + '<p>' + clipped + '</p>'
+      + '<div class="recent-reply-foot">'
+      + '<span>' + escHtml(item.date || '') + '</span>'
+      + '<span>' + escHtml(item.caseId || '') + '</span>'
+      + '</div>'
+      + '</article>';
+  }).join('');
 }
 
 function renderDashboardError() {
@@ -492,4 +535,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.dash-tab').forEach(btn=>{btn.addEventListener('click',()=>loadDashboard(btn.dataset.period));});
   loadStats();
   loadDashboard('7d');
+  loadRecentReplies();
 });

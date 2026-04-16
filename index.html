@@ -151,20 +151,14 @@
       <div class="section-title">案件處理儀表板</div>
       <div class="dashboard-grid">
 
-        <div class="dash-card">
+        <div class="dash-card recent-replies-card">
           <div class="dash-card-title">
-            <span>案件趨勢（新增 vs 結案）</span>
-            <div class="dash-tabs">
-              <button class="dash-tab active" data-period="7d">近7日</button>
-              <button class="dash-tab" data-period="30d">近一個月</button>
-              <button class="dash-tab" data-period="90d">近三個月</button>
-            </div>
+            <span>近期公開回覆</span>
+            <button class="dash-link-btn" type="button" onclick="showPage('list')">查看全部</button>
           </div>
-          <div class="bar-legend">
-            <span class="legend-dot legend-new"></span>新增
-            <span class="legend-dot legend-closed" style="margin-left:12px;"></span>結案
+          <div class="recent-replies" id="recentReplies">
+            <div class="chart-loading">載入近期公開回覆中...</div>
           </div>
-          <div class="bar-chart" id="barChart"><div class="chart-loading">載入中…</div></div>
         </div>
 
         <div class="dash-card">
