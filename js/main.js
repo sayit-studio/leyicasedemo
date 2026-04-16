@@ -30,6 +30,12 @@ function setHref(selector, value) {
   });
 }
 
+function setBrandLogo(selector, src = 'leyi/assets/brand/logo.png') {
+  document.querySelectorAll(selector).forEach(el => {
+    el.innerHTML = `<img src="${src}" alt="${SITE_TEMPLATE_CONFIG.brand.name}">`;
+  });
+}
+
 function hydrateSiteShell() {
   document.title = SITE_TEMPLATE_CONFIG.seo.homeTitle;
   document.querySelector('meta[name="description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.homeDescription);
@@ -37,7 +43,7 @@ function hydrateSiteShell() {
   document.querySelector('meta[property="og:description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.homeDescription);
   document.querySelector('meta[property="og:image"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.ogImage);
 
-  setText('.nav-brand-icon', SITE_TEMPLATE_CONFIG.brand.icon);
+  setBrandLogo('.nav-brand-icon');
   setText('.nav-brand-name', SITE_TEMPLATE_CONFIG.brand.name);
   setText('.hero-badge', `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.tagline}`);
   setHtml('.hero-title', `${CONFIG.HERO_TITLE[0]}<br><span class="accent">${CONFIG.HERO_TITLE[1]}</span>`);

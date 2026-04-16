@@ -781,7 +781,7 @@ document.title = SITE_TEMPLATE_CONFIG.seo.achievementsTitle;
 document.querySelector('meta[name="description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
 document.querySelector('meta[property="og:title"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsTitle);
 document.querySelector('meta[property="og:description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
-document.querySelector('.nav-brand-icon').textContent = SITE_TEMPLATE_CONFIG.brand.icon;
+document.querySelector('.nav-brand-icon').innerHTML = `<img src="assets/brand/logo.png" alt="${SITE_TEMPLATE_CONFIG.brand.name}">`;
 document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.brand.name;
 document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
 document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();

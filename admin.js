@@ -12,6 +12,12 @@ const ADMIN_CONFIG = {
 
 const TEMPLATE_CONFIG = window.SITE_TEMPLATE_CONFIG || null;
 
+function getAdminLogoSrc() {
+  return window.location.pathname.includes('/admin/')
+    ? '../leyi/assets/brand/logo.png'
+    : 'leyi/assets/brand/logo.png';
+}
+
 /* ══════════════════════════════
    1. 身份驗證
 ══════════════════════════════ */
@@ -191,7 +197,7 @@ const Sidebar = {
     if (TEMPLATE_CONFIG) {
       if (brandNameEl) brandNameEl.textContent = TEMPLATE_CONFIG.brand.adminName;
       if (brandRoleEl) brandRoleEl.textContent = TEMPLATE_CONFIG.brand.adminSubtitle;
-      if (brandIconEl) brandIconEl.textContent = TEMPLATE_CONFIG.brand.icon;
+      if (brandIconEl) brandIconEl.innerHTML = `<img src="${getAdminLogoSrc()}" alt="Logo">`;
     }
     if (nameEl)   nameEl.textContent  = Auth.getName() || '使用者';
     if (tagEl)    tagEl.textContent   = this._roleLabel(Auth.getRole());
