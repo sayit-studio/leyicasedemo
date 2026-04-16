@@ -549,6 +549,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
+  align-items: start;
 }
 .achievement-item-card {
   background: var(--glass-bg2);
@@ -558,7 +559,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  height: auto;
   animation: cardRise .55s ease both;
 }
 .achievement-item-card:nth-child(2) { animation-delay: .04s; }
@@ -629,6 +630,10 @@
   font-size: 15px;
   line-height: 1.8;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .achievement-tags {
   display: flex;
@@ -647,7 +652,7 @@
   padding: 4px 10px;
 }
 .achievement-action {
-  margin-top: auto;
+  margin-top: 4px;
   border: 0;
   cursor: pointer;
   border-radius: var(--radius-full);
@@ -676,41 +681,6 @@
   font-weight: 800;
   padding: 8px 14px;
   box-shadow: var(--shadow-sm);
-}
-.source-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
-.source-card {
-  background: rgba(255,255,255,.72);
-  border: 1px solid var(--glass-border);
-  border-radius: 26px;
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-}
-.source-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff;
-  font-size: 21px;
-  margin-bottom: 18px;
-}
-.source-card h3 {
-  font-family: var(--font-display);
-  color: var(--color-text);
-  font-size: 20px;
-  margin: 0 0 10px;
-}
-.source-card p {
-  color: var(--color-text-muted);
-  font-size: 14px;
-  line-height: 1.75;
-  margin: 0;
 }
 
 /* Detail modal */
@@ -904,10 +874,10 @@
   .featured-card img { min-height: 300px; }
   .featured-content { padding: 22px; }
   .achievement-grid { grid-template-columns: 1fr; gap: 18px; }
-  .achievement-item-card { border-radius: 22px; }
+  .achievement-item-card { border-radius: 22px; height: auto; min-height: 0; }
   .achievement-content { padding: 18px; }
   .achievement-title { font-size: 19px; }
-  .source-grid { grid-template-columns: 1fr; }
+  .achievement-desc { -webkit-line-clamp: 5; }
   .detail-modal { padding: 12px; align-items: flex-end; }
   .detail-dialog { border-radius: 24px 24px 0 0; max-height: 92vh; }
   .detail-body { padding: 22px 18px 26px; }
@@ -988,36 +958,6 @@
       <p>以項目卡片呈現每一件完成事項，保留分類標籤、時間、內容與詳情入口，方便民眾快速瀏覽與深入了解。</p>
     </div>
     <div class="achievement-grid" id="achievementGrid"></div>
-  </section>
-
-  <section class="achievement-section source-section">
-    <div class="section-head">
-      <span class="section-eyebrow">成果來源</span>
-      <h2 class="section-heading">每項成果都有來源與處理脈絡</h2>
-      <p>政績不是單向宣傳，而是從里民反映、現場會勘、社區活動與機關協調累積出來的服務紀錄。</p>
-    </div>
-    <div class="source-grid">
-      <article class="source-card">
-        <div class="source-icon">📮</div>
-        <h3>陳情案件</h3>
-        <p>來自里民直接反映的生活問題，整理後追蹤改善進度與公開成果。</p>
-      </article>
-      <article class="source-card">
-        <div class="source-icon">👣</div>
-        <h3>現場會勘</h3>
-        <p>把問題帶到現場確認，留下改善前後紀錄，避免只停留在文字描述。</p>
-      </article>
-      <article class="source-card">
-        <div class="source-icon">🤝</div>
-        <h3>社區活動</h3>
-        <p>包含親子、樂齡、環境與社區凝聚活動，呈現服務與居民互動成果。</p>
-      </article>
-      <article class="source-card">
-        <div class="source-icon">🏛️</div>
-        <h3>機關協調</h3>
-        <p>需要跨單位處理的事項，記錄協調、追蹤與完成結果，讓流程更透明。</p>
-      </article>
-    </div>
   </section>
 </main>
 
@@ -1274,6 +1214,10 @@ function uniqueArray(values) {
   return [...new Set(asArray(values))];
 }
 
+function cleanText(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
 function normalizeAchievementItem(item, idx) {
   const image = item.image || item.coverImage || item.cover || item['封面圖片'] || `${ACHIEVEMENT_IMAGE_BASE}achievement-${String((idx % 6) + 1).padStart(2, '0')}.jpg`;
   const images = [
@@ -1284,18 +1228,18 @@ function normalizeAchievementItem(item, idx) {
     ...asArray(item['成果前圖片']),
     ...asArray(item['成果後圖片'])
   ];
-  const content = item.content || item.detail || item['詳細內容'] || item.summary || item['摘要'] || '';
+  const content = cleanText(item.content || item.detail || item['詳細內容'] || item.summary || item['摘要']);
 
   return {
     id: item.id || item.pageId || item.recordId || `achievement-${idx + 1}`,
-    title: item.title || item.name || item['政績標題'] || `服務成果 ${idx + 1}`,
-    date: item.date || item.publishedAt || item['發布日期'] || '',
+    title: cleanText(item.title || item.name || item['政績標題'] || `服務成果 ${idx + 1}`),
+    date: cleanText(item.date || item.publishedAt || item['發布日期']),
     image,
     featured: Boolean(item.featured ?? item.isFeatured ?? item.isPinned ?? item['是否精選']),
-    source: item.source || item.sourceType || item.type || item['政績類型'] || '政績資料庫',
+    source: cleanText(item.source || item.sourceType || item.type || item['政績類型'] || '政績資料庫'),
     tags: uniqueArray(item.tags || item['標籤'] || item.category || item['議題類型']),
     content,
-    summary: item.summary || item['摘要'] || content,
+    summary: cleanText(item.summary || item['摘要'] || content),
     process: asArray(item.process || item['服務過程'] || content),
     images: uniqueArray(images),
     videoUrl: item.videoUrl || item.sourceUrl || item['來源連結'] || ''
