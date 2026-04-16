@@ -431,6 +431,119 @@
   font-size: 14px; color: var(--color-text-light);
 }
 
+/* ── 政績項目牆 */
+.achievement-wall {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 20px 96px;
+}
+.achievement-wall-head {
+  max-width: 760px;
+  margin-bottom: 30px;
+}
+.achievement-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-pale);
+  color: var(--color-primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.achievement-wall-head h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.18;
+  margin: 16px 0 12px;
+  color: var(--color-text);
+}
+.achievement-wall-head p {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.achievement-item-card {
+  background: var(--glass-bg2);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  animation: cardRise .55s ease both;
+}
+.achievement-item-card:nth-child(2) { animation-delay: .04s; }
+.achievement-item-card:nth-child(3) { animation-delay: .08s; }
+.achievement-item-card:nth-child(4) { animation-delay: .12s; }
+.achievement-item-card:nth-child(5) { animation-delay: .16s; }
+.achievement-item-card:nth-child(6) { animation-delay: .2s; }
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.achievement-image {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(232,127,36,.3), transparent 28%),
+    linear-gradient(135deg, var(--color-bg-dark), var(--color-bg-section));
+  overflow: hidden;
+  cursor: pointer;
+}
+.achievement-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s ease;
+}
+.achievement-item-card:hover .achievement-image img {
+  transform: scale(1.05);
+}
+.achievement-image.is-missing::after {
+  content: '請放入圖片';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.achievement-content {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.achievement-date {
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+.achievement-title {
+  font-family: var(--font-display);
+  color: var(--color-text);
+  font-size: 21px;
+  line-height: 1.35;
+  margin: 0;
+}
+.achievement-desc {
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.8;
+  margin: 0;
+}
+
 /* Toast */
 .toast-container {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -473,6 +586,16 @@
   .ach-card-cover,
   .ach-card-cover-placeholder { height: 160px; }
   .ach-card-title { font-size: 16px; }
+
+  .achievement-wall { padding: 42px 18px 76px; }
+  .achievement-grid { grid-template-columns: 1fr; gap: 18px; }
+  .achievement-item-card { border-radius: 22px; }
+  .achievement-content { padding: 18px; }
+  .achievement-title { font-size: 19px; }
+}
+
+@media (min-width: 769px) and (max-width: 1040px) {
+  .achievement-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style>
 </head>
@@ -511,49 +634,15 @@
   <p>從立法到服務，每一項成果都是對市民承諾的具體實現。<br>公開透明，讓政績有跡可循。</p>
 </div>
 
-<!-- ══ 篩選 Tab ══ -->
-<div class="filter-wrap">
-  <div class="filter-tabs" id="filterTabs">
-    <button class="ftab active" data-type="">全部</button>
-    <button class="ftab" data-type="立法成果">立法成果</button>
-    <button class="ftab" data-type="選民服務">選民服務</button>
-    <button class="ftab" data-type="會勘">會勘</button>
-    <button class="ftab" data-type="質詢">質詢</button>
-    <button class="ftab" data-type="提案">提案</button>
-    <button class="ftab" data-type="活動">活動</button>
-    <button class="ftab" data-type="其他">其他</button>
+<!-- ══ 政績項目牆 ══ -->
+<main class="achievement-wall">
+  <div class="achievement-wall-head">
+    <span class="achievement-kicker">代表性服務事項</span>
+    <h2>每一項政績，都是一件被完成的承諾</h2>
+    <p>第一版先以項目方式展示，不呈現類別，聚焦政績名稱、時間、內容與現場圖片。</p>
   </div>
-</div>
-
-<!-- ══ 時間軸主體 ══ -->
-<div class="timeline-wrap">
-  <div class="timeline" id="timeline">
-    <!-- 骨架屏 -->
-    <div class="skeleton-list" id="skeletonList">
-      <div class="skeleton-item">
-        <div class="skeleton-card" style="margin-right:26px;"><div class="skeleton-cover"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line med"></div><div class="skeleton-line"></div></div></div>
-        <div class="skeleton-dot-wrap"><div class="skeleton-dot"></div></div>
-        <div></div>
-      </div>
-      <div class="skeleton-item">
-        <div></div>
-        <div class="skeleton-dot-wrap"><div class="skeleton-dot"></div></div>
-        <div class="skeleton-card" style="margin-left:26px;"><div class="skeleton-cover"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line med"></div><div class="skeleton-line"></div></div></div>
-      </div>
-      <div class="skeleton-item">
-        <div class="skeleton-card" style="margin-right:26px;"><div class="skeleton-cover"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line"></div></div></div>
-        <div class="skeleton-dot-wrap"><div class="skeleton-dot"></div></div>
-        <div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 載入更多 sentinel -->
-  <div id="loadSentinel" class="load-sentinel" style="display:none;">
-    <div class="load-spinner"></div>
-  </div>
-  <div id="allLoaded" class="all-loaded" style="display:none;">— 已顯示全部政績 —</div>
-</div>
+  <div class="achievement-grid" id="achievementGrid"></div>
+</main>
 
 <!-- ══ Lightbox ══ -->
 <div class="lightbox" id="lightbox" onclick="Lightbox.closeOnBackdrop(event)">
@@ -585,17 +674,51 @@
    政績專區 — 前台邏輯
    ════════════════════════════════════════ */
 
-const WEBHOOK = SITE_UTILS.webhook();
-
-// ── 狀態
-let _state = {
-  page: 1,
-  limit: 10,
-  type: '',
-  loading: false,
-  allLoaded: false,
-  items: [],
-};
+const ACHIEVEMENT_IMAGE_BASE = 'assets/achievements/';
+const ACHIEVEMENT_ITEMS = [
+  {
+    id: 'achievement-01',
+    title: '校園周邊通學步道改善',
+    date: '2026-04-08',
+    image: `${ACHIEVEMENT_IMAGE_BASE}achievement-01.jpg`,
+    content: '針對學校周邊人行空間不足、接送動線混亂問題，協調相關單位完成標線重整、通學步道改善與路口安全提醒，讓家長接送與學童步行更安心。'
+  },
+  {
+    id: 'achievement-02',
+    title: '社區排水溝渠清淤與修繕',
+    date: '2026-03-22',
+    image: `${ACHIEVEMENT_IMAGE_BASE}achievement-02.jpg`,
+    content: '接獲居民反映雨後積水與異味問題後，安排現場會勘並促成排水溝渠清淤、破損處修補與後續巡檢機制，降低汛期淹水風險。'
+  },
+  {
+    id: 'achievement-03',
+    title: '公園休憩設施更新',
+    date: '2026-02-17',
+    image: `${ACHIEVEMENT_IMAGE_BASE}achievement-03.jpg`,
+    content: '協助改善公園座椅老舊、照明不足與兒童遊具安全疑慮，完成設施更新與環境整理，讓鄰里居民有更舒適的日常休憩空間。'
+  },
+  {
+    id: 'achievement-04',
+    title: '市場周邊交通動線整理',
+    date: '2026-01-29',
+    image: `${ACHIEVEMENT_IMAGE_BASE}achievement-04.jpg`,
+    content: '針對市場尖峰時段人車交織與臨停問題，推動攤商卸貨區、行人穿越動線與交通提醒標示優化，改善採買環境與周邊通行安全。'
+  },
+  {
+    id: 'achievement-05',
+    title: '里民活動中心環境改善',
+    date: '2025-12-18',
+    image: `${ACHIEVEMENT_IMAGE_BASE}achievement-05.jpg`,
+    content: '協調改善活動中心牆面滲水、照明老舊與公共使用空間不足問題，讓長者課程、社區會議與親子活動有更穩定的使用環境。'
+  },
+  {
+    id: 'achievement-06',
+    title: '巷弄照明與夜間安全提升',
+    date: '2025-11-30',
+    image: `${ACHIEVEMENT_IMAGE_BASE}achievement-06.jpg`,
+    content: '彙整居民夜間通行安全需求，促成巷弄照明增設與故障燈具汰換，提升返家路線辨識度，減少夜間治安與交通死角。'
+  }
+];
 
 // ── Lightbox
 const Lightbox = {
@@ -632,318 +755,20 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape')     Lightbox.close();
 });
 
-// ── Toast
-function showToast(msg, duration = 2800) {
-  const el = document.createElement('div');
-  el.className = 'toast-msg';
-  el.textContent = msg;
-  document.getElementById('toastContainer').appendChild(el);
-  setTimeout(() => {
-    el.style.opacity = '0';
-    el.style.transition = 'opacity .3s';
-    setTimeout(() => el.remove(), 300);
-  }, duration);
-}
-
-// ── 篩選 Tab
-document.getElementById('filterTabs').addEventListener('click', e => {
-  const btn = e.target.closest('.ftab');
-  if (!btn) return;
-  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  _state.type = btn.dataset.type;
-  resetAndLoad();
-});
-
-// ── 重置並重新載入
-function resetAndLoad() {
-  _state.page = 1;
-  _state.allLoaded = false;
-  _state.items = [];
-  document.getElementById('timeline').querySelectorAll('.tl-item').forEach(el => el.remove());
-  document.getElementById('skeletonList').style.display = '';
-  document.getElementById('loadSentinel').style.display = 'none';
-  document.getElementById('allLoaded').style.display = 'none';
-  fetchAchievements();
-}
-
-// ── 取得資料
-async function fetchAchievements() {
-  if (_state.loading || _state.allLoaded) return;
-  _state.loading = true;
-
-  try {
-    const params = new URLSearchParams({
-      page:  _state.page,
-      limit: _state.limit,
-      type:  _state.type,
-    });
-    const res  = await fetch(`${WEBHOOK}/achievements?${params}`);
-    const data = await res.json();
-
-    if (data.success && data.items?.length) {
-      document.getElementById('skeletonList').style.display = 'none';
-      renderItems(data.items);
-      _state.items.push(...data.items);
-      _state.page++;
-
-      if (_state.page > data.totalPages || data.items.length < _state.limit) {
-        _state.allLoaded = true;
-        document.getElementById('loadSentinel').style.display = 'none';
-        if (_state.items.length > 0) {
-          document.getElementById('allLoaded').style.display = 'block';
-        }
-      } else {
-        document.getElementById('loadSentinel').style.display = 'flex';
-      }
-    } else {
-      document.getElementById('skeletonList').style.display = 'none';
-      if (_state.items.length === 0) {
-        document.getElementById('timeline').insertAdjacentHTML('beforeend',
-          `<div style="text-align:center;padding:80px 20px;color:var(--color-text-muted);font-size:15px;">
-            <div style="font-size:48px;margin-bottom:16px;">🏆</div>
-            <div>目前尚無${_state.type ? '「' + _state.type + '」類型的' : ''}政績資料</div>
-           </div>`);
-      }
-      _state.allLoaded = true;
-    }
-  } catch (err) {
-    console.error('[Achievements] fetch error:', err);
-    document.getElementById('skeletonList').style.display = 'none';
-    document.getElementById('timeline').insertAdjacentHTML('beforeend',
-      `<div style="text-align:center;padding:60px 20px;color:var(--color-text-muted);">
-        <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
-        <div>資料載入失敗，請稍後再試</div>
-        <button onclick="resetAndLoad()" style="margin-top:16px;padding:8px 20px;background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius-full);cursor:pointer;font-size:14px;">重新載入</button>
-       </div>`);
-  } finally {
-    _state.loading = false;
-  }
-}
-
-// ── 日期格式化
-function fmtDate(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return `${d.getMonth() + 1}/${d.getDate()}`;
-}
-function fmtYear(iso) {
-  if (!iso) return '';
-  return new Date(iso).getFullYear() + '';
-}
-
-// ── 渲染卡片
-function renderItems(items) {
-  const tl = document.getElementById('timeline');
-  const currentCount = tl.querySelectorAll('.tl-item').length;
-
-  items.forEach((item, i) => {
-    const idx    = currentCount + i;
-    const liked  = !!localStorage.getItem(`achievement_liked_${item.id}`);
-    const isPinned = item.isPinned;
-    const imgs   = [item.coverImage, ...(item.images || [])].filter(Boolean);
-    const thumbs = imgs.slice(0, 3);
-    const extraCount = imgs.length - 3;
-
-    // 封面
-    const coverHtml = item.coverImage
-      ? `<img class="ach-card-cover" src="${item.coverImage}" alt="${item.title}" loading="lazy">`
-      : `<div class="ach-card-cover-placeholder">🏆</div>`;
-
-    // 縮圖列（僅當有額外圖片時）
-    let thumbsHtml = '';
-    if (item.images?.length) {
-      thumbsHtml = `<div class="ach-thumbs">`;
-      thumbs.forEach((url, ti) => {
-        thumbsHtml += `<img class="ach-thumb" src="${url}" alt="附圖 ${ti+1}" loading="lazy" onclick="Lightbox.open(${JSON.stringify(imgs)}, ${ti})">`;
-      });
-      if (extraCount > 0) {
-        thumbsHtml += `<div class="ach-thumb-more" onclick="Lightbox.open(${JSON.stringify(imgs)}, 3)">+${extraCount}</div>`;
-      }
-      thumbsHtml += `</div>`;
-    }
-
-    // 標籤
-    const tagsHtml = item.tags?.length
-      ? `<div class="ach-tags">${item.tags.map(t => `<span class="ach-tag">#${t}</span>`).join('')}</div>`
-      : '';
-
-    const html = `
-      <div class="tl-item" id="ach-${item.id}" data-id="${item.id}">
-        ${idx % 2 === 0 ? `
-          <div class="ach-card">${coverHtml}
-            <div class="ach-card-body">
-              <div class="ach-meta">
-                ${isPinned ? `<span class="ach-badge pinned-badge">🔖 重點</span>` : ''}
-                <span class="ach-badge">${item.type || '其他'}</span>
-                <span class="ach-date-sm">${item.date || ''}</span>
-              </div>
-              <div class="ach-card-title">${item.title}</div>
-              <div class="ach-card-content">${item.content || ''}</div>
-              ${tagsHtml}${thumbsHtml}
-            </div>
-            <div class="ach-card-footer">
-              <button class="ach-like-btn ${liked ? 'liked' : ''}"
-                      onclick="handleLike(this, '${item.id}')"
-                      ${liked ? 'disabled' : ''}>
-                <span class="like-heart">❤</span>
-                <span class="like-count">${item.likes || 0}</span>
-              </button>
-              <div class="ach-share-wrap">
-                <button class="ach-share-btn" onclick="toggleShare(this, '${item.id}', event)">
-                  <span>↗</span> 分享
-                </button>
-                <div class="share-popover">
-                  <a class="share-option" href="#" onclick="shareLine('${item.id}');return false;">💚 LINE</a>
-                  <a class="share-option" href="#" onclick="shareFb('${item.id}');return false;">📘 Facebook</a>
-                  <a class="share-option" href="#" onclick="shareIg('${item.id}');return false;">📸 Instagram</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="tl-dot"><div class="tl-dot-circle ${isPinned ? 'pinned' : ''}"></div></div>
-          <div class="tl-date">
-            <div>${fmtDate(item.date)}</div>
-            <div class="tl-date-year">${fmtYear(item.date)}</div>
-          </div>
-        ` : `
-          <div class="tl-date">
-            <div>${fmtDate(item.date)}</div>
-            <div class="tl-date-year">${fmtYear(item.date)}</div>
-          </div>
-          <div class="tl-dot"><div class="tl-dot-circle ${isPinned ? 'pinned' : ''}"></div></div>
-          <div class="ach-card">${coverHtml}
-            <div class="ach-card-body">
-              <div class="ach-meta">
-                ${isPinned ? `<span class="ach-badge pinned-badge">🔖 重點</span>` : ''}
-                <span class="ach-badge">${item.type || '其他'}</span>
-                <span class="ach-date-sm">${item.date || ''}</span>
-              </div>
-              <div class="ach-card-title">${item.title}</div>
-              <div class="ach-card-content">${item.content || ''}</div>
-              ${tagsHtml}${thumbsHtml}
-            </div>
-            <div class="ach-card-footer">
-              <button class="ach-like-btn ${liked ? 'liked' : ''}"
-                      onclick="handleLike(this, '${item.id}')"
-                      ${liked ? 'disabled' : ''}>
-                <span class="like-heart">❤</span>
-                <span class="like-count">${item.likes || 0}</span>
-              </button>
-              <div class="ach-share-wrap">
-                <button class="ach-share-btn" onclick="toggleShare(this, '${item.id}', event)">
-                  <span>↗</span> 分享
-                </button>
-                <div class="share-popover">
-                  <a class="share-option" href="#" onclick="shareLine('${item.id}');return false;">💚 LINE</a>
-                  <a class="share-option" href="#" onclick="shareFb('${item.id}');return false;">📘 Facebook</a>
-                  <a class="share-option" href="#" onclick="shareIg('${item.id}');return false;">📸 Instagram</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        `}
-      </div>`;
-
-    tl.insertAdjacentHTML('beforeend', html);
-
-    // Intersection Observer for card animation
-    const el = document.getElementById(`ach-${item.id}`);
-    if (el) cardObserver.observe(el);
-  });
-}
-
-// ── 卡片進場動畫
-const cardObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      cardObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-// ── 無限捲動 sentinel
-const sentinelObserver = new IntersectionObserver((entries) => {
-  if (entries[0].isIntersecting && !_state.loading && !_state.allLoaded) {
-    fetchAchievements();
-  }
-}, { threshold: 0.1 });
-sentinelObserver.observe(document.getElementById('loadSentinel'));
-
-// ── 按讚
-async function handleLike(btn, id) {
-  const key = `achievement_liked_${id}`;
-  if (localStorage.getItem(key)) return;
-
-  btn.disabled = true;
-  try {
-    const res  = await fetch(`${WEBHOOK}/achievements/like`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      localStorage.setItem(key, '1');
-      btn.classList.add('liked');
-
-      const countEl = btn.querySelector('.like-count');
-      const newCount = data.likes ?? ((parseInt(countEl.textContent) || 0) + 1);
-      countEl.textContent = newCount;
-
-      // 浮現 +1 動畫
-      const float = document.createElement('span');
-      float.className = 'like-float';
-      float.textContent = '+1';
-      btn.appendChild(float);
-      setTimeout(() => float.remove(), 600);
-    } else {
-      btn.disabled = false;
-    }
-  } catch (e) {
-    console.error('[Like] error:', e);
-    btn.disabled = false;
-  }
-}
-
-// ── 分享
-function getShareUrl(id) {
-  return `${location.origin}${location.pathname}#achievement-${id}`;
-}
-function toggleShare(btn, id, e) {
-  e.stopPropagation();
-  const popover = btn.nextElementSibling;
-  // 關閉其他所有開啟的 popover
-  document.querySelectorAll('.share-popover.open').forEach(p => {
-    if (p !== popover) p.classList.remove('open');
-  });
-  popover.classList.toggle('open');
-}
-// 點擊其他地方關閉 popover
-document.addEventListener('click', () => {
-  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
-});
-
-function shareLine(id) {
-  const url = encodeURIComponent(getShareUrl(id));
-  window.open(`https://social-plugins.line.me/lineit/share?url=${url}`, '_blank');
-  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
-}
-function shareFb(id) {
-  const url = encodeURIComponent(getShareUrl(id));
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
-}
-async function shareIg(id) {
-  const url = getShareUrl(id);
-  try {
-    await navigator.clipboard.writeText(url);
-    showToast('連結已複製，請貼到 IG 限動 ✨');
-  } catch {
-    showToast('複製連結：' + url);
-  }
-  document.querySelectorAll('.share-popover.open').forEach(p => p.classList.remove('open'));
+function renderAchievementItems(items) {
+  const grid = document.getElementById('achievementGrid');
+  grid.innerHTML = items.map(item => `
+    <article class="achievement-item-card" id="${item.id}">
+      <div class="achievement-image" onclick="Lightbox.open(['${item.image}'], 0)">
+        <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.closest('.achievement-image').classList.add('is-missing');this.remove();">
+      </div>
+      <div class="achievement-content">
+        <div class="achievement-date">${item.date}</div>
+        <h3 class="achievement-title">${item.title}</h3>
+        <p class="achievement-desc">${item.content}</p>
+      </div>
+    </article>
+  `).join('');
 }
 
 // ── Hamburger
@@ -961,21 +786,14 @@ document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.bra
 document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
 document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();
 
-fetchAchievements();
+renderAchievementItems(ACHIEVEMENT_ITEMS);
 
 // ── URL hash 跳轉到指定政績
 window.addEventListener('load', () => {
   const hash = location.hash;
-  if (hash && hash.startsWith('#achievement-')) {
-    const id = hash.replace('#achievement-', '');
-    const waitForEl = setInterval(() => {
-      const el = document.getElementById(`ach-${id}`);
-      if (el) {
-        clearInterval(waitForEl);
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 200);
-  }
+  if (!hash) return;
+  const el = document.querySelector(hash);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 </script>
 </body>
