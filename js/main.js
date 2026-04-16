@@ -45,7 +45,6 @@ function hydrateSiteShell() {
 
   setBrandLogo('.nav-brand-icon');
   setText('.nav-brand-name', SITE_TEMPLATE_CONFIG.brand.name);
-  setText('.hero-badge', `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.tagline}`);
   setHtml('.hero-title', `${CONFIG.HERO_TITLE[0]}<br><span class="accent">${CONFIG.HERO_TITLE[1]}</span>`);
   setText('.hero-sub', CONFIG.HERO_SUB);
   setText('.footer-brand', `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`);

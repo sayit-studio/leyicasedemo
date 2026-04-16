@@ -1,5 +1,5 @@
 {
-  "name": "WF-11 政績列表 (leyicasedemo)",
+  "name": "WF-11 政績列表 leyicasedemo/achievements",
   "nodes": [
     {
       "parameters": {
@@ -9,7 +9,7 @@
         "options": {}
       },
       "id": "b1a2c3d4-0001-4001-8001-a1b2c3d4e5f6",
-      "name": "Webhook",
+      "name": "接收政績列表查詢",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [240, 300],
@@ -21,11 +21,10 @@
         "operation": "getAll",
         "databaseId": {
           "__rl": true,
-          "value": "DB-06-政績資料庫-請填入實際-Notion-DB-ID",
+          "value": "344b3ad1d1cd80dfb8dad1099b9e0e6a",
           "mode": "id"
         },
-        "returnAll": false,
-        "limit": 100,
+        "returnAll": true,
         "filterType": "manual",
         "filters": {
           "conditions": [
@@ -39,11 +38,11 @@
         "sort": {
           "sortRules": [
             {
-              "key": "重要程度",
-              "direction": "descending"
+              "key": "顯示排序",
+              "direction": "ascending"
             },
             {
-              "key": "成果日期",
+              "key": "發布日期",
               "direction": "descending"
             }
           ]
@@ -54,17 +53,17 @@
         "simplifyOutput": false
       },
       "id": "b1a2c3d4-0002-4001-8001-a1b2c3d4e5f6",
-      "name": "Notion 查詢 DB-06 政績",
+      "name": "查詢 Notion demoDB_achievement",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [460, 300]
     },
     {
       "parameters": {
-        "jsCode": "// ════════════════════════════════════════\n// WF-11 政績列表 — 格式化 + 分頁\n// Notion Simplify: OFF（走完整路徑）\n// ════════════════════════════════════════\n\n// 取得 query params\nconst query    = $('Webhook').first().json.query || {};\nconst page     = parseInt(query.page  ?? '1');\nconst limit    = parseInt(query.limit ?? '10');\nconst typeFilter = (query.type || '').trim();\n\n// 原始 Notion items\nconst rawItems = $input.all();\n\n// ── 格式化函式\nfunction formatItem(item) {\n  const props = item.json.properties || {};\n\n  // 政績名稱\n  const title = props['政績名稱']?.title?.[0]?.plain_text ?? '';\n\n  // 政績類型\n  const type = props['政績類型']?.select?.name ?? '';\n\n  // 政績內容（取第一個 rich_text 塊；多塊時串接）\n  const contentBlocks = props['政績內容']?.rich_text ?? [];\n  const content = contentBlocks.map(b => b.plain_text).join('');\n\n  // 成果日期\n  const date = props['成果日期']?.date?.start ?? '';\n\n  // 主圖片（優先 file URL，fallback external URL）\n  const coverFiles = props['主圖片']?.files ?? [];\n  const coverImage = coverFiles[0]?.file?.url\n                  || coverFiles[0]?.external?.url\n                  || null;\n\n  // 附圖（多張）\n  const imagesFiles = props['附圖']?.files ?? [];\n  const images = imagesFiles.map(f => f?.file?.url || f?.external?.url).filter(Boolean);\n\n  // 按讚數\n  const likes = props['按讚數']?.number ?? 0;\n\n  // 是否公開\n  const isPublic = props['是否公開']?.checkbox ?? false;\n\n  // 重要程度（置頂判斷）\n  const importance = props['重要程度']?.select?.name ?? '一般';\n  const isPinned   = importance === '重點';\n\n  // 標籤\n  const tags = (props['標籤']?.multi_select ?? []).map(t => t.name);\n\n  // Notion Page ID\n  const id = item.json.id;\n\n  return { id, title, type, content, date, coverImage, images, likes, isPublic, isPinned, importance, tags };\n}\n\n// ── 格式化所有項目\nlet items = rawItems.map(formatItem);\n\n// ── 類型篩選\nif (typeFilter) {\n  items = items.filter(i => i.type === typeFilter);\n}\n\n// ── 分頁\nconst total      = items.length;\nconst totalPages = Math.max(1, Math.ceil(total / limit));\nconst safePage   = Math.min(Math.max(page, 1), totalPages);\nconst start      = (safePage - 1) * limit;\nconst pageItems  = items.slice(start, start + limit);\n\n// ── 輸出\nreturn [\n  {\n    json: {\n      success:    true,\n      items:      pageItems,\n      total,\n      page:       safePage,\n      totalPages,\n    }\n  }\n];\n"
+        "jsCode": "const query = $('接收政績列表查詢').first().json.query || {};\nconst page = Math.max(parseInt(query.page || '1', 10), 1);\nconst limit = Math.max(parseInt(query.limit || '100', 10), 1);\nconst tagFilter = String(query.tag || '').trim();\nconst featuredOnly = String(query.featured || '').toLowerCase() === 'true';\nconst rawItems = $input.all();\n\nfunction getText(prop) {\n  if (!prop) return '';\n  if (prop.type === 'title') return (prop.title || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'rich_text') return (prop.rich_text || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'select') return prop.select?.name || '';\n  if (prop.type === 'date') return prop.date?.start || '';\n  if (prop.type === 'url') return prop.url || '';\n  if (prop.type === 'number') return prop.number ?? '';\n  if (prop.type === 'checkbox') return prop.checkbox || false;\n  return '';\n}\n\nfunction getFiles(prop) {\n  if (!prop || prop.type !== 'files') return [];\n  return (prop.files || []).map(f => f.file?.url || f.external?.url || '').filter(Boolean);\n}\n\nfunction getTags(prop) {\n  return (prop?.multi_select || []).map(t => t.name).filter(Boolean);\n}\n\nfunction splitProcess(value) {\n  return String(value || '').split(/\\r?\\n|、|,/).map(v => v.trim()).filter(Boolean).slice(0, 6);\n}\n\nfunction sourceFromProps(props) {\n  const type = getText(props['政績類型']);\n  if (type) return type;\n  if (getText(props['相關案件編號'])) return '陳情案件';\n  if (getText(props['相關會勘ID'])) return '現場會勘';\n  if (getText(props['相關質詢ID'])) return '質詢成果';\n  if (getText(props['相關提案ID'])) return '提案成果';\n  return '政績資料庫';\n}\n\nlet items = rawItems.map((item, index) => {\n  const props = item.json.properties || {};\n  const title = getText(props['政績標題']);\n  const type = getText(props['政績類型']);\n  const category = getText(props['議題類型']);\n  const summary = getText(props['摘要']);\n  const content = getText(props['詳細內容']) || summary;\n  const coverImages = getFiles(props['封面圖片']);\n  const beforeImages = getFiles(props['成果前圖片']);\n  const afterImages = getFiles(props['成果後圖片']);\n  const images = [...coverImages, ...beforeImages, ...afterImages];\n\n  return {\n    id: item.json.id || `achievement-${index + 1}`,\n    title,\n    type,\n    source: sourceFromProps(props),\n    category,\n    tags: getTags(props['標籤']),\n    date: getText(props['發布日期']),\n    summary,\n    content,\n    featured: Boolean(getText(props['是否精選'])),\n    image: coverImages[0] || images[0] || '',\n    images,\n    beforeImages,\n    afterImages,\n    process: splitProcess(content),\n    videoUrl: getText(props['來源連結']),\n    sortOrder: Number(getText(props['顯示排序']) || 999),\n    status: getText(props['資料狀態'])\n  };\n}).filter(item => item.title && item.status !== '草稿' && item.status !== '隱藏');\n\nif (tagFilter) items = items.filter(item => item.tags.includes(tagFilter) || item.category === tagFilter || item.type === tagFilter);\nif (featuredOnly) items = items.filter(item => item.featured);\n\nitems.sort((a, b) => (a.sortOrder - b.sortOrder) || String(b.date).localeCompare(String(a.date)));\n\nconst total = items.length;\nconst totalPages = Math.max(1, Math.ceil(total / limit));\nconst safePage = Math.min(page, totalPages);\nconst start = (safePage - 1) * limit;\nconst pageItems = items.slice(start, start + limit);\n\nreturn [{ json: { success: true, total, page: safePage, limit, totalPages, items: pageItems } }];"
       },
       "id": "b1a2c3d4-0003-4001-8001-a1b2c3d4e5f6",
-      "name": "Code 格式化 + 分頁",
+      "name": "整理政績列表結果",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [680, 300]
@@ -90,40 +89,40 @@
         }
       },
       "id": "b1a2c3d4-0004-4001-8001-a1b2c3d4e5f6",
-      "name": "Respond to Webhook",
+      "name": "回傳政績列表結果",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [900, 300]
     }
   ],
   "connections": {
-    "Webhook": {
+    "接收政績列表查詢": {
       "main": [
         [
           {
-            "node": "Notion 查詢 DB-06 政績",
+            "node": "查詢 Notion demoDB_achievement",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Notion 查詢 DB-06 政績": {
+    "查詢 Notion demoDB_achievement": {
       "main": [
         [
           {
-            "node": "Code 格式化 + 分頁",
+            "node": "整理政績列表結果",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code 格式化 + 分頁": {
+    "整理政績列表結果": {
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "回傳政績列表結果",
             "type": "main",
             "index": 0
           }
@@ -146,4 +145,3 @@
     { "name": "政績版" }
   ]
 }
-

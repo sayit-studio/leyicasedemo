@@ -1063,7 +1063,8 @@
    ════════════════════════════════════════ */
 
 const ACHIEVEMENT_IMAGE_BASE = 'assets/achievements/';
-const ACHIEVEMENT_ITEMS = [
+const ACHIEVEMENT_ENDPOINT = SITE_UTILS.webhook('achievements');
+const FALLBACK_ACHIEVEMENT_ITEMS = [
   {
     id: 'achievement-01',
     title: '校園周邊通學步道改善',
@@ -1170,6 +1171,7 @@ const ACHIEVEMENT_ITEMS = [
     videoUrl: ''
   }
 ];
+let achievementItems = FALLBACK_ACHIEVEMENT_ITEMS.map(item => ({ ...item }));
 
 // ── Lightbox
 const Lightbox = {
@@ -1212,7 +1214,7 @@ document.addEventListener('keydown', e => {
 
 const AchievementDetail = {
   open(id) {
-    const item = ACHIEVEMENT_ITEMS.find(entry => entry.id === id);
+    const item = achievementItems.find(entry => entry.id === id);
     if (!item) return;
     const images = item.images?.length ? item.images : [item.image];
     document.getElementById('detailCover').src = item.image;
@@ -1255,6 +1257,78 @@ const AchievementDetail = {
     if (e.target === document.getElementById('detailModal')) this.close();
   }
 };
+
+function asArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (typeof value === 'string') {
+    return value
+      .split(/\r?\n|、|,/)
+      .map(text => text.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function uniqueArray(values) {
+  return [...new Set(asArray(values))];
+}
+
+function normalizeAchievementItem(item, idx) {
+  const image = item.image || item.coverImage || item.cover || item['封面圖片'] || `${ACHIEVEMENT_IMAGE_BASE}achievement-${String((idx % 6) + 1).padStart(2, '0')}.jpg`;
+  const images = [
+    image,
+    ...asArray(item.images),
+    ...asArray(item.beforeImages),
+    ...asArray(item.afterImages),
+    ...asArray(item['成果前圖片']),
+    ...asArray(item['成果後圖片'])
+  ];
+  const content = item.content || item.detail || item['詳細內容'] || item.summary || item['摘要'] || '';
+
+  return {
+    id: item.id || item.pageId || item.recordId || `achievement-${idx + 1}`,
+    title: item.title || item.name || item['政績標題'] || `服務成果 ${idx + 1}`,
+    date: item.date || item.publishedAt || item['發布日期'] || '',
+    image,
+    featured: Boolean(item.featured ?? item.isFeatured ?? item.isPinned ?? item['是否精選']),
+    source: item.source || item.sourceType || item.type || item['政績類型'] || '政績資料庫',
+    tags: uniqueArray(item.tags || item['標籤'] || item.category || item['議題類型']),
+    content,
+    summary: item.summary || item['摘要'] || content,
+    process: asArray(item.process || item['服務過程'] || content),
+    images: uniqueArray(images),
+    videoUrl: item.videoUrl || item.sourceUrl || item['來源連結'] || ''
+  };
+}
+
+function normalizeAchievementResponse(data) {
+  const rawItems = Array.isArray(data) ? data : (data.items || data.data || data.results || []);
+  return rawItems
+    .map(normalizeAchievementItem)
+    .filter(item => item.title && item.content);
+}
+
+function renderAchievements(items) {
+  achievementItems = items.length ? items : FALLBACK_ACHIEVEMENT_ITEMS.map(item => ({ ...item }));
+  const featured = achievementItems.filter(item => item.featured);
+  renderFeaturedItems(featured.length ? featured : achievementItems.slice(0, 3));
+  renderAchievementItems(achievementItems);
+}
+
+async function loadAchievements() {
+  renderAchievements(FALLBACK_ACHIEVEMENT_ITEMS);
+  try {
+    const res = await fetch(ACHIEVEMENT_ENDPOINT);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.success === false) throw new Error('API returned success=false');
+    const items = normalizeAchievementResponse(data);
+    if (items.length) renderAchievements(items);
+  } catch (err) {
+    console.warn('Achievement API fallback:', err);
+  }
+}
 
 function renderFeaturedItems(items) {
   const grid = document.getElementById('featuredGrid');
@@ -1309,8 +1383,7 @@ document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.bra
 document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
 document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();
 
-renderFeaturedItems(ACHIEVEMENT_ITEMS.filter(item => item.featured));
-renderAchievementItems(ACHIEVEMENT_ITEMS);
+loadAchievements();
 
 // ── URL hash 跳轉到指定政績
 window.addEventListener('load', () => {
