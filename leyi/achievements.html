@@ -437,11 +437,18 @@
   margin: 0 auto;
   padding: 56px 20px 96px;
 }
-.achievement-wall-head {
+.achievement-section {
+  margin-bottom: 72px;
+}
+.achievement-section:last-child {
+  margin-bottom: 0;
+}
+.achievement-wall-head,
+.section-head {
   max-width: 760px;
   margin-bottom: 30px;
 }
-.achievement-kicker {
+.section-eyebrow {
   display: inline-flex;
   align-items: center;
   padding: 6px 14px;
@@ -452,17 +459,91 @@
   font-weight: 700;
   letter-spacing: .08em;
 }
-.achievement-wall-head h2 {
+.achievement-wall-head h2,
+.section-heading {
   font-family: var(--font-display);
   font-size: clamp(28px, 4vw, 44px);
   line-height: 1.18;
   margin: 16px 0 12px;
   color: var(--color-text);
 }
-.achievement-wall-head p {
+.achievement-wall-head p,
+.section-head p {
   color: var(--color-text-muted);
   font-size: 16px;
   line-height: 1.8;
+}
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 22px;
+}
+.featured-card {
+  position: relative;
+  min-height: 360px;
+  border-radius: 34px;
+  overflow: hidden;
+  background: var(--color-bg-dark);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.featured-card:first-child {
+  grid-row: span 2;
+}
+.featured-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+  transition: transform .45s ease;
+}
+.featured-card:hover img {
+  transform: scale(1.04);
+}
+.featured-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(44,26,8,.02), rgba(44,26,8,.82));
+}
+.featured-content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  padding: 28px;
+  color: #fff;
+}
+.featured-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.featured-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.26);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 10px;
+  backdrop-filter: blur(8px);
+}
+.featured-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.25;
+  margin: 0 0 10px;
+}
+.featured-desc {
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 0;
+  color: rgba(255,255,255,.88);
 }
 .achievement-grid {
   display: grid;
@@ -530,6 +611,12 @@
   font-weight: 800;
   letter-spacing: .08em;
 }
+.achievement-source {
+  color: var(--color-text-light);
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: -8px;
+}
 .achievement-title {
   font-family: var(--font-display);
   color: var(--color-text);
@@ -589,6 +676,41 @@
   font-weight: 800;
   padding: 8px 14px;
   box-shadow: var(--shadow-sm);
+}
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.source-card {
+  background: rgba(255,255,255,.72);
+  border: 1px solid var(--glass-border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+.source-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  font-size: 21px;
+  margin-bottom: 18px;
+}
+.source-card h3 {
+  font-family: var(--font-display);
+  color: var(--color-text);
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+.source-card p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.75;
+  margin: 0;
 }
 
 /* Detail modal */
@@ -775,10 +897,17 @@
   .ach-card-title { font-size: 16px; }
 
   .achievement-wall { padding: 42px 18px 76px; }
+  .achievement-section { margin-bottom: 52px; }
+  .featured-grid { grid-template-columns: 1fr; gap: 18px; }
+  .featured-card,
+  .featured-card:first-child { grid-row: auto; min-height: 300px; border-radius: 24px; }
+  .featured-card img { min-height: 300px; }
+  .featured-content { padding: 22px; }
   .achievement-grid { grid-template-columns: 1fr; gap: 18px; }
   .achievement-item-card { border-radius: 22px; }
   .achievement-content { padding: 18px; }
   .achievement-title { font-size: 19px; }
+  .source-grid { grid-template-columns: 1fr; }
   .detail-modal { padding: 12px; align-items: flex-end; }
   .detail-dialog { border-radius: 24px 24px 0 0; max-height: 92vh; }
   .detail-body { padding: 22px 18px 26px; }
@@ -827,8 +956,8 @@
 
 <!-- ══ 政績項目牆 ══ -->
 <main class="achievement-wall">
-  <div class="achievement-wall-head">
-    <span class="achievement-kicker">代表性服務事項</span>
+  <section class="achievement-section intro-section">
+    <div class="achievement-wall-head">
     <h2>每一項政績，都是一件被完成的承諾</h2>
     <p>里長服務最重要的是把生活裡的小問題處理好。從道路安全、親子活動、樂齡關懷到社區環境，每一件成果都來自里民的需要與現場的協調。</p>
     <div class="service-keywords">
@@ -840,8 +969,56 @@
       <span class="service-keyword">環境改善</span>
       <span class="service-keyword">鄰里照顧</span>
     </div>
-  </div>
-  <div class="achievement-grid" id="achievementGrid"></div>
+    </div>
+  </section>
+
+  <section class="achievement-section featured-section">
+    <div class="section-head">
+      <span class="section-eyebrow">精選成果</span>
+      <h2 class="section-heading">先看最有感的服務成果</h2>
+      <p>把民眾最容易理解、最能代表服務價值的成果放在前面，讓訪客快速知道這位里長做了什麼、解決了什麼。</p>
+    </div>
+    <div class="featured-grid" id="featuredGrid"></div>
+  </section>
+
+  <section class="achievement-section wall-section">
+    <div class="section-head">
+      <span class="section-eyebrow">成果牆</span>
+      <h2 class="section-heading">所有服務事項集中呈現</h2>
+      <p>以項目卡片呈現每一件完成事項，保留分類標籤、時間、內容與詳情入口，方便民眾快速瀏覽與深入了解。</p>
+    </div>
+    <div class="achievement-grid" id="achievementGrid"></div>
+  </section>
+
+  <section class="achievement-section source-section">
+    <div class="section-head">
+      <span class="section-eyebrow">成果來源</span>
+      <h2 class="section-heading">每項成果都有來源與處理脈絡</h2>
+      <p>政績不是單向宣傳，而是從里民反映、現場會勘、社區活動與機關協調累積出來的服務紀錄。</p>
+    </div>
+    <div class="source-grid">
+      <article class="source-card">
+        <div class="source-icon">📮</div>
+        <h3>陳情案件</h3>
+        <p>來自里民直接反映的生活問題，整理後追蹤改善進度與公開成果。</p>
+      </article>
+      <article class="source-card">
+        <div class="source-icon">👣</div>
+        <h3>現場會勘</h3>
+        <p>把問題帶到現場確認，留下改善前後紀錄，避免只停留在文字描述。</p>
+      </article>
+      <article class="source-card">
+        <div class="source-icon">🤝</div>
+        <h3>社區活動</h3>
+        <p>包含親子、樂齡、環境與社區凝聚活動，呈現服務與居民互動成果。</p>
+      </article>
+      <article class="source-card">
+        <div class="source-icon">🏛️</div>
+        <h3>機關協調</h3>
+        <p>需要跨單位處理的事項，記錄協調、追蹤與完成結果，讓流程更透明。</p>
+      </article>
+    </div>
+  </section>
 </main>
 
 <!-- ══ Detail Modal ══ -->
@@ -892,6 +1069,8 @@ const ACHIEVEMENT_ITEMS = [
     title: '校園周邊通學步道改善',
     date: '2026-04-08',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-01.jpg`,
+    featured: true,
+    source: '陳情案件 + 現場會勘',
     tags: ['教育', '學校', '道路安全', '親子友善'],
     content: '針對學校周邊人行空間不足、接送動線混亂問題，協調相關單位完成標線重整、通學步道改善與路口安全提醒，讓家長接送與學童步行更安心。',
     summary: '從家長反映到現場會勘，完成校園周邊動線改善，降低上下學時段行人與車流交錯風險。',
@@ -908,6 +1087,7 @@ const ACHIEVEMENT_ITEMS = [
     title: '社區排水溝渠清淤與修繕',
     date: '2026-03-22',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-02.jpg`,
+    source: '陳情案件',
     tags: ['排水', '環境改善', '防汛', '社區安全'],
     content: '接獲居民反映雨後積水與異味問題後，安排現場會勘並促成排水溝渠清淤、破損處修補與後續巡檢機制，降低汛期淹水風險。',
     summary: '把容易積水、產生異味的排水問題處理好，讓雨季前的社區更安心。',
@@ -924,6 +1104,8 @@ const ACHIEVEMENT_ITEMS = [
     title: '公園休憩設施更新',
     date: '2026-02-17',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-03.jpg`,
+    featured: true,
+    source: '現場會勘',
     tags: ['公園', '親子互動', '樂齡互動', '公共設施'],
     content: '協助改善公園座椅老舊、照明不足與兒童遊具安全疑慮，完成設施更新與環境整理，讓鄰里居民有更舒適的日常休憩空間。',
     summary: '把公園維持好，就是讓孩子有地方玩、長輩有地方坐、鄰里有地方交流。',
@@ -940,6 +1122,7 @@ const ACHIEVEMENT_ITEMS = [
     title: '市場周邊交通動線整理',
     date: '2026-01-29',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-04.jpg`,
+    source: '里民反映 + 交通協調',
     tags: ['交通', '市場', '行人安全', '道路'],
     content: '針對市場尖峰時段人車交織與臨停問題，推動攤商卸貨區、行人穿越動線與交通提醒標示優化，改善採買環境與周邊通行安全。',
     summary: '市場周邊每天都有採買人潮，整理動線能讓攤商、居民與行人都更安全。',
@@ -956,6 +1139,8 @@ const ACHIEVEMENT_ITEMS = [
     title: '里民活動中心環境改善',
     date: '2025-12-18',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-05.jpg`,
+    featured: true,
+    source: '社區活動',
     tags: ['活動中心', '帶動社區', '樂齡課程', '親子活動'],
     content: '協調改善活動中心牆面滲水、照明老舊與公共使用空間不足問題，讓長者課程、社區會議與親子活動有更穩定的使用環境。',
     summary: '活動中心是里民共同使用的客廳，環境改善後，課程、會議與社區活動都能更穩定進行。',
@@ -972,6 +1157,7 @@ const ACHIEVEMENT_ITEMS = [
     title: '巷弄照明與夜間安全提升',
     date: '2025-11-30',
     image: `${ACHIEVEMENT_IMAGE_BASE}achievement-06.jpg`,
+    source: '陳情案件',
     tags: ['照明', '治安', '道路', '鄰里安全'],
     content: '彙整居民夜間通行安全需求，促成巷弄照明增設與故障燈具汰換，提升返家路線辨識度，減少夜間治安與交通死角。',
     summary: '夜間安全感來自看得清楚、走得安心，巷弄照明是里民每天都會感受到的改善。',
@@ -1034,6 +1220,7 @@ const AchievementDetail = {
     document.getElementById('detailBody').innerHTML = `
       <div class="detail-meta">
         <span class="detail-pill">${item.date}</span>
+        ${item.source ? `<span class="detail-pill">${item.source}</span>` : ''}
         ${(item.tags || []).map(tag => `<span class="detail-pill">${tag}</span>`).join('')}
       </div>
       <h2>${item.title}</h2>
@@ -1069,6 +1256,23 @@ const AchievementDetail = {
   }
 };
 
+function renderFeaturedItems(items) {
+  const grid = document.getElementById('featuredGrid');
+  grid.innerHTML = items.map(item => `
+    <article class="featured-card" onclick="AchievementDetail.open('${item.id}')">
+      <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.closest('.featured-card').classList.add('is-missing');this.remove();">
+      <div class="featured-content">
+        <div class="featured-meta">
+          <span class="featured-pill">${item.date}</span>
+          ${item.source ? `<span class="featured-pill">${item.source}</span>` : ''}
+        </div>
+        <h3 class="featured-title">${item.title}</h3>
+        <p class="featured-desc">${item.summary || item.content}</p>
+      </div>
+    </article>
+  `).join('');
+}
+
 function renderAchievementItems(items) {
   const grid = document.getElementById('achievementGrid');
   grid.innerHTML = items.map(item => `
@@ -1078,6 +1282,7 @@ function renderAchievementItems(items) {
       </div>
       <div class="achievement-content">
         <div class="achievement-date">${item.date}</div>
+        ${item.source ? `<div class="achievement-source">${item.source}</div>` : ''}
         <div class="achievement-tags">
           ${(item.tags || []).map(tag => `<span class="achievement-tag">${tag}</span>`).join('')}
         </div>
@@ -1104,6 +1309,7 @@ document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.bra
 document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
 document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();
 
+renderFeaturedItems(ACHIEVEMENT_ITEMS.filter(item => item.featured));
 renderAchievementItems(ACHIEVEMENT_ITEMS);
 
 // ── URL hash 跳轉到指定政績
