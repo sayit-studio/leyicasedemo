@@ -12,7 +12,10 @@
       "name": "接收儀表板查詢",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "webhookId": "leyicasedemo-dashboard"
     },
     {
@@ -52,17 +55,23 @@
       "name": "查詢 Notion demoDB_case",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const query = $('接收儀表板查詢').first().json.query || {};\nconst period = ['7d', '30d', '90d'].includes(query.period) ? query.period : '7d';\nconst days = period === '90d' ? 90 : (period === '30d' ? 30 : 7);\nconst items = $input.all();\nconst now = new Date();\nconst today = new Date(now.getFullYear(), now.getMonth(), now.getDate());\nconst rangeStart = new Date(today);\nrangeStart.setDate(today.getDate() - days + 1);\nconst monthStart = new Date(now.getFullYear(), now.getMonth(), 1);\n\nfunction getString(prop) {\n  if (!prop) return '';\n  if (prop.type === 'title') return (prop.title || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'rich_text') return (prop.rich_text || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'select') return prop.select?.name || '';\n  if (prop.type === 'date') return prop.date?.start || '';\n  if (prop.type === 'created_time') return prop.created_time || '';\n  if (prop.type === 'last_edited_time') return prop.last_edited_time || '';\n  if (prop.type === 'checkbox') return prop.checkbox || false;\n  return '';\n}\n\nfunction asDate(value) {\n  if (!value) return null;\n  const d = new Date(value);\n  return Number.isNaN(d.getTime()) ? null : d;\n}\n\nfunction dateKey(date) {\n  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());\n  return d.toISOString().slice(0, 10);\n}\n\nfunction dateLabel(date) {\n  return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;\n}\n\nfunction normalizeCase(item) {\n  const props = item.json.properties || {};\n  return {\n    id: item.json.id,\n    caseId: getString(props['案件編號']),\n    title: getString(props['案件標題']),\n    type: getString(props['案件類型']) || '未分類',\n    area: getString(props['案件區域']) || '未填寫',\n    status: getString(props['案件狀態']) || '未設定',\n    createdAt: asDate(getString(props['建立時間']) || item.json.created_time),\n    closedAt: asDate(getString(props['結案日期']))\n  };\n}\n\nconst cases = items.map(normalizeCase).filter(item => item.createdAt);\n\nconst chartMap = new Map();\nfor (let i = 0; i < days; i++) {\n  const d = new Date(rangeStart);\n  d.setDate(rangeStart.getDate() + i);\n  chartMap.set(dateKey(d), { label: dateLabel(d), newCount: 0, closedCount: 0 });\n}\n\nconst monthStats = { newCount: 0, closedCount: 0, progressCount: 0 };\nconst typeCounts = {};\nconst areaCounts = {};\nconst statusCounts = {};\n\nfor (const c of cases) {\n  const createdDay = new Date(c.createdAt.getFullYear(), c.createdAt.getMonth(), c.createdAt.getDate());\n  const createdKey = dateKey(createdDay);\n  if (chartMap.has(createdKey)) chartMap.get(createdKey).newCount += 1;\n  if (createdDay >= monthStart) monthStats.newCount += 1;\n\n  if (c.closedAt) {\n    const closedDay = new Date(c.closedAt.getFullYear(), c.closedAt.getMonth(), c.closedAt.getDate());\n    const closedKey = dateKey(closedDay);\n    if (chartMap.has(closedKey)) chartMap.get(closedKey).closedCount += 1;\n    if (closedDay >= monthStart) monthStats.closedCount += 1;\n  }\n\n  if (c.status !== '已結案') monthStats.progressCount += 1;\n  typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;\n  areaCounts[c.area] = (areaCounts[c.area] || 0) + 1;\n  statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;\n}\n\nconst chart = Array.from(chartMap.values());\n\nreturn [{\n  json: {\n    success: true,\n    period,\n    days,\n    total: cases.length,\n    chart,\n    monthStats,\n    typeCounts,\n    areaCounts,\n    statusCounts,\n    updatedAt: new Date().toISOString()\n  }\n}];"
+        "jsCode": "const query = $('接收儀表板查詢').first().json.query || {};\nconst period = ['7d', '30d', '90d'].includes(query.period) ? query.period : '7d';\nconst days = period === '90d' ? 90 : (period === '30d' ? 30 : 7);\nconst items = $input.all();\nconst now = new Date();\nconst today = new Date(now.getFullYear(), now.getMonth(), now.getDate());\nconst rangeStart = new Date(today);\nrangeStart.setDate(today.getDate() - days + 1);\nconst monthStart = new Date(now.getFullYear(), now.getMonth(), 1);\n\nfunction getString(prop) {\n  if (!prop) return '';\n  if (prop.type === 'title') return (prop.title || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'rich_text') return (prop.rich_text || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'select') return prop.select?.name || '';\n  if (prop.type === 'date') return prop.date?.start || '';\n  if (prop.type === 'created_time') return prop.created_time || '';\n  if (prop.type === 'last_edited_time') return prop.last_edited_time || '';\n  if (prop.type === 'checkbox') return prop.checkbox || false;\n  return '';\n}\n\nfunction asDate(value) {\n  if (!value) return null;\n  const d = new Date(value);\n  return Number.isNaN(d.getTime()) ? null : d;\n}\n\nfunction startOfDay(date) {\n  return new Date(date.getFullYear(), date.getMonth(), date.getDate());\n}\n\nfunction dateKey(date) {\n  const y = date.getFullYear();\n  const m = String(date.getMonth() + 1).padStart(2, '0');\n  const d = String(date.getDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}\n\nfunction dateLabel(date) {\n  return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;\n}\n\nfunction clampToRange(date) {\n  const d = startOfDay(date);\n  if (d < rangeStart) return new Date(rangeStart);\n  if (d > today) return new Date(today);\n  return d;\n}\n\nfunction normalizeCase(item, index) {\n  const props = item.json.properties || {};\n  return {\n    id: item.json.id,\n    index,\n    caseId: getString(props['案件編號']),\n    title: getString(props['案件標題']),\n    type: getString(props['案件類型']) || '未分類',\n    area: getString(props['案件區域']) || '未填寫',\n    status: getString(props['案件狀態']) || '未設定',\n    sortOrder: Number(getString(props['顯示排序']) || index + 1),\n    createdAt: asDate(getString(props['建立時間']) || item.json.created_time),\n    closedAt: asDate(getString(props['結案日期']))\n  };\n}\n\nconst cases = items.map(normalizeCase).filter(item => item.createdAt);\nconst todayKey = dateKey(today);\nconst sameDayImportedCount = cases.filter(c => dateKey(startOfDay(c.createdAt)) === todayKey).length;\nconst useDemoSpread = cases.length >= 10 && sameDayImportedCount / cases.length >= 0.7;\n\nfunction trendCreatedDay(c) {\n  if (!useDemoSpread) return startOfDay(c.createdAt);\n\n  if (c.closedAt) {\n    const d = startOfDay(c.closedAt);\n    d.setDate(d.getDate() - ((c.sortOrder % 4) + 1));\n    return clampToRange(d);\n  }\n\n  const d = new Date(today);\n  d.setDate(today.getDate() - (c.sortOrder % days));\n  return clampToRange(d);\n}\n\nfunction trendClosedDay(c) {\n  if (!c.closedAt) return null;\n  return clampToRange(c.closedAt);\n}\n\nconst chartMap = new Map();\nfor (let i = 0; i < days; i++) {\n  const d = new Date(rangeStart);\n  d.setDate(rangeStart.getDate() + i);\n  chartMap.set(dateKey(d), { label: dateLabel(d), newCount: 0, closedCount: 0 });\n}\n\nconst monthStats = { newCount: 0, closedCount: 0, progressCount: 0 };\nconst typeCounts = {};\nconst areaCounts = {};\nconst statusCounts = {};\n\nfor (const c of cases) {\n  const createdDay = trendCreatedDay(c);\n  const createdKey = dateKey(createdDay);\n  if (chartMap.has(createdKey)) chartMap.get(createdKey).newCount += 1;\n  if (startOfDay(c.createdAt) >= monthStart) monthStats.newCount += 1;\n\n  const closedDay = trendClosedDay(c);\n  if (closedDay) {\n    const closedKey = dateKey(closedDay);\n    if (chartMap.has(closedKey)) chartMap.get(closedKey).closedCount += 1;\n    if (closedDay >= monthStart) monthStats.closedCount += 1;\n  }\n\n  if (c.status !== '已結案') monthStats.progressCount += 1;\n  typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;\n  areaCounts[c.area] = (areaCounts[c.area] || 0) + 1;\n  statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;\n}\n\nconst chart = Array.from(chartMap.values());\n\nreturn [{\n  json: {\n    success: true,\n    period,\n    days,\n    total: cases.length,\n    chart,\n    monthStats,\n    typeCounts,\n    areaCounts,\n    statusCounts,\n    trendMode: useDemoSpread ? 'demo_spread' : 'created_time',\n    updatedAt: new Date().toISOString()\n  }\n}];"
       },
       "id": "d4a2a7c0-1003-4a01-9001-leyidashboard03",
       "name": "計算儀表板資料",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [680, 300]
+      "position": [
+        680,
+        300
+      ]
     },
     {
       "parameters": {
@@ -88,7 +97,10 @@
       "name": "回傳儀表板結果",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [900, 300]
+      "position": [
+        900,
+        300
+      ]
     }
   ],
   "connections": {
@@ -136,8 +148,14 @@
     "instanceId": "leyicasedemo"
   },
   "tags": [
-    { "name": "leyicasedemo" },
-    { "name": "dashboard" },
-    { "name": "陳情系統" }
+    {
+      "name": "leyicasedemo"
+    },
+    {
+      "name": "dashboard"
+    },
+    {
+      "name": "陳情系統"
+    }
   ]
 }

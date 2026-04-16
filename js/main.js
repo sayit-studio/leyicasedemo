@@ -201,15 +201,36 @@ async function loadDashboard(period) {
   if (_dashCache[period]) { renderDashboard(_dashCache[period]); return; }
   try {
     const res  = await fetch(WEBHOOK.DASH + '?period=' + period);
+    if (!res.ok) throw new Error(`Dashboard webhook HTTP ${res.status}`);
     const data = await res.json();
-    if (data.success) { _dashCache[period] = data; renderDashboard(data); }
-  } catch(e) {}
+    if (!data.success) throw new Error('Dashboard webhook returned success=false');
+    _dashCache[period] = data;
+    renderDashboard(data);
+  } catch(e) {
+    console.warn('[dashboard] load failed:', e);
+    renderDashboardError();
+  }
 }
 
 function renderDashboard(data) {
   renderStackedBar(data);
   renderMonthStats(data);
   renderPieChart(data);
+}
+
+function renderDashboardError() {
+  const chart = document.getElementById('barChart');
+  if (chart) chart.innerHTML = '<div class="chart-loading">儀錶板資料暫時無法載入，請確認 n8n dashboard webhook 是否啟用。</div>';
+  ['ms-new','ms-closed','ms-progress'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '—';
+  });
+  const bar = document.getElementById('msProgressBar');
+  if (bar) bar.style.width = '0%';
+  const lbl = document.getElementById('msProgressLabel');
+  if (lbl) lbl.textContent = '結案率 —';
+  const legend = document.getElementById('pieLegend');
+  if (legend) legend.innerHTML = '<div style="color:var(--color-text-muted);font-size:13px;">類別資料暫時無法載入</div>';
 }
 
 function renderStackedBar(data) {
