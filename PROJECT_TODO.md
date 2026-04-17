@@ -106,7 +106,14 @@
 
 目的：確認 GitHub 內 workflow JSON 與 n8n 線上版本一致。
 
-需要檢查：
+目前狀態：
+
+1. 已新增 `N8N_WORKFLOW_STATUS.md`
+2. 已確認正式 webhook 可用：`/stats`、`/list`、`/query`、`/dashboard`、`/achievements`
+3. 已確認正式 webhook 尚未存在或未啟用：`/inspections`、`/interpellations`、`/proposals`、`/pages`、`/settings`
+4. 尚未測試 POST：`/submit`、`/achievements/like`
+
+待補：
 
 1. `/stats`
 2. `/list`
@@ -117,6 +124,7 @@
 7. `/achievements/like`
 8. 尚未完成的 `/pages`
 9. 尚未完成的 `/settings`
+10. 匯出線上可用 workflow JSON 至 `n8n/`
 
 ### 優先順序 2：完成 `site_settings`
 
