@@ -1,0 +1,136 @@
+{
+  "name": "WF-13 網站設定 leyicasedemo/settings",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "leyicasedemo/settings",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c2d3e4f5-1301-4001-8001-a1b2c3d4e5f6",
+      "name": "接收網站設定查詢",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "leyicasedemo-settings"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "344b3ad1d1cd8015a7abf91dfb965033",
+          "mode": "id"
+        },
+        "returnAll": false,
+        "limit": 1,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "是否啟用",
+              "condition": "checkbox",
+              "checkboxValue": true
+            }
+          ]
+        },
+        "options": {
+          "downloadFiles": false
+        },
+        "simplifyOutput": false
+      },
+      "id": "c2d3e4f5-1302-4001-8001-a1b2c3d4e5f6",
+      "name": "查詢 Notion demoDB_site_settings",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction getText(prop) {\n  if (!prop) return '';\n  if (prop.type === 'title') return (prop.title || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'rich_text') return (prop.rich_text || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'select') return prop.select?.name || '';\n  if (prop.type === 'url') return prop.url || '';\n  if (prop.type === 'number') return prop.number ?? '';\n  if (prop.type === 'checkbox') return prop.checkbox || false;\n  return '';\n}\n\nconst defaults = {\n  siteKey: 'leyicasedemo',\n  brandName: '數位服務處',\n  brandShortName: '數位服務處',\n  adminName: '市民服務平台',\n  systemMode: 'achievement',\n  primaryColor: '#E87F24',\n  accentColor: '#FFC81E',\n  logoUrl: 'leyi/assets/brand/logo.png',\n  heroTitleLine1: '數位時代的',\n  heroTitleLine2: '市民服務新標準',\n  heroSubtitle: '透過數位化陳情平台，每一件市民的問題都將被看見、被追蹤、被解決。',\n  lineUrl: 'https://lin.ee/Q9cWSP5',\n  webhookBase: 'https://drwu.zeabur.app',\n  webhookMode: 'webhook',\n  webhookPrefix: 'leyicasedemo',\n  inspectionsCount: 156,\n  interpellationsCount: 83,\n  proposalsCount: 29,\n  isActive: true\n};\n\nif (!items.length) {\n  return [{ json: { success: true, source: 'fallback', settings: defaults } }];\n}\n\nconst props = items[0].json.properties || {};\nconst rawTitle = getText(props['首頁標題']);\nconst titleParts = rawTitle.split(/\\r?\\n|\\|/).map(v => v.trim()).filter(Boolean);\n\nconst settings = {\n  siteKey: getText(props['網站代碼']) || defaults.siteKey,\n  brandName: getText(props['品牌名稱']) || defaults.brandName,\n  brandShortName: getText(props['品牌簡稱']) || getText(props['品牌名稱']) || defaults.brandShortName,\n  adminName: getText(props['後台名稱']) || defaults.adminName,\n  systemMode: getText(props['系統模式']) || defaults.systemMode,\n  primaryColor: getText(props['主色']) || defaults.primaryColor,\n  accentColor: getText(props['輔助色']) || defaults.accentColor,\n  logoUrl: getText(props['Logo圖片']) || defaults.logoUrl,\n  heroTitleLine1: titleParts[0] || defaults.heroTitleLine1,\n  heroTitleLine2: titleParts[1] || defaults.heroTitleLine2,\n  heroSubtitle: getText(props['首頁副標']) || defaults.heroSubtitle,\n  lineUrl: getText(props['LINE連結']) || defaults.lineUrl,\n  webhookBase: getText(props['WebhookBase']) || defaults.webhookBase,\n  webhookMode: 'webhook',\n  webhookPrefix: getText(props['WebhookPrefix']) || defaults.webhookPrefix,\n  inspectionsCount: Number(getText(props['地方會勘數量']) || defaults.inspectionsCount),\n  interpellationsCount: Number(getText(props['國會質詢數量']) || defaults.interpellationsCount),\n  proposalsCount: Number(getText(props['國會提案數量']) || defaults.proposalsCount),\n  isActive: getText(props['是否啟用']) !== false\n};\n\nreturn [{ json: { success: true, source: 'notion', settings } }];"
+      },
+      "id": "c2d3e4f5-1303-4001-8001-a1b2c3d4e5f6",
+      "name": "整理網站設定結果",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "c2d3e4f5-1304-4001-8001-a1b2c3d4e5f6",
+      "name": "回傳網站設定結果",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "接收網站設定查詢": {
+      "main": [
+        [
+          {
+            "node": "查詢 Notion demoDB_site_settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "查詢 Notion demoDB_site_settings": {
+      "main": [
+        [
+          {
+            "node": "整理網站設定結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "整理網站設定結果": {
+      "main": [
+        [
+          {
+            "node": "回傳網站設定結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateId": "WF-13",
+    "instanceId": "leyicasedemo"
+  },
+  "tags": [
+    { "name": "leyicasedemo" },
+    { "name": "settings" },
+    { "name": "模板設定" }
+  ]
+}

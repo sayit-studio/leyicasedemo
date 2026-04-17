@@ -14,6 +14,17 @@ const WEBHOOK  = {
   PROPOSALS: SITE_UTILS.webhook('proposals'),
 };
 
+function refreshWebhookEndpoints() {
+  WEBHOOK.STATS = SITE_UTILS.webhook('stats');
+  WEBHOOK.LIST = SITE_UTILS.webhook('list');
+  WEBHOOK.QUERY = SITE_UTILS.webhook('query');
+  WEBHOOK.DASH = SITE_UTILS.webhook('dashboard');
+  WEBHOOK.SUBMIT = SITE_UTILS.webhook('submit');
+  WEBHOOK.INSPECTIONS = SITE_UTILS.webhook('inspections');
+  WEBHOOK.INTERPELLATIONS = SITE_UTILS.webhook('interpellations');
+  WEBHOOK.PROPOSALS = SITE_UTILS.webhook('proposals');
+}
+
 function setText(selector, value) {
   const el = document.querySelector(selector);
   if (el && value !== undefined) el.textContent = value;
@@ -528,7 +539,10 @@ function toggleFaq(el) {
 /* ══════════════════════════════
    9. Enter 鍵查詢
 ══════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const siteSettings = await SITE_SETTINGS_STORE.loadRemote();
+  SITE_SETTINGS_STORE.apply(siteSettings);
+  refreshWebhookEndpoints();
   hydrateSiteShell();
   const qi=document.getElementById('queryInput');
   if(qi) qi.addEventListener('keydown',e=>{if(e.key==='Enter')queryCase();});

@@ -68,6 +68,14 @@ const API = {
       if (res.status === 401) { Auth.logout(); return null; }
       return await res.json();
     } catch(e) {
+      if (path === '/settings' && window.SITE_SETTINGS_STORE) {
+        if (method === 'GET') {
+          return { success: true, source: 'local', settings: SITE_SETTINGS_STORE.readLocal() };
+        }
+        if (method === 'PATCH' && body) {
+          return { success: true, source: 'local', settings: SITE_SETTINGS_STORE.writeLocal(body) };
+        }
+      }
       console.error('[API Error]', path, e);
       toast.error('網路連線失敗，請稍後再試。');
       return null;

@@ -56,13 +56,18 @@
 
 目標：同一套模板可以依客戶切換品牌與風格。
 
+目前狀態：
+
+1. 已新增前台 `SITE_SETTINGS_STORE`，可讀取 n8n `/settings`，失敗時使用 localStorage/default fallback
+2. 已新增 `n8n/WF-13_settings.json`
+3. 後台設定頁已可編輯品牌名稱、Logo URL、主色、輔助色、首頁標題、首頁副標、Webhook 與統計數字
+
 待處理：
 
-1. 串接 `demoDB_site_settings`
-2. 建立 n8n `/settings` workflow
-3. 設定可控制 logo、品牌名稱、首頁文案、LINE 連結
-4. 設定可控制 theme key
-5. 建立第二套前台視覺風格
+1. 將 `n8n/WF-13_settings.json` 匯入 n8n 並啟用正式 `/settings`
+2. 確認 `demoDB_site_settings` 有啟用中的設定列
+3. 補 theme key 欄位與第二套前台視覺風格
+4. 後台設定頁改為真正寫回 Notion / n8n，而不只是 GitHub Pages local fallback
 
 ### 3. 政績牆補強
 
@@ -132,10 +137,10 @@
 
 預期成果：
 
-1. 前台讀取品牌設定
-2. 可切換 theme key
+1. 匯入並啟用 `n8n/WF-13_settings.json`
+2. 前台可讀取品牌設定
 3. 可切換 logo、文案與 CTA
-4. 後台可看到設定資料
+4. 補 theme key 並建立第二套視覺風格
 
 ### 優先順序 3：完成 `site_pages`
 

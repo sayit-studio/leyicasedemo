@@ -115,6 +115,151 @@ const SITE_UTILS = {
   },
 };
 
+const SITE_SETTINGS_SCHEMA_V1 = [
+  { key: 'siteKey', notion: '網站代碼', type: 'string' },
+  { key: 'brandName', notion: '品牌名稱', type: 'string' },
+  { key: 'brandShortName', notion: '品牌簡稱', type: 'string' },
+  { key: 'adminName', notion: '後台名稱', type: 'string' },
+  { key: 'systemMode', notion: '系統模式', type: 'string' },
+  { key: 'primaryColor', notion: '主色', type: 'string' },
+  { key: 'accentColor', notion: '輔助色', type: 'string' },
+  { key: 'logoUrl', notion: 'Logo圖片', type: 'url' },
+  { key: 'heroTitleLine1', notion: '首頁標題', type: 'string' },
+  { key: 'heroTitleLine2', notion: '首頁標題', type: 'string' },
+  { key: 'heroSubtitle', notion: '首頁副標', type: 'string' },
+  { key: 'lineUrl', notion: 'LINE連結', type: 'url' },
+  { key: 'webhookBase', notion: 'WebhookBase', type: 'url' },
+  { key: 'webhookPrefix', notion: 'WebhookPrefix', type: 'string' },
+  { key: 'inspectionsCount', notion: '地方會勘數量', type: 'number' },
+  { key: 'interpellationsCount', notion: '國會質詢數量', type: 'number' },
+  { key: 'proposalsCount', notion: '國會提案數量', type: 'number' },
+  { key: 'isActive', notion: '是否啟用', type: 'boolean' },
+];
+
+const SITE_SETTINGS_STORE = {
+  storageKey: `${SITE_TEMPLATE_CONFIG.siteKey}:site_settings:v1`,
+  schema: SITE_SETTINGS_SCHEMA_V1,
+
+  defaults() {
+    return {
+      siteKey: SITE_TEMPLATE_CONFIG.siteKey,
+      brandName: SITE_TEMPLATE_CONFIG.brand.name,
+      brandShortName: SITE_TEMPLATE_CONFIG.brand.shortName,
+      adminName: SITE_TEMPLATE_CONFIG.brand.adminName,
+      systemMode: SITE_TEMPLATE_CONFIG.systemMode,
+      primaryColor: '#E87F24',
+      accentColor: '#FFC81E',
+      logoUrl: 'leyi/assets/brand/logo.png',
+      heroTitleLine1: SITE_TEMPLATE_CONFIG.content.heroTitle[0],
+      heroTitleLine2: SITE_TEMPLATE_CONFIG.content.heroTitle[1],
+      heroSubtitle: SITE_TEMPLATE_CONFIG.content.heroSub,
+      lineUrl: SITE_TEMPLATE_CONFIG.integrations.lineUrl,
+      webhookBase: SITE_TEMPLATE_CONFIG.integrations.webhookBase,
+      webhookMode: SITE_TEMPLATE_CONFIG.integrations.webhookMode,
+      webhookPrefix: SITE_TEMPLATE_CONFIG.integrations.webhookPrefix,
+      inspectionsCount: SITE_TEMPLATE_CONFIG.petitions.staticStats.inspections,
+      interpellationsCount: SITE_TEMPLATE_CONFIG.petitions.staticStats.interpellations,
+      proposalsCount: SITE_TEMPLATE_CONFIG.petitions.staticStats.proposals,
+      isActive: true,
+    };
+  },
+
+  normalize(input = {}) {
+    const fallback = this.defaults();
+    const source = input.settings || input;
+    return {
+      ...fallback,
+      siteKey: String(source.siteKey || source.siteCode || fallback.siteKey),
+      brandName: String(source.brandName || source.name || fallback.brandName),
+      brandShortName: String(source.brandShortName || source.shortName || source.brandName || fallback.brandShortName),
+      adminName: String(source.adminName || fallback.adminName),
+      systemMode: String(source.systemMode || fallback.systemMode),
+      primaryColor: String(source.primaryColor || fallback.primaryColor),
+      accentColor: String(source.accentColor || fallback.accentColor),
+      logoUrl: String(source.logoUrl || fallback.logoUrl),
+      heroTitleLine1: String(source.heroTitleLine1 || fallback.heroTitleLine1),
+      heroTitleLine2: String(source.heroTitleLine2 || fallback.heroTitleLine2),
+      heroSubtitle: String(source.heroSubtitle || source.heroSub || fallback.heroSubtitle),
+      lineUrl: String(source.lineUrl || fallback.lineUrl),
+      webhookBase: String(source.webhookBase || source.n8nBase || fallback.webhookBase).replace(/\/$/, ''),
+      webhookMode: String(source.webhookMode || fallback.webhookMode || 'webhook'),
+      webhookPrefix: String(source.webhookPrefix || source.prefix || fallback.webhookPrefix).replace(/^\/|\/$/g, ''),
+      inspectionsCount: Number(source.inspectionsCount ?? fallback.inspectionsCount) || 0,
+      interpellationsCount: Number(source.interpellationsCount ?? fallback.interpellationsCount) || 0,
+      proposalsCount: Number(source.proposalsCount ?? fallback.proposalsCount) || 0,
+      isActive: source.isActive !== false,
+    };
+  },
+
+  readLocal() {
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      return raw ? this.normalize(JSON.parse(raw)) : this.defaults();
+    } catch (error) {
+      console.warn('[SITE_SETTINGS_STORE] Failed to read local settings.', error);
+      return this.defaults();
+    }
+  },
+
+  writeLocal(settings) {
+    const normalized = this.normalize(settings);
+    localStorage.setItem(this.storageKey, JSON.stringify(normalized));
+    return normalized;
+  },
+
+  async loadRemote() {
+    try {
+      const url = SITE_UTILS.webhook('settings');
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`settings webhook HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data?.success || !data.settings) throw new Error('settings webhook returned empty settings');
+      const settings = this.normalize(data.settings);
+      this.writeLocal(settings);
+      return settings;
+    } catch (error) {
+      console.warn('[SITE_SETTINGS_STORE] Remote settings unavailable, using local/default settings.', error);
+      return this.readLocal();
+    }
+  },
+
+  apply(settings) {
+    const s = this.normalize(settings);
+    SITE_TEMPLATE_CONFIG.siteKey = s.siteKey;
+    SITE_TEMPLATE_CONFIG.systemMode = s.systemMode;
+    SITE_TEMPLATE_CONFIG.brand.name = s.brandName;
+    SITE_TEMPLATE_CONFIG.brand.shortName = s.brandShortName;
+    SITE_TEMPLATE_CONFIG.brand.adminName = s.adminName;
+    SITE_TEMPLATE_CONFIG.brand.copyrightName = s.brandName;
+    SITE_TEMPLATE_CONFIG.content.heroTitle = [s.heroTitleLine1, s.heroTitleLine2];
+    SITE_TEMPLATE_CONFIG.content.heroSub = s.heroSubtitle;
+    SITE_TEMPLATE_CONFIG.integrations.lineUrl = s.lineUrl;
+    SITE_TEMPLATE_CONFIG.integrations.webhookBase = s.webhookBase;
+    SITE_TEMPLATE_CONFIG.integrations.webhookMode = s.webhookMode;
+    SITE_TEMPLATE_CONFIG.integrations.webhookPrefix = s.webhookPrefix;
+    SITE_TEMPLATE_CONFIG.petitions.staticStats.inspections = s.inspectionsCount;
+    SITE_TEMPLATE_CONFIG.petitions.staticStats.interpellations = s.interpellationsCount;
+    SITE_TEMPLATE_CONFIG.petitions.staticStats.proposals = s.proposalsCount;
+
+    CONFIG.BRAND_NAME = s.brandName;
+    CONFIG.BRAND_SHORT = s.brandShortName;
+    CONFIG.SYSTEM_MODE = s.systemMode;
+    CONFIG.HERO_TITLE = SITE_TEMPLATE_CONFIG.content.heroTitle;
+    CONFIG.HERO_SUB = s.heroSubtitle;
+    CONFIG.LINE_URL = s.lineUrl;
+    CONFIG.WEBHOOK_BASE = s.webhookBase;
+    CONFIG.WEBHOOK_MODE = s.webhookMode;
+    CONFIG.WEBHOOK_PREFIX = s.webhookPrefix;
+    CONFIG.STAT_STATIC = SITE_TEMPLATE_CONFIG.petitions.staticStats;
+
+    document.documentElement.style.setProperty('--brand-primary', s.primaryColor);
+    document.documentElement.style.setProperty('--brand-accent', s.accentColor);
+    document.documentElement.style.setProperty('--color-primary', s.primaryColor);
+    document.documentElement.style.setProperty('--color-accent', s.accentColor);
+    return s;
+  },
+};
+
 const CONFIG = {
   BRAND_NAME: SITE_TEMPLATE_CONFIG.brand.name,
   BRAND_SHORT: SITE_TEMPLATE_CONFIG.brand.shortName,
@@ -386,3 +531,11 @@ const SITE_PAGE_STORE = {
     return this.sortPages(roots);
   },
 };
+
+Object.assign(window, {
+  SITE_TEMPLATE_CONFIG,
+  SITE_UTILS,
+  CONFIG,
+  SITE_SETTINGS_STORE,
+  SITE_PAGE_STORE,
+});

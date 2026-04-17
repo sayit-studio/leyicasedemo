@@ -28,7 +28,7 @@
 
   <div class="main-content" id="mainContent">
     <div class="topbar">
-      <div><div class="topbar-title">系統設定</div><div class="topbar-subtitle">Webhook、LINE、靜態數字設定</div></div>
+      <div><div class="topbar-title">系統設定</div><div class="topbar-subtitle">品牌、首頁文案、Webhook、LINE 與靜態數字設定</div></div>
       <div class="topbar-actions">
         <button class="btn btn-primary" onclick="saveAll()">💾 儲存所有設定</button>
         <button class="topbar-btn" onclick="Auth.logout()">🚪</button>
@@ -40,6 +40,48 @@
       <div id="settingsWrap" style="display:none;display:flex;flex-direction:column;gap:24px;">
 
         <!-- Webhook 設定 -->
+        <div class="neu-card">
+          <div class="card-title"><span class="card-icon">🎨</span>品牌與首頁設定</div>
+          <div class="grid-2" style="gap:18px;">
+            <div class="form-group">
+              <label class="form-label">品牌名稱</label>
+              <input type="text" class="neu-input" id="s-brandName" placeholder="數位服務處">
+            </div>
+            <div class="form-group">
+              <label class="form-label">品牌簡稱</label>
+              <input type="text" class="neu-input" id="s-brandShortName" placeholder="數位服務處">
+            </div>
+            <div class="form-group">
+              <label class="form-label">後台名稱</label>
+              <input type="text" class="neu-input" id="s-adminName" placeholder="市民服務平台">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Logo 圖片 URL</label>
+              <input type="url" class="neu-input" id="s-logoUrl" placeholder="leyi/assets/brand/logo.png">
+            </div>
+            <div class="form-group">
+              <label class="form-label">主色</label>
+              <input type="text" class="neu-input" id="s-primaryColor" placeholder="#E87F24">
+            </div>
+            <div class="form-group">
+              <label class="form-label">輔助色</label>
+              <input type="text" class="neu-input" id="s-accentColor" placeholder="#FFC81E">
+            </div>
+            <div class="form-group">
+              <label class="form-label">首頁標題第一行</label>
+              <input type="text" class="neu-input" id="s-heroTitleLine1" placeholder="數位時代的">
+            </div>
+            <div class="form-group">
+              <label class="form-label">首頁標題第二行</label>
+              <input type="text" class="neu-input" id="s-heroTitleLine2" placeholder="市民服務新標準">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;margin:0;">
+              <label class="form-label">首頁副標</label>
+              <textarea class="neu-input" id="s-heroSubtitle" rows="3" placeholder="透過數位化陳情平台，每一件市民的問題都將被看見、被追蹤、被解決。"></textarea>
+            </div>
+          </div>
+        </div>
+
         <div class="neu-card">
           <div class="card-title"><span class="card-icon">🔗</span>Webhook 端點設定</div>
           <div style="margin-bottom:14px;padding:12px 16px;background:var(--primary-pale);border-radius:var(--r-sm);font-size:13px;color:var(--primary-dark);">
@@ -194,7 +236,17 @@
 <script>
 Auth.require('admin');
 
-const ENDPOINTS = ['stats','list','query','submit','dashboard','notify'];
+const ENDPOINTS = [
+  'stats',
+  'list',
+  'query',
+  'submit',
+  'dashboard',
+  'achievements',
+  'achievements/like',
+  'pages',
+  'settings',
+];
 
 function onModeChange() {
   const isAch = document.getElementById('s-mode').value === 'achievement';
@@ -257,7 +309,10 @@ async function testWebhooks() {
 }
 
 async function loadSettings() {
-  const data = await API.settings.get();
+  let data = await API.settings.get();
+  if (!data?.settings && window.SITE_SETTINGS_STORE) {
+    data = { success: true, settings: SITE_SETTINGS_STORE.readLocal(), source: 'local' };
+  }
   document.getElementById('loadingWrap').style.display  = 'none';
   document.getElementById('settingsWrap').style.display = 'flex';
 
@@ -265,8 +320,19 @@ async function loadSettings() {
   const s = data.settings;
   const set = (id, val) => { const el = document.getElementById(id); if(el && val !== undefined) el.value = val; };
 
+  set('s-brandName', s.brandName);
+  set('s-brandShortName', s.brandShortName);
+  set('s-adminName', s.adminName);
+  set('s-logoUrl', s.logoUrl);
+  set('s-primaryColor', s.primaryColor);
+  set('s-accentColor', s.accentColor);
+  set('s-heroTitleLine1', s.heroTitleLine1);
+  set('s-heroTitleLine2', s.heroTitleLine2);
+  set('s-heroSubtitle', s.heroSubtitle);
   set('s-n8nBase',   s.n8nBase);
+  set('s-n8nBase',   s.webhookBase);
   set('s-prefix',    s.prefix);
+  set('s-prefix',    s.webhookPrefix);
   set('s-lineToken', s.lineToken);
   set('s-lineSecret',s.lineSecret);
   set('s-lineGroupId',s.lineGroupId);
@@ -295,8 +361,19 @@ async function loadSettings() {
 async function saveAll() {
   const get = id => document.getElementById(id)?.value?.trim() || '';
   const body = {
+    brandName:  get('s-brandName'),
+    brandShortName: get('s-brandShortName'),
+    adminName: get('s-adminName'),
+    logoUrl: get('s-logoUrl'),
+    primaryColor: get('s-primaryColor'),
+    accentColor: get('s-accentColor'),
+    heroTitleLine1: get('s-heroTitleLine1'),
+    heroTitleLine2: get('s-heroTitleLine2'),
+    heroSubtitle: get('s-heroSubtitle'),
     n8nBase:    get('s-n8nBase'),
+    webhookBase:get('s-n8nBase'),
     prefix:     get('s-prefix'),
+    webhookPrefix:get('s-prefix'),
     lineToken:  get('s-lineToken'),
     lineSecret: get('s-lineSecret'),
     lineGroupId:get('s-lineGroupId'),
@@ -316,8 +393,14 @@ async function saveAll() {
     cloudinarySecret:      get('s-cdnSecret'),
   };
 
-  const r = await API.settings.update(body);
+  let r = await API.settings.update(body);
+  if (!r?.success && window.SITE_SETTINGS_STORE) {
+    SITE_SETTINGS_STORE.writeLocal(body);
+    SITE_SETTINGS_STORE.apply(body);
+    r = { success: true, source: 'local' };
+  }
   if (r?.success) {
+    if (window.SITE_SETTINGS_STORE) SITE_SETTINGS_STORE.writeLocal(body);
     localStorage.setItem('system_mode', body.systemMode);
     toast.success('設定已儲存 ✓');
   } else {
