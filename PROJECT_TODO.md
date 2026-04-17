@@ -43,11 +43,12 @@
 1. 已有 `site_pages` 第一版資料模型
 2. 已有後台頁面管理雛形
 3. 已有前台導覽設定化的初步基礎
+4. 已新增 `n8n/WF-14_pages.json`
 
 待處理：
 
-1. 串接 `demoDB_site_pages`
-2. 建立 n8n `/pages` workflow
+1. 將 `n8n/WF-14_pages.json` 匯入 n8n 並啟用正式 `/pages`
+2. 在 `demoDB_site_pages` 建立預設頁面資料
 3. 建立 n8n `/pages/:slug` 或等效查詢流程
 4. 前台導覽正式改為讀取頁面資料
 5. 最多只支援 2 層頁面，不做任意深度樹

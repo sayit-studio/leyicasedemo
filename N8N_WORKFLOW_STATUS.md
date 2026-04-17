@@ -20,7 +20,7 @@ Base URL:
 | Proposals | `/proposals` | GET | 404 | Missing | `demoDB_proposals` | Build workflow or hide frontend entry until ready. |
 | Achievements | `/achievements` | GET | 200 OK, empty items | `n8n/WF-11_achievements_list.json` | `demoDB_achievement` | Verify Notion public/filter data and field mapping. |
 | Achievement like | `/achievements/like` | POST | Not tested this pass | `n8n/WF-12_achievements_like.json` | `demoDB_achievement` | Test manually with one safe achievement id. |
-| Pages | `/pages` | GET | 404 | Missing | `demoDB_site_pages` | Build after `site_pages` mapping is confirmed. |
+| Pages | `/pages` | GET | 404 | `n8n/WF-14_pages.json` | `demoDB_site_pages` | Import workflow into n8n and enable production webhook. |
 | Settings | `/settings` | GET | 404 | `n8n/WF-13_settings.json` | `demoDB_site_settings` | Import workflow into n8n and enable production webhook. |
 
 ## Current Gap
@@ -33,7 +33,7 @@ Before expanding more frontend features, the repo should contain the exported wo
 
 1. Export live `stats`, `list`, `query`, and `submit` workflow JSON into `n8n/`.
 2. Import and activate `n8n/WF-13_settings.json` for `demoDB_site_settings`.
-3. Build `pages` workflow for `demoDB_site_pages`.
+3. Import and activate `n8n/WF-14_pages.json` for `demoDB_site_pages`.
 4. Decide whether `inspections`, `interpellations`, and `proposals` should be implemented now or temporarily hidden from frontend navigation.
 5. Fix `achievements` data source/filter so the wall returns real Notion rows instead of an empty list.
 

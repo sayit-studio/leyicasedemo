@@ -1,0 +1,143 @@
+{
+  "name": "WF-14 前台頁面設定 leyicasedemo/pages",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "leyicasedemo/pages",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d3e4f5a6-1401-4001-8001-a1b2c3d4e5f6",
+      "name": "接收頁面設定查詢",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "leyicasedemo-pages"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "343b3ad1d1cd80079903dfd6c5592c9f",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "內容狀態",
+              "condition": "select",
+              "selectValue": "已發布"
+            }
+          ]
+        },
+        "sort": {
+          "sortRules": [
+            {
+              "key": "排序",
+              "direction": "ascending"
+            }
+          ]
+        },
+        "options": {
+          "downloadFiles": false
+        },
+        "simplifyOutput": false
+      },
+      "id": "d3e4f5a6-1402-4001-8001-a1b2c3d4e5f6",
+      "name": "查詢 Notion demoDB_site_pages",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawItems = $input.all();\n\nfunction getText(prop) {\n  if (!prop) return '';\n  if (prop.type === 'title') return (prop.title || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'rich_text') return (prop.rich_text || []).map(t => t.plain_text || '').join('');\n  if (prop.type === 'select') return prop.select?.name || '';\n  if (prop.type === 'url') return prop.url || '';\n  if (prop.type === 'number') return prop.number ?? '';\n  if (prop.type === 'checkbox') return prop.checkbox || false;\n  return '';\n}\n\nconst pages = rawItems.map((item, index) => {\n  const props = item.json.properties || {};\n  const pageId = getText(props['頁面代碼']) || item.json.id || `page-${index + 1}`;\n  const pageType = getText(props['頁面類型']) || 'section';\n  const externalUrl = getText(props['外部連結']);\n\n  return {\n    id: pageId,\n    title: getText(props['頁面名稱']),\n    slug: externalUrl || pageId,\n    parent_id: getText(props['父層頁面ID']) || null,\n    sort_order: Number(getText(props['排序']) || ((index + 1) * 10)),\n    is_visible: getText(props['是否顯示']) !== false,\n    page_type: pageType,\n    template_key: getText(props['模板代碼']) || pageType,\n    nav_label: getText(props['導覽名稱']) || getText(props['頁面名稱']),\n    nav_icon: getText(props['導覽圖示']),\n    seo_title: getText(props['SEO標題']),\n    seo_description: getText(props['SEO描述'])\n  };\n}).filter(page => page.title && page.is_visible);\n\nconst byId = new Map(pages.map(page => [page.id, { ...page, children: [] }]));\nconst roots = [];\n\npages.sort((a, b) => a.sort_order - b.sort_order).forEach(page => {\n  const item = byId.get(page.id);\n  const parent = item.parent_id ? byId.get(item.parent_id) : null;\n  if (parent && !parent.parent_id) {\n    parent.children.push(item);\n  } else {\n    item.parent_id = null;\n    roots.push(item);\n  }\n});\n\nroots.forEach(root => root.children.sort((a, b) => a.sort_order - b.sort_order));\nroots.sort((a, b) => a.sort_order - b.sort_order);\n\nreturn [{ json: { success: true, total: pages.length, maxDepth: 2, pages, tree: roots } }];"
+      },
+      "id": "d3e4f5a6-1403-4001-8001-a1b2c3d4e5f6",
+      "name": "整理頁面設定結果",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "d3e4f5a6-1404-4001-8001-a1b2c3d4e5f6",
+      "name": "回傳頁面設定結果",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "接收頁面設定查詢": {
+      "main": [
+        [
+          {
+            "node": "查詢 Notion demoDB_site_pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "查詢 Notion demoDB_site_pages": {
+      "main": [
+        [
+          {
+            "node": "整理頁面設定結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "整理頁面設定結果": {
+      "main": [
+        [
+          {
+            "node": "回傳頁面設定結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateId": "WF-14",
+    "instanceId": "leyicasedemo"
+  },
+  "tags": [
+    { "name": "leyicasedemo" },
+    { "name": "pages" },
+    { "name": "前台頁面管理" }
+  ]
+}
