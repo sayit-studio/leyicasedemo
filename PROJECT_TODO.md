@@ -1,238 +1,213 @@
-# Project TODO
+﻿# PROJECT TODO
 
-## 目標
+本文件只保留目前仍有執行價值的待辦。已完成事項不再展開細節，詳細開發紀錄請看 `進度專案.md`。
 
-把目前的 demo site 整理成可複製的客戶模板，並補齊：
+## 專案定位
 
-1. 前台頁面結構可由後台管理
-2. Notion / n8n / Cloudinary / API 串接完成
-3. 政績專區重新設計，能明確傳達「成果的重要性」
-4. 建立可持續複製與交付的 SOP
+這不是單一 SaaS，而是可快速複製的客戶 Demo 模板。
 
-## 一、架構決策
+每個客戶應具備：
 
-### A. 前台頁面管理方式
+1. 獨立品牌與視覺設定
+2. 獨立 Notion 資料庫
+3. 獨立 n8n webhook 路徑
+4. 可替換前台內容與頁面
+5. 可展示陳情、政績、公開成果與後台管理流程
 
-需求：前台頁面可以透過後台控制新增、顯示開關、父子層、排序。
+## 已完成
 
-建議做法：
+1. 前台首頁基礎 UI 與手機版主要 RWD
+2. Hero CTA 手機版比例修正
+3. 首頁「如何提出陳情？」流程卡片手機版修正
+4. 公開案件列表讀取 n8n `/list`
+5. 案件查詢讀取 n8n `/query`
+6. 陳情送出流程對應 n8n `/submit`
+7. 首頁統計與儀錶板基礎資料讀取
+8. 首頁「案件趨勢」改為「近期公開回覆」
+9. 政績牆頁面基礎 UI
+10. 政績牆串接 n8n `/achievements`
+11. demo logo 支援 `leyi/assets/brand/logo.png`
+12. Super Admin demo 登入 fallback
+13. 後台 CSS 路徑修正
+14. Notion 8 個 demoDB 資料庫規劃與 ID 對應文件
+15. demoDB_case 已建立擬真測試資料
 
-1. 建立 `site_pages` 資料模型
-2. 後台提供頁面樹狀管理介面
-3. 支援拖曳排序、父子層設定、slug、顯示開關、頁面類型
-4. 前台導覽與頁面區塊由頁面設定驅動
+## 進行中
 
-### B. 政績專區的內容模型
+### 1. 前台頁面管理
 
-目前問題：
+目標：前台導覽與頁面可由設定資料驅動。
 
-1. 呈現偏時間軸與列表，重要性層級不夠明確
-2. 視覺上像資料羅列，不像「成果展示」
-3. 沒有把「成果價值」與「社會感知」拉出來
+目前狀態：
 
-建議重做成三層：
+1. 已有 `site_pages` 第一版資料模型
+2. 已有後台頁面管理雛形
+3. 已有前台導覽設定化的初步基礎
 
-1. 旗艦成果：大圖 + 影響數據 + 成果摘要
-2. 專題成果：依主題分類的成果卡群組
-3. 完整成果庫：可篩選、可搜尋、可排序的資料列表
+待處理：
 
-## 二、你手工要做的
+1. 串接 `demoDB_site_pages`
+2. 建立 n8n `/pages` workflow
+3. 建立 n8n `/pages/:slug` 或等效查詢流程
+4. 前台導覽正式改為讀取頁面資料
+5. 最多只支援 2 層頁面，不做任意深度樹
 
-### 1. 資料源規劃
+### 2. Site Settings 與第二套風格
 
-1. 建立 Notion workspace 中要用的 databases
-2. 確認每個 database 的欄位命名，不要中途頻繁更動
-3. 建立 n8n 環境與 credentials
-4. 建立 Cloudinary 帳號與上傳 preset
-5. 準備每個客戶的品牌素材：
-   - logo
-   - 品牌色
-   - 首頁主文案
-   - 聯絡方式
-   - LINE 連結
-   - 政績內容樣本
+目標：同一套模板可以依客戶切換品牌與風格。
 
-### 2. 產品決策
+待處理：
 
-1. 確定前台頁面是否允許「純連結頁」與「內容頁」共存
-2. 確定頁面層級最多支援幾層，建議先限制 2 層
-3. 確定政績專區的主軸是：
-   - 服務成果
-   - 政策推動
-   - 地方建設
-   - 綜合型
-4. 決定第一版是否要做多語系，建議不要
-5. 確定第一版是否支援多客戶共用後台，建議不要
+1. 串接 `demoDB_site_settings`
+2. 建立 n8n `/settings` workflow
+3. 設定可控制 logo、品牌名稱、首頁文案、LINE 連結
+4. 設定可控制 theme key
+5. 建立第二套前台視覺風格
 
-### 3. 外部平台設定
+### 3. 政績牆補強
 
-1. 在 GitHub 建立正式 repo 或確認目前 repo 作為主 repo
-2. 設定部署環境
-3. 設定網域
-4. 建立正式環境 secrets
+目標：政績牆能展示具體成果，讓民眾理解服務成果。
 
-## 三、Codex 可以完成的
+目前狀態：
 
-### 1. 模板與前端架構
+1. 已改為成果卡片呈現
+2. 已支援標籤、圖片、內容與詳情基礎資料
+3. 已串接 `/achievements`
 
-1. 繼續把前台頁面改成設定驅動
-2. 建立 `site_pages` 的前端資料結構
-3. 實作後台頁面管理 UI
-4. 實作前台導覽樹與頁面顯示邏輯
-5. 整理客戶模板設定結構
-6. 建立 clone / handoff 文件
+待處理：
 
-### 2. 政績專區重構
+1. 詳情 modal 補完整過程文字
+2. 支援多張圖片輪播
+3. 支援影片連結
+4. 支援標籤篩選
+5. 補齊成果資料的 n8n 欄位對應文件
 
-1. 重新設計政績專區資訊架構
-2. 製作新的政績首頁版型
-3. 調整政績卡片與視覺層級
-4. 串接後台管理欄位到政績前台
-5. 補上成果分類、置頂、精選、封面圖機制
+### 4. 後台管理
 
-### 3. Notion / n8n 相關產物
+目標：Demo 能展示「前台可由後台管理」的可信流程。
 
-1. 幫你定義 Notion database schema
-2. 幫你整理每個 schema 的欄位用途
-3. 幫你產出 n8n workflow 規格文件
-4. 幫你補齊 workflow JSON 範本
-5. 幫你整理 webhook payload 規格
+目前狀態：
 
-### 4. 工程交付文件
+1. Super Admin demo 登入可用
+2. 後台頁面已修正 CSS 載入
+3. 有客戶管理與頁面管理雛形
 
-1. 建立專案初始化文件
-2. 建立新客戶複製 SOP
-3. 建立部署檢查清單
-4. 建立待辦與里程碑文件
+待處理：
 
-## 四、共同配合完成的
+1. 後台頁面管理串接真實資料
+2. 後台站台設定串接真實資料
+3. 客戶管理補「新增客戶」流程
+4. Webhook 端點管理補對應資訊
+5. 權限系統目前仍是 demo fallback，正式版需另行設計
 
-### 1. Notion database 建置
+## 下一步建議
 
-Codex 可完成：
+### 優先順序 1：整理 n8n workflow 實際狀態
 
-1. schema 設計
-2. 欄位命名規格
-3. 關聯建議
-4. demo 資料樣本格式
+目的：確認 GitHub 內 workflow JSON 與 n8n 線上版本一致。
 
-你要完成：
+需要檢查：
 
-1. 實際在 Notion 建 database
-2. 建 integration
-3. 授權該 integration 存取資料庫
-4. 提供 database IDs
+1. `/stats`
+2. `/list`
+3. `/query`
+4. `/dashboard`
+5. `/submit`
+6. `/achievements`
+7. `/achievements/like`
+8. 尚未完成的 `/pages`
+9. 尚未完成的 `/settings`
 
-### 2. n8n 建置
+### 優先順序 2：完成 `site_settings`
 
-Codex 可完成：
+目的：讓第二套風格與品牌設定可以由資料庫控制。
 
-1. workflow 設計
-2. JSON 範本
-3. 節點命名規範
-4. webhook 路徑規劃
+預期成果：
 
-你要完成：
+1. 前台讀取品牌設定
+2. 可切換 theme key
+3. 可切換 logo、文案與 CTA
+4. 後台可看到設定資料
 
-1. 匯入 workflow
-2. 設定 n8n credentials
-3. 連接 Notion / Cloudinary / LINE
-4. 實際測試執行
+### 優先順序 3：完成 `site_pages`
 
-### 3. GitHub / 部署
+目的：讓前台導覽不再寫死。
 
-Codex 可完成：
+預期成果：
 
-1. 本地修改程式
-2. 產出 commit 內容
-3. 幫你整理 PR 說明
-4. 如果 repo 已連上對應工具，可直接協助操作 GitHub
+1. 前台導覽讀取 page data
+2. 支援顯示 / 隱藏
+3. 支援最多 2 層
+4. 後台可看到頁面列表與排序
 
-你要完成：
+### 優先順序 4：整理交付 SOP
 
-1. 確認 repo 權限
-2. 確認是否允許直接 push / 開 PR
-3. 確認部署目標平台與權限
+目的：讓每次複製新客戶 Demo 時可照表操作。
 
-## 五、Notion 待建項目
+需要文件：
 
-### 建議資料庫
+1. Notion 建表 SOP
+2. n8n 匯入 workflow SOP
+3. GitHub Pages 部署 SOP
+4. 新客戶初始化 SOP
+5. 圖片與媒體素材命名 SOP
 
-1. `DB-01-site-settings`
-   - 客戶品牌設定
-   - LINE
-   - CTA
-   - 功能開關
+## 暫緩
 
-2. `DB-02-site-pages`
-   - 頁面名稱
-   - slug
-   - 父頁
-   - 順序
-   - 顯示開關
-   - 頁面類型
+以下項目先不做，避免 Demo 第一版範圍過大：
 
-3. `DB-03-petitions`
-   - 陳情案件資料
+1. 任務派工系統
+2. 任意深度頁面樹
+3. Block-level page builder
+4. 正式多租戶 SaaS 架構
+5. 完整權限 RBAC
+6. Cloudinary 正式上傳流程
+7. CSV 匯入 / 匯出
+8. GitHub PR 自動化流程
 
-4. `DB-04-inspections`
-   - 會勘資料
+## Notion DB 清單
 
-5. `DB-05-interpellations`
-   - 質詢資料
+正式 ID 與欄位請以 `NOTION_DB_MAPPING.md` 為準。
 
-6. `DB-06-proposals`
-   - 提案資料
+1. `demoDB_site_settings`
+2. `demoDB_site_pages`
+3. `demoDB_case`
+4. `demoDB_inspections`
+5. `demoDB_interpellations`
+6. `demoDB_proposals`
+7. `demoDB_achievement`
+8. `demoDB_media_assets`
 
-7. `DB-07-achievements`
-   - 政績成果資料
+## n8n Webhook 清單
 
-8. `DB-08-media-assets`
-   - 圖片 / 封面 / 影音資源索引
+目前命名原則：`leyicasedemo/xxxx`
 
-## 六、n8n 待建項目
+正式路徑範例：
 
-1. 首頁統計 `stats`
-2. 案件列表 `list`
-3. 案件查詢 `query`
-4. 儀表板 `dashboard`
-5. 表單送件 `submit`
-6. 會勘清單 `inspections`
-7. 質詢清單 `interpellations`
-8. 提案清單 `proposals`
-9. 政績列表 `achievements`
-10. 政績按讚 `achievements/like`
-11. 頁面結構 `pages`
-12. 頁面詳細資料 `pages/:slug`
+`https://drwu.zeabur.app/webhook/leyicasedemo/stats`
 
-## 七、目前系統尚未完成的功能
+已使用或規劃中的路徑：
 
-### 高優先
+1. `leyicasedemo/stats`
+2. `leyicasedemo/list`
+3. `leyicasedemo/query`
+4. `leyicasedemo/dashboard`
+5. `leyicasedemo/submit`
+6. `leyicasedemo/inspections`
+7. `leyicasedemo/interpellations`
+8. `leyicasedemo/proposals`
+9. `leyicasedemo/achievements`
+10. `leyicasedemo/achievements/like`
+11. `leyicasedemo/pages`
+12. `leyicasedemo/settings`
 
-1. 後台頁面樹狀管理
-2. 前台導覽與頁面動態渲染
-3. 表單欄位設定化
-4. Notion / n8n 正式串接
-5. 圖片上傳流程完整化
-6. 政績專區改版
+## 判斷原則
 
-### 中優先
+後續開發優先順序：
 
-1. 客戶模板設定拆分
-2. 新客戶 clone SOP
-3. 後台欄位與權限收斂
-4. 部署設定與 secrets 管理
+1. 先讓前後台流程跑得通
+2. 再讓資料來源可替換
+3. 再做 UI 細節
+4. 最後才做自動化與正式權限
 
-### 低優先
-
-1. 更多視覺主題
-2. 更多分享機制
-3. CSV / 匯出優化
-
-## 八、下一輪建議執行項目
-
-1. 定義 `site_pages` schema
-2. 實作後台頁面管理 UI 雛形
-3. 改首頁與導覽為頁面設定驅動
-4. 重新設計政績專區 wireframe
-5. 補 Notion / n8n 規格文件
+不為 Demo 第一版增加過重架構。
