@@ -72,6 +72,15 @@
       <span class="bubble bubble-6"></span>
     </div>
 
+    <div class="hero-media-stage" id="heroMediaStage" aria-hidden="true">
+      <div class="hero-media-slide is-active" style="--hero-bg:url('leyi/assets/achievements/achievement-01.jpg')"></div>
+      <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-02.jpg')"></div>
+      <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-03.jpg')"></div>
+      <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-04.jpg')"></div>
+      <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-05.jpg')"></div>
+      <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-06.jpg')"></div>
+    </div>
+
     <div class="hero-body">
       <h1 class="hero-title">
         數位時代<br>
@@ -85,31 +94,13 @@
         <a href="form.html" class="btn-primary">立即陳情</a>
         <a href="#" class="btn-primary" onclick="showPage('query');return false;">查詢進度</a>
       </div>
-      <div class="hero-image-rail" aria-label="政績成果快速導覽">
-        <a class="hero-shot hero-shot-1" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-01.jpg" alt="政績成果 1">
-          <span>社區改善</span>
-        </a>
-        <a class="hero-shot hero-shot-2" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-02.jpg" alt="政績成果 2">
-          <span>道路安全</span>
-        </a>
-        <a class="hero-shot hero-shot-3" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-03.jpg" alt="政績成果 3">
-          <span>親子互動</span>
-        </a>
-        <a class="hero-shot hero-shot-4" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-04.jpg" alt="政績成果 4">
-          <span>樂齡關懷</span>
-        </a>
-        <a class="hero-shot hero-shot-5" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-05.jpg" alt="政績成果 5">
-          <span>校園守護</span>
-        </a>
-        <a class="hero-shot hero-shot-6" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-06.jpg" alt="政績成果 6">
-          <span>環境整理</span>
-        </a>
+      <div class="hero-media-controls" aria-label="切換首頁形象背景">
+        <button class="hero-media-dot is-active" type="button" data-hero-slide="0">社區改善</button>
+        <button class="hero-media-dot" type="button" data-hero-slide="1">道路安全</button>
+        <button class="hero-media-dot" type="button" data-hero-slide="2">親子互動</button>
+        <button class="hero-media-dot" type="button" data-hero-slide="3">樂齡關懷</button>
+        <button class="hero-media-dot" type="button" data-hero-slide="4">校園守護</button>
+        <button class="hero-media-dot" type="button" data-hero-slide="5">環境整理</button>
       </div>
 
       <!-- 統計卡片 — 政績版 -->

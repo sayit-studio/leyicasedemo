@@ -226,6 +226,54 @@ function initHeroBubbles() {
   });
 }
 
+function initHeroMediaCarousel() {
+  const hero = document.querySelector('.hero-unit');
+  const slides = Array.from(document.querySelectorAll('.hero-media-slide'));
+  const dots = Array.from(document.querySelectorAll('[data-hero-slide]'));
+  if (!hero || slides.length === 0) return;
+
+  let current = Math.max(0, slides.findIndex(slide => slide.classList.contains('is-active')));
+  let timer = null;
+
+  const show = nextIndex => {
+    current = (nextIndex + slides.length) % slides.length;
+    slides.forEach((slide, index) => slide.classList.toggle('is-active', index === current));
+    dots.forEach(dot => {
+      const isActive = Number(dot.dataset.heroSlide) === current;
+      dot.classList.toggle('is-active', isActive);
+      dot.setAttribute('aria-pressed', String(isActive));
+    });
+  };
+
+  const start = () => {
+    if (timer) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    timer = window.setInterval(() => show(current + 1), 5200);
+  };
+  const stop = () => {
+    if (timer) window.clearInterval(timer);
+    timer = null;
+  };
+  const restart = () => {
+    stop();
+    start();
+  };
+
+  dots.forEach(dot => {
+    dot.setAttribute('aria-pressed', String(dot.classList.contains('is-active')));
+    dot.addEventListener('click', () => {
+      show(Number(dot.dataset.heroSlide));
+      restart();
+    });
+  });
+
+  hero.addEventListener('pointerenter', stop);
+  hero.addEventListener('pointerleave', start);
+  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  show(current);
+  start();
+}
+
 /* ══════════════════════════════
    4. 儀表板
 ══════════════════════════════ */
@@ -575,6 +623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const initialPage = (location.hash || '').replace(/^#/, '');
   if (initialPage && document.getElementById('page-' + initialPage)) showPage(initialPage);
   initHeroBubbles();
+  initHeroMediaCarousel();
   updateScrollProgress();
   window.addEventListener('scroll', updateScrollProgress, { passive: true });
   window.addEventListener('resize', updateScrollProgress);
