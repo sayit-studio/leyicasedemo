@@ -229,7 +229,6 @@ function initHeroBubbles() {
 function initHeroMediaCarousel() {
   const hero = document.querySelector('.hero-unit');
   const slides = Array.from(document.querySelectorAll('.hero-media-slide'));
-  const dots = Array.from(document.querySelectorAll('[data-hero-slide]'));
   if (!hero || slides.length === 0) return;
 
   let current = Math.max(0, slides.findIndex(slide => slide.classList.contains('is-active')));
@@ -238,11 +237,6 @@ function initHeroMediaCarousel() {
   const show = nextIndex => {
     current = (nextIndex + slides.length) % slides.length;
     slides.forEach((slide, index) => slide.classList.toggle('is-active', index === current));
-    dots.forEach(dot => {
-      const isActive = Number(dot.dataset.heroSlide) === current;
-      dot.classList.toggle('is-active', isActive);
-      dot.setAttribute('aria-pressed', String(isActive));
-    });
   };
 
   const start = () => {
@@ -254,19 +248,6 @@ function initHeroMediaCarousel() {
     if (timer) window.clearInterval(timer);
     timer = null;
   };
-  const restart = () => {
-    stop();
-    start();
-  };
-
-  dots.forEach(dot => {
-    dot.setAttribute('aria-pressed', String(dot.classList.contains('is-active')));
-    dot.addEventListener('click', () => {
-      show(Number(dot.dataset.heroSlide));
-      restart();
-    });
-  });
-
   hero.addEventListener('pointerenter', stop);
   hero.addEventListener('pointerleave', start);
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
