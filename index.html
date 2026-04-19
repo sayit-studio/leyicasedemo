@@ -75,25 +75,24 @@
 
     <div class="hero-body">
       <div class="hero-media-stage" id="heroMediaStage" aria-label="政績成果輪播">
-        <div class="hero-media-slide is-active" style="--hero-bg:url('../leyi/assets/achievements/achievement-01.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-02.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-03.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-04.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-05.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-06.jpg')"></div>
+        <div class="hero-media-slide is-active" style="--hero-bg:url('leyi/assets/achievements/achievement-01.jpg')"></div>
+        <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-02.jpg')"></div>
+        <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-03.jpg')"></div>
+        <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-04.jpg')"></div>
+        <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-05.jpg')"></div>
+        <div class="hero-media-slide" style="--hero-bg:url('leyi/assets/achievements/achievement-06.jpg')"></div>
         <div class="hero-copy">
           <h1>數位時代的<br><span>市民新標準</span></h1>
           <p>每一件服務、每一次改善，都讓居民看得見。放心交給我，讓地方需求被回應、被追蹤、被完成。</p>
+          <div class="hero-copy-actions">
+            <a href="form.html" class="hero-copy-cta">立即陳情</a>
+            <a href="#" class="hero-copy-link" onclick="showPage('query');return false;">已有案件？查詢進度</a>
+          </div>
         </div>
-      </div>
-      <div class="hero-btns">
-        <a href="leyi/achievements.html" class="btn-primary btn-achievement">政績牆</a>
-        <a href="form.html" class="btn-primary">立即陳情</a>
-        <a href="#" class="btn-primary" onclick="showPage('query');return false;">查詢進度</a>
       </div>
 
       <!-- 統計卡片 — 政績版 -->
-      <div class="stats-grid">
+      <div class="stats-grid hero-stats-grid">
 
         <!-- 主角：累積服務件數 -->
         <div class="stat-card stat-hero" onclick="openModal('totalPetitions')" tabindex="0">
@@ -197,6 +196,46 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- 政績快速檢視 -->
+  <div class="home-achievement-section">
+    <div class="section-wrap">
+      <div class="home-achievement-head">
+        <div>
+          <div class="home-section-eyebrow">政績牆快速檢視</div>
+          <h2 class="home-section-title">先看最有感的服務成果</h2>
+          <p>用居民看得懂的照片、時間與處理重點，把地方服務成果快速呈現。</p>
+        </div>
+        <a class="dash-link-btn achievement-more-link" href="leyi/achievements.html">查看完整政績牆</a>
+      </div>
+      <div class="home-achievement-grid">
+        <a class="home-achievement-card" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-01.jpg" alt="社區改善成果">
+          <div class="home-achievement-card-body">
+            <span>社區改善</span>
+            <h3>整理公共空間，讓日常動線更舒適</h3>
+            <p>整合現場會勘、單位協調與後續追蹤，讓居民立即看見改善。</p>
+          </div>
+        </a>
+        <a class="home-achievement-card" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-02.jpg" alt="道路安全成果">
+          <div class="home-achievement-card-body">
+            <span>道路安全</span>
+            <h3>通學與通勤路線安全優先處理</h3>
+            <p>聚焦標線、路口提醒與行人空間，降低民眾每天遇到的風險。</p>
+          </div>
+        </a>
+        <a class="home-achievement-card" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-05.jpg" alt="樂齡關懷成果">
+          <div class="home-achievement-card-body">
+            <span>樂齡關懷</span>
+            <h3>把服務帶進社區，讓照顧更靠近居民</h3>
+            <p>用活動、據點與公共服務串起地方需求，累積可被看見的成果。</p>
+          </div>
+        </a>
       </div>
     </div>
   </div>
