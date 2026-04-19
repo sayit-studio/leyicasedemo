@@ -201,6 +201,31 @@ function closeModal() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+function updateScrollProgress() {
+  const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = max > 0 ? (window.scrollY / max) * 100 : 0;
+  bar.style.width = Math.max(0, Math.min(100, progress)) + '%';
+}
+
+function initHeroBubbles() {
+  const hero = document.querySelector('.hero-unit');
+  if (!hero) return;
+  const move = (clientX, clientY) => {
+    const rect = hero.getBoundingClientRect();
+    const x = clientX - rect.left - rect.width / 2;
+    const y = clientY - rect.top - rect.height / 2;
+    hero.style.setProperty('--bubble-x', `${x}px`);
+    hero.style.setProperty('--bubble-y', `${y}px`);
+  };
+  hero.addEventListener('pointermove', event => move(event.clientX, event.clientY));
+  hero.addEventListener('pointerleave', () => {
+    hero.style.setProperty('--bubble-x', '0px');
+    hero.style.setProperty('--bubble-y', '0px');
+  });
+}
+
 /* ══════════════════════════════
    4. 儀表板
 ══════════════════════════════ */
@@ -549,6 +574,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.dash-tab').forEach(btn=>{btn.addEventListener('click',()=>loadDashboard(btn.dataset.period));});
   const initialPage = (location.hash || '').replace(/^#/, '');
   if (initialPage && document.getElementById('page-' + initialPage)) showPage(initialPage);
+  initHeroBubbles();
+  updateScrollProgress();
+  window.addEventListener('scroll', updateScrollProgress, { passive: true });
+  window.addEventListener('resize', updateScrollProgress);
   loadStats();
   loadDashboard('7d');
   loadRecentReplies();

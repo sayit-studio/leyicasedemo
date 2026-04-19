@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 <!-- ═══════════ NAVBAR ═══════════ -->
 <nav class="navbar">
@@ -62,6 +63,14 @@
     <div class="hero-deco hero-deco-2"></div>
     <div class="hero-deco hero-deco-3"></div>
     <div class="hero-deco hero-deco-4"></div>
+    <div class="bubble-field" id="bubbleField" aria-hidden="true">
+      <span class="bubble bubble-1"></span>
+      <span class="bubble bubble-2"></span>
+      <span class="bubble bubble-3"></span>
+      <span class="bubble bubble-4"></span>
+      <span class="bubble bubble-5"></span>
+      <span class="bubble bubble-6"></span>
+    </div>
 
     <div class="hero-body">
       <h1 class="hero-title">
@@ -72,9 +81,35 @@
         放心交給我
       </p>
       <div class="hero-btns">
-        <a href="leyi/achievements.html" class="btn-primary btn-achievement">🏆 政績牆</a>
-        <a href="form.html" class="btn-primary">🏛️ 立即陳情</a>
-        <a href="#" class="btn-outline" onclick="showPage('query');return false;">🔍 查詢進度</a>
+        <a href="leyi/achievements.html" class="btn-primary btn-achievement">政績牆</a>
+        <a href="form.html" class="btn-primary">立即陳情</a>
+        <a href="#" class="btn-primary" onclick="showPage('query');return false;">查詢進度</a>
+      </div>
+      <div class="hero-image-rail" aria-label="政績成果快速導覽">
+        <a class="hero-shot hero-shot-1" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-01.jpg" alt="政績成果 1">
+          <span>社區改善</span>
+        </a>
+        <a class="hero-shot hero-shot-2" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-02.jpg" alt="政績成果 2">
+          <span>道路安全</span>
+        </a>
+        <a class="hero-shot hero-shot-3" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-03.jpg" alt="政績成果 3">
+          <span>親子互動</span>
+        </a>
+        <a class="hero-shot hero-shot-4" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-04.jpg" alt="政績成果 4">
+          <span>樂齡關懷</span>
+        </a>
+        <a class="hero-shot hero-shot-5" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-05.jpg" alt="政績成果 5">
+          <span>校園守護</span>
+        </a>
+        <a class="hero-shot hero-shot-6" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-06.jpg" alt="政績成果 6">
+          <span>環境整理</span>
+        </a>
       </div>
 
       <!-- 統計卡片 — 政績版 -->
