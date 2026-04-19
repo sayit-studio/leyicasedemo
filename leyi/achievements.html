@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>政績專區 — 數位服務處</title>
-<meta name="description" content="數位服務處政績一覽，包含立法成果、選民服務、會勘、質詢、提案等重要事蹟。">
+<title>政績專區 — 樂藝數位服務處</title>
+<meta name="description" content="樂藝數位服務處政績一覽，包含立法成果、選民服務、會勘、質詢、提案等重要事蹟。">
 <meta property="og:type"        content="website">
-<meta property="og:title"       content="政績專區 — 數位服務處">
-<meta property="og:description" content="數位服務處政績一覽，公開透明呈現每一項服務成果。">
+<meta property="og:title"       content="政績專區 — 樂藝數位服務處">
+<meta property="og:description" content="樂藝數位服務處政績一覽，公開透明呈現每一項服務成果。">
 <meta property="og:locale"      content="zh_TW">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -895,15 +895,15 @@
 <nav class="navbar">
   <div class="nav-inner">
     <a class="nav-brand" href="../index.html">
-      <div class="nav-brand-icon">🏛️</div>
-      <span class="nav-brand-name">數位服務處</span>
+      <div class="nav-brand-icon"><img src="assets/brand/logo.png" alt="樂藝數位服務處"></div>
+      <span class="nav-brand-name">樂藝數位服務處</span>
     </a>
     <div class="nav-links">
       <a class="nav-link" href="../index.html">首頁</a>
-      <a class="nav-link active" href="achievements.html">政績專區</a>
-      <a class="nav-link" href="../index.html#page-inspections" onclick="window.location='../index.html';return false;">現場會勘</a>
-      <a class="nav-link" href="../index.html#page-interpellations" onclick="window.location='../index.html';return false;">國會質詢</a>
-      <a class="nav-link" href="../index.html#page-proposals" onclick="window.location='../index.html';return false;">國會提案</a>
+      <a class="nav-link" href="../index.html#list">案件列表</a>
+      <a class="nav-link" href="../index.html#query">案件查詢</a>
+      <a class="nav-link active" href="achievements.html">政績牆</a>
+      <a class="nav-link" href="../index.html#faq">常見問題</a>
       <a class="nav-link nav-cta" href="../form.html">＋ 我要陳情</a>
     </div>
     <button class="hamburger" id="hamburgerBtn" aria-label="選單">
@@ -912,7 +912,10 @@
   </div>
   <div class="mobile-nav" id="mobileNav">
     <a class="nav-link" href="../index.html">🏠 首頁</a>
-    <a class="nav-link active" href="achievements.html">🏆 政績專區</a>
+    <a class="nav-link" href="../index.html#list">📋 案件列表</a>
+    <a class="nav-link" href="../index.html#query">🔎 案件查詢</a>
+    <a class="nav-link active" href="achievements.html">🏆 政績牆</a>
+    <a class="nav-link" href="../index.html#faq">❓ 常見問題</a>
     <a class="nav-link" href="../form.html">＋ 我要陳情</a>
   </div>
 </nav>
@@ -988,12 +991,12 @@
 
 <!-- ══ FOOTER ══ -->
 <footer class="site-footer">
-  <div class="footer-brand">🏛️ 數位服務處</div>
+  <div class="footer-brand">🏛️ 樂藝數位服務處</div>
   <div class="footer-sub">數位透明 · 為民服務 · 每件問題都有人跟進</div>
   <div class="footer-social">
     <a class="footer-social-card" href="https://lin.ee/Q9cWSP5" target="_blank">💬 LINE 官方帳號</a>
   </div>
-  <div class="footer-copy">© 2025 數位服務處 · All rights reserved.</div>
+  <div class="footer-copy">© 2025 樂藝數位服務處 · All rights reserved.</div>
 </footer>
 
 <script src="../js/config.js"></script>
@@ -1003,7 +1006,7 @@
    ════════════════════════════════════════ */
 
 const ACHIEVEMENT_IMAGE_BASE = 'assets/achievements/';
-const ACHIEVEMENT_ENDPOINT = SITE_UTILS.webhook('achievements');
+let ACHIEVEMENT_ENDPOINT = SITE_UTILS.webhook('achievements');
 const FALLBACK_ACHIEVEMENT_ITEMS = [
   {
     id: 'achievement-01',
@@ -1317,17 +1320,30 @@ document.getElementById('hamburgerBtn').addEventListener('click', () => {
   document.getElementById('mobileNav').classList.toggle('open');
 });
 
-// ── 頁面初始化
-document.title = SITE_TEMPLATE_CONFIG.seo.achievementsTitle;
-document.querySelector('meta[name="description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
-document.querySelector('meta[property="og:title"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsTitle);
-document.querySelector('meta[property="og:description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
-document.querySelector('.nav-brand-icon').innerHTML = `<img src="assets/brand/logo.png" alt="${SITE_TEMPLATE_CONFIG.brand.name}">`;
-document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.brand.name;
-document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
-document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();
+function achievementLogoSrc() {
+  const logo = CONFIG.LOGO_URL || 'leyi/assets/brand/logo.png';
+  if (/^https?:\/\//.test(logo)) return logo;
+  return logo.replace(/^leyi\//, '');
+}
 
-loadAchievements();
+async function initAchievementPage() {
+  const siteSettings = await SITE_SETTINGS_STORE.loadRemote();
+  SITE_SETTINGS_STORE.apply(siteSettings);
+  ACHIEVEMENT_ENDPOINT = SITE_UTILS.webhook('achievements');
+
+  document.title = SITE_TEMPLATE_CONFIG.seo.achievementsTitle;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsTitle);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', SITE_TEMPLATE_CONFIG.seo.achievementsDescription);
+  document.querySelector('.nav-brand-icon').innerHTML = `<img src="${achievementLogoSrc()}" alt="${SITE_TEMPLATE_CONFIG.brand.name}">`;
+  document.querySelector('.nav-brand-name').textContent = SITE_TEMPLATE_CONFIG.brand.name;
+  document.querySelector('.footer-brand').textContent = `${SITE_TEMPLATE_CONFIG.brand.icon} ${SITE_TEMPLATE_CONFIG.brand.name}`;
+  document.querySelector('.footer-copy').textContent = SITE_UTILS.footerCopyright();
+
+  loadAchievements();
+}
+
+initAchievementPage();
 
 // ── URL hash 跳轉到指定政績
 window.addEventListener('load', () => {

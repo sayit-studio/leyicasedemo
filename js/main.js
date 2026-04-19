@@ -41,7 +41,7 @@ function setHref(selector, value) {
   });
 }
 
-function setBrandLogo(selector, src = 'leyi/assets/brand/logo.png') {
+function setBrandLogo(selector, src = CONFIG.LOGO_URL || 'leyi/assets/brand/logo.png') {
   document.querySelectorAll(selector).forEach(el => {
     el.innerHTML = `<img src="${src}" alt="${SITE_TEMPLATE_CONFIG.brand.name}">`;
   });
@@ -547,6 +547,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const qi=document.getElementById('queryInput');
   if(qi) qi.addEventListener('keydown',e=>{if(e.key==='Enter')queryCase();});
   document.querySelectorAll('.dash-tab').forEach(btn=>{btn.addEventListener('click',()=>loadDashboard(btn.dataset.period));});
+  const initialPage = (location.hash || '').replace(/^#/, '');
+  if (initialPage && document.getElementById('page-' + initialPage)) showPage(initialPage);
   loadStats();
   loadDashboard('7d');
   loadRecentReplies();

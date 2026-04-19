@@ -8,14 +8,14 @@ const SITE_TEMPLATE_CONFIG = {
   systemMode: 'achievement',
 
   brand: {
-    name: '數位服務處',
-    shortName: '數位服務處',
+    name: '樂藝數位服務處',
+    shortName: '樂藝數位服務處',
     adminName: '市民服務平台',
     icon: '🏛️',
     tagline: '數位透明・為民服務',
     footerTagline: '數位透明 · 為民服務 · 每件問題都有人跟進',
     adminSubtitle: 'Admin Console',
-    copyrightName: '數位服務處',
+    copyrightName: '樂藝數位服務處',
   },
 
   integrations: {
@@ -34,8 +34,8 @@ const SITE_TEMPLATE_CONFIG = {
   },
 
   content: {
-    heroTitle: ['數位時代的', '市民服務新標準'],
-    heroSub: '透過數位化陳情平台，每一件市民的問題都將被看見、被追蹤、被解決。',
+    heroTitle: ['數位時代', '市民新標準'],
+    heroSub: '放心交給我',
     heroFigure: false,
     lineLinkLabel: 'LINE 官方帳號',
     flowSteps: [
@@ -45,7 +45,7 @@ const SITE_TEMPLATE_CONFIG = {
       { num: '04', icon: '✅', title: '結果通知回覆', desc: '案件處理完成後，公開說明及結果回覆將同步更新在查詢頁面。' },
     ],
     faqItems: [
-      { q: '什麼是數位服務處？', a: '這是一個公開透明的市民陳情服務平台，讓每一件市民的問題都能被看見、被追蹤、被解決。' },
+      { q: '什麼是樂藝數位服務處？', a: '這是一個公開透明的市民陳情服務平台，讓每一件市民的問題都能被看見、被追蹤、被解決。' },
       { q: '如何提出陳情？', a: '點選「我要陳情」按鈕，填寫問題類型、標題與詳細內容，留下聯絡資料後送出即可。' },
       { q: '如何查詢陳情進度？', a: '點選「案件查詢」，輸入您的案件編號（格式：SVC-YYYYMMDD-XXXX）即可查看目前辦理狀態。' },
       { q: '案件一般需要多久處理？', a: '視案件性質及主管機關時程而定，一般案件約 7–14 個工作天，緊急案件會優先處理。' },
@@ -87,12 +87,12 @@ const SITE_TEMPLATE_CONFIG = {
   },
 
   seo: {
-    homeTitle: '數位服務處｜市民陳情服務平台',
+    homeTitle: '樂藝數位服務處｜市民陳情服務平台',
     homeDescription: '公開透明的市民陳情平台，線上登錄陳情、即時查詢案件進度，每件問題都有人跟進處理。',
     ogImage: './og-image.png',
-    achievementsTitle: '政績專區 — 數位服務處',
-    achievementsDescription: '數位服務處政績一覽，公開透明呈現每一項服務成果。',
-    formTitle: '填寫陳情表單 — 數位服務處',
+    achievementsTitle: '政績專區 — 樂藝數位服務處',
+    achievementsDescription: '樂藝數位服務處政績一覽，公開透明呈現每一項服務成果。',
+    formTitle: '填寫陳情表單 — 樂藝數位服務處',
     loginTitle: '登入 — 市民服務平台管理後台',
   },
 };
@@ -167,19 +167,45 @@ const SITE_SETTINGS_STORE = {
   normalize(input = {}) {
     const fallback = this.defaults();
     const source = input.settings || input;
+    const requestedSiteKey = String(source.siteKey || source.siteCode || fallback.siteKey);
+    const rawBrandName = String(source.brandName || source.name || fallback.brandName);
+    const rawShortName = String(source.brandShortName || source.shortName || source.brandName || fallback.brandShortName);
+    const rawHeroTitleLine1 = String(source.heroTitleLine1 || fallback.heroTitleLine1);
+    const rawHeroTitleLine2 = String(source.heroTitleLine2 || fallback.heroTitleLine2);
+    const rawHeroSubtitle = String(source.heroSubtitle || source.heroSub || fallback.heroSubtitle);
+    const rawLogoUrl = String(source.logoUrl || fallback.logoUrl);
+    const isLeyiDemo = requestedSiteKey === 'leyicasedemo';
+    const brandName = isLeyiDemo && ['數位服務處', '數位服務處 Demo'].includes(rawBrandName)
+      ? '樂藝數位服務處'
+      : rawBrandName;
+    const brandShortName = isLeyiDemo && ['數位服務處', '數位服務處 Demo'].includes(rawShortName)
+      ? '樂藝數位服務處'
+      : rawShortName;
+    const heroTitleLine1 = isLeyiDemo && rawHeroTitleLine1.includes('數位時代')
+      ? '數位時代'
+      : rawHeroTitleLine1;
+    const heroTitleLine2 = isLeyiDemo && rawHeroTitleLine2.includes('市民服務')
+      ? '市民新標準'
+      : rawHeroTitleLine2;
+    const heroSubtitle = isLeyiDemo && rawHeroSubtitle.includes('每一件')
+      ? '放心交給我'
+      : rawHeroSubtitle;
+    const logoUrl = isLeyiDemo && rawLogoUrl.includes('og-image')
+      ? 'leyi/assets/brand/logo.png'
+      : rawLogoUrl;
     return {
       ...fallback,
-      siteKey: String(source.siteKey || source.siteCode || fallback.siteKey),
-      brandName: String(source.brandName || source.name || fallback.brandName),
-      brandShortName: String(source.brandShortName || source.shortName || source.brandName || fallback.brandShortName),
+      siteKey: requestedSiteKey,
+      brandName,
+      brandShortName,
       adminName: String(source.adminName || fallback.adminName),
       systemMode: String(source.systemMode || fallback.systemMode),
       primaryColor: String(source.primaryColor || fallback.primaryColor),
       accentColor: String(source.accentColor || fallback.accentColor),
-      logoUrl: String(source.logoUrl || fallback.logoUrl),
-      heroTitleLine1: String(source.heroTitleLine1 || fallback.heroTitleLine1),
-      heroTitleLine2: String(source.heroTitleLine2 || fallback.heroTitleLine2),
-      heroSubtitle: String(source.heroSubtitle || source.heroSub || fallback.heroSubtitle),
+      logoUrl,
+      heroTitleLine1,
+      heroTitleLine2,
+      heroSubtitle,
       lineUrl: String(source.lineUrl || fallback.lineUrl),
       webhookBase: String(source.webhookBase || source.n8nBase || fallback.webhookBase).replace(/\/$/, ''),
       webhookMode: String(source.webhookMode || fallback.webhookMode || 'webhook'),
@@ -243,6 +269,7 @@ const SITE_SETTINGS_STORE = {
 
     CONFIG.BRAND_NAME = s.brandName;
     CONFIG.BRAND_SHORT = s.brandShortName;
+    CONFIG.LOGO_URL = s.logoUrl;
     CONFIG.SYSTEM_MODE = s.systemMode;
     CONFIG.HERO_TITLE = SITE_TEMPLATE_CONFIG.content.heroTitle;
     CONFIG.HERO_SUB = s.heroSubtitle;
@@ -264,6 +291,7 @@ const CONFIG = {
   BRAND_NAME: SITE_TEMPLATE_CONFIG.brand.name,
   BRAND_SHORT: SITE_TEMPLATE_CONFIG.brand.shortName,
   BRAND_ICON: SITE_TEMPLATE_CONFIG.brand.icon,
+  LOGO_URL: 'leyi/assets/brand/logo.png',
   BRAND_TAGLINE: SITE_TEMPLATE_CONFIG.brand.tagline,
   SYSTEM_MODE: SITE_TEMPLATE_CONFIG.systemMode,
   HERO_TITLE: SITE_TEMPLATE_CONFIG.content.heroTitle,
