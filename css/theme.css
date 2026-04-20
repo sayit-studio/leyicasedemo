@@ -1248,9 +1248,9 @@ body::before {
   .hero-media-stage {
     display: block;
     width: 100vw;
-    min-height: 640px;
-    height: calc(100vh - 72px);
-    height: calc(100svh - 72px);
+    min-height: 540px;
+    height: min(620px, calc(100vh - 72px));
+    height: min(620px, calc(100svh - 72px));
     margin: 0 calc(50% - 50vw) 0;
     overflow: hidden;
   }
@@ -1260,19 +1260,20 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 2;
-    height: 150px;
-    background: linear-gradient(180deg, rgba(255,252,231,0) 0%, rgba(255,252,231,.34) 58%, var(--color-bg-pale) 100%);
+    z-index: 3;
+    height: 110px;
+    background: linear-gradient(180deg, rgba(255,252,231,0) 0%, rgba(255,252,231,.28) 52%, var(--color-bg-pale) 100%);
     pointer-events: none;
   }
   .hero-copy {
     justify-content: flex-end;
-    padding: 0 34px 148px;
+    z-index: 4;
+    padding: 0 34px 54px;
   }
   .hero-copy-actions {
     width: min(100%, 340px);
-    margin-top: 26px;
-    gap: 14px;
+    margin-top: 22px;
+    gap: 12px;
   }
   .hero-copy-cta,
   .hero-copy-link {
@@ -1284,7 +1285,7 @@ body::before {
     display: block;
     width: calc(100% - 40px);
     margin: 0 auto;
-    padding: 30px 0 0;
+    padding: 28px 0 0;
     text-align: left;
   }
   .hero-data-title::before {
@@ -1306,27 +1307,29 @@ body::before {
 
 @media (max-width: 480px) {
   .hero-media-stage {
-    min-height: 640px;
-    height: calc(100vh - 72px);
-    height: calc(100svh - 72px);
+    min-height: 540px;
+    height: min(620px, calc(100vh - 72px));
+    height: min(620px, calc(100svh - 72px));
   }
   .hero-copy {
-    padding: 0 30px 152px;
+    padding: 0 30px 50px;
   }
   .hero-copy h1 {
-    font-size: 39px;
+    font-size: 36px;
+    margin-bottom: 12px;
   }
   .hero-copy p {
-    font-size: 14px;
-    line-height: 1.75;
+    font-size: 13px;
+    line-height: 1.65;
   }
   .hero-copy-actions {
-    width: min(100%, 330px);
-    margin-top: 24px;
+    width: min(100%, 320px);
+    margin-top: 18px;
+    gap: 10px;
   }
   .hero-copy-cta,
   .hero-copy-link {
-    min-height: 52px;
+    min-height: 50px;
     font-size: 15px;
   }
   .hero-data-title {
