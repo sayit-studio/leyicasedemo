@@ -1266,9 +1266,10 @@ body::before {
     pointer-events: none;
   }
   .hero-copy {
-    justify-content: flex-end;
+    justify-content: center;
     z-index: 4;
-    padding: 0 34px 54px;
+    padding: 78px 34px 56px;
+    transform: translateY(36px);
   }
   .hero-copy-actions {
     width: min(100%, 340px);
@@ -1312,7 +1313,8 @@ body::before {
     height: min(620px, calc(100svh - 72px));
   }
   .hero-copy {
-    padding: 0 30px 50px;
+    padding: 74px 30px 48px;
+    transform: translateY(34px);
   }
   .hero-copy h1 {
     font-size: 36px;
