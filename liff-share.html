@@ -40,12 +40,12 @@
       const params = new URLSearchParams(window.location.search);
 
       const CONFIG = {
-        liffId: params.get("liffId") || "YOUR_LIFF_ID",
+        liffId: params.get("liffId") || "2007930859-PMmcwbZV",
         n8nWebhookUrl:
           params.get("webhook") || "https://example.com/webhook/line-mgm-conversion",
         referralId: params.get("ref") || "demo-referrer",
         campaignId: params.get("campaign") || "demo-campaign",
-        autoShare: params.get("auto") === "1",
+        autoShare: params.get("auto") !== "0",
         allowMultipleRecipients: params.get("single") !== "1"
       };
 
