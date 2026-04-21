@@ -11,25 +11,26 @@
     <main class="app-shell">
       <section class="share-panel" aria-labelledby="page-title">
         <p class="eyebrow">LINE OA MGM Share</p>
-        <h1 id="page-title">好友分享測試</h1>
+        <div class="share-icon" aria-hidden="true">LINE</div>
+        <h1 id="page-title">正在開啟分享</h1>
         <p class="lead">
-          點擊下方按鈕後，選擇 LINE 好友或群組，系統會送出完整 Flex Message 測試包。
+          請稍候，系統正在準備 LINE 好友選擇器。
         </p>
 
         <div class="status-box" id="statusBox" role="status" aria-live="polite">
           準備初始化 LIFF。
         </div>
 
-        <div class="actions">
+        <div class="actions is-hidden" id="actionArea">
           <button class="primary-button" id="shareButton" type="button" disabled>
-            分享 Flex 測試包
+            開啟分享
           </button>
-          <button class="secondary-button" id="previewButton" type="button">
+          <button class="secondary-button is-hidden" id="previewButton" type="button">
             查看測試 JSON
           </button>
         </div>
 
-        <details class="debug-panel" id="debugPanel">
+        <details class="debug-panel is-hidden" id="debugPanel">
           <summary>Flex Message JSON</summary>
           <pre id="jsonPreview"></pre>
         </details>
@@ -46,7 +47,8 @@
         referralId: params.get("ref") || "demo-referrer",
         campaignId: params.get("campaign") || "demo-campaign",
         autoShare: params.get("auto") !== "0",
-        allowMultipleRecipients: params.get("single") !== "1"
+        allowMultipleRecipients: params.get("single") !== "1",
+        debug: params.get("debug") === "1"
       };
 
       const state = {
@@ -56,6 +58,7 @@
       };
 
       const statusBox = document.querySelector("#statusBox");
+      const actionArea = document.querySelector("#actionArea");
       const shareButton = document.querySelector("#shareButton");
       const previewButton = document.querySelector("#previewButton");
       const debugPanel = document.querySelector("#debugPanel");
@@ -197,9 +200,17 @@
         jsonPreview.textContent = JSON.stringify([buildFlexMessage()], null, 2);
       }
 
-      function enableShare() {
+      function showManualShare() {
+        actionArea.classList.remove("is-hidden");
+      }
+
+      function enableShare(showButton = false) {
         state.readyToShare = true;
         shareButton.disabled = false;
+
+        if (showButton || CONFIG.debug || !CONFIG.autoShare) {
+          showManualShare();
+        }
       }
 
       function isPlaceholderLiffId() {
@@ -208,6 +219,12 @@
 
       async function initLiff() {
         refreshPreview();
+
+        if (CONFIG.debug) {
+          actionArea.classList.remove("is-hidden");
+          previewButton.classList.remove("is-hidden");
+          debugPanel.classList.remove("is-hidden");
+        }
 
         if (isPlaceholderLiffId()) {
           setStatus(
@@ -241,7 +258,10 @@
             return;
           }
 
-          setStatus("LIFF 已就緒，可以分享完整 Flex 測試包。", "success");
+          setStatus(
+            CONFIG.autoShare ? "正在開啟好友選擇畫面。" : "LIFF 已就緒，可以開啟分享。",
+            "success"
+          );
           enableShare();
 
           if (CONFIG.autoShare) {
@@ -250,6 +270,7 @@
         } catch (error) {
           console.error(error);
           setStatus(`LIFF 初始化失敗：${error.message || error}`, "error");
+          showManualShare();
         }
       }
 
@@ -276,6 +297,7 @@
           console.error(error);
           setStatus(`分享失敗或已取消：${error.message || error}`, "error");
           shareButton.disabled = false;
+          showManualShare();
         } finally {
           state.sharing = false;
         }
