@@ -1,0 +1,115 @@
+{
+  "type": "flex",
+  "altText": "好友推薦分享測試",
+  "contents": {
+    "type": "bubble",
+    "size": "mega",
+    "hero": {
+      "type": "image",
+      "url": "https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=1200&q=80",
+      "size": "full",
+      "aspectRatio": "20:13",
+      "aspectMode": "cover"
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "spacing": "md",
+      "contents": [
+        {
+          "type": "text",
+          "text": "好友限定推薦",
+          "weight": "bold",
+          "size": "xl",
+          "color": "#111827"
+        },
+        {
+          "type": "text",
+          "text": "這是一則 LIFF Share Target Picker 測試訊息，會以完整 Flex Message 格式分享給好友。",
+          "wrap": true,
+          "size": "sm",
+          "color": "#374151"
+        },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "margin": "lg",
+          "spacing": "sm",
+          "contents": [
+            {
+              "type": "box",
+              "layout": "baseline",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "推薦碼",
+                  "color": "#6b7280",
+                  "size": "sm",
+                  "flex": 2
+                },
+                {
+                  "type": "text",
+                  "text": "{{ref}}",
+                  "wrap": true,
+                  "color": "#111827",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "baseline",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "活動",
+                  "color": "#6b7280",
+                  "size": "sm",
+                  "flex": 2
+                },
+                {
+                  "type": "text",
+                  "text": "{{campaign}}",
+                  "wrap": true,
+                  "color": "#111827",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "spacing": "sm",
+      "contents": [
+        {
+          "type": "button",
+          "style": "primary",
+          "color": "#06c755",
+          "action": {
+            "type": "uri",
+            "label": "領取好友推薦",
+            "uri": "{{claimUrl}}"
+          }
+        },
+        {
+          "type": "button",
+          "style": "link",
+          "action": {
+            "type": "uri",
+            "label": "了解更多",
+            "uri": "{{learnMoreUrl}}"
+          }
+        }
+      ],
+      "flex": 0
+    }
+  }
+}
