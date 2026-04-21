@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>正在開啟 LINE</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="share-panel" aria-labelledby="page-title">
+        <p class="eyebrow debug-only">LINE OA MGM Share</p>
+        <div class="share-icon" aria-hidden="true">LINE</div>
+        <h1 id="page-title">請稍候</h1>
+        <p class="lead">
+          正在開啟 LINE。
+        </p>
+
+        <div class="status-box" id="statusBox" role="status" aria-live="polite">
+          準備中。
+        </div>
+
+        <div class="actions is-hidden" id="actionArea">
+          <button class="primary-button" id="shareButton" type="button" disabled>
+            繼續
+          </button>
+          <button class="secondary-button is-hidden" id="previewButton" type="button">
+            查看測試 JSON
+          </button>
+        </div>
+
+        <details class="debug-panel is-hidden" id="debugPanel">
+          <summary>Flex Message JSON</summary>
+          <pre id="jsonPreview"></pre>
+        </details>
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+
+      const CONFIG = {
+        liffId: params.get("liffId") || "2007930859-PMmcwbZV",
+        n8nWebhookUrl:
+          params.get("webhook") || "https://example.com/webhook/line-mgm-conversion",
+        referralId: params.get("ref") || "demo-referrer",
+        campaignId: params.get("campaign") || "demo-campaign",
+        messageId: params.get("message") || "oa-test",
+        autoShare: params.get("auto") !== "0",
+        allowMultipleRecipients: params.get("single") !== "1",
+        debug: params.get("debug") === "1"
+      };
+
+      const state = {
+        initialized: false,
+        readyToShare: false,
+        sharing: false,
+        flexMessage: null
+      };
+
+      const statusBox = document.querySelector("#statusBox");
+      const actionArea = document.querySelector("#actionArea");
+      const shareButton = document.querySelector("#shareButton");
+      const previewButton = document.querySelector("#previewButton");
+      const debugPanel = document.querySelector("#debugPanel");
+      const jsonPreview = document.querySelector("#jsonPreview");
+
+      function buildTrackedUrl(actionName) {
+        const url = new URL(CONFIG.n8nWebhookUrl);
+        url.searchParams.set("source", "line_liff_share");
+        url.searchParams.set("action", actionName);
+        url.searchParams.set("ref", CONFIG.referralId);
+        url.searchParams.set("campaign", CONFIG.campaignId);
+        return url.toString();
+      }
+
+      function getMessagePath() {
+        const safeMessageId = CONFIG.messageId.replace(/[^a-zA-Z0-9_-]/g, "");
+        return `./messages/${safeMessageId || "oa-test"}.json`;
+      }
+
+      function interpolateValue(value) {
+        if (typeof value !== "string") {
+          return value;
+        };
+
+        return value
+          .replaceAll("{{ref}}", CONFIG.referralId)
+          .replaceAll("{{campaign}}", CONFIG.campaignId)
+          .replaceAll("{{claimUrl}}", buildTrackedUrl("claim"))
+          .replaceAll("{{learnMoreUrl}}", buildTrackedUrl("learn_more"));
+      }
+
+      function interpolateJson(value) {
+        if (Array.isArray(value)) {
+          return value.map(interpolateJson);
+        }
+
+        if (value && typeof value === "object") {
+          return Object.fromEntries(
+            Object.entries(value).map(([key, item]) => [key, interpolateJson(item)])
+          );
+        }
+
+        return interpolateValue(value);
+      }
+
+      async function loadFlexMessage() {
+        const response = await fetch(getMessagePath(), { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error(`找不到訊息檔：${CONFIG.messageId}`);
+        }
+
+        const message = interpolateJson(await response.json());
+
+        if (!message || message.type !== "flex" || !message.altText || !message.contents) {
+          throw new Error("訊息檔必須是完整 Flex Message，且包含 type、altText、contents。");
+        }
+
+        state.flexMessage = message;
+        return message;
+      }
+
+      function setStatus(message, tone = "default") {
+        statusBox.textContent = CONFIG.debug ? message : "準備中。";
+        statusBox.dataset.tone = tone;
+      }
+
+      function refreshPreview() {
+        jsonPreview.textContent = JSON.stringify([state.flexMessage], null, 2);
+      }
+
+      function showManualShare() {
+        actionArea.classList.remove("is-hidden");
+      }
+
+      function enableShare(showButton = false) {
+        state.readyToShare = true;
+        shareButton.disabled = false;
+
+        if (showButton || CONFIG.debug || !CONFIG.autoShare) {
+          showManualShare();
+        }
+      }
+
+      function isPlaceholderLiffId() {
+        return !CONFIG.liffId || CONFIG.liffId === "YOUR_LIFF_ID";
+      }
+
+      async function initLiff() {
+        if (CONFIG.debug) {
+          document.body.classList.add("debug-mode");
+          actionArea.classList.remove("is-hidden");
+          previewButton.classList.remove("is-hidden");
+          debugPanel.classList.remove("is-hidden");
+        }
+
+        if (isPlaceholderLiffId()) {
+          setStatus(
+            "尚未設定 LIFF ID。目前只能預覽畫面與 JSON，請用 ?liffId=你的LIFF_ID 或直接修改 CONFIG.liffId。",
+            "warning"
+          );
+          return;
+        }
+
+        if (!window.liff) {
+          setStatus("LIFF SDK 尚未載入，請確認網路連線或 SDK URL。", "error");
+          return;
+        }
+
+        try {
+          setStatus(`正在載入訊息：${CONFIG.messageId}`);
+          await loadFlexMessage();
+          refreshPreview();
+
+          setStatus("正在初始化 LIFF。");
+          await liff.init({ liffId: CONFIG.liffId });
+          state.initialized = true;
+
+          if (!liff.isLoggedIn()) {
+            setStatus("尚未登入 LINE，正在導向登入。");
+            liff.login({ redirectUri: window.location.href });
+            return;
+          }
+
+          if (!liff.isApiAvailable("shareTargetPicker")) {
+            setStatus(
+              "目前環境無法使用 Share Target Picker。請確認 LINE Developers 已啟用此功能，並在 LINE 或支援的 HTTPS 環境測試。",
+              "error"
+            );
+            return;
+          }
+
+          setStatus(
+            CONFIG.autoShare ? "正在開啟好友選擇畫面。" : "LIFF 已就緒，可以開啟分享。",
+            "success"
+          );
+          enableShare();
+
+          if (CONFIG.autoShare) {
+            await shareFlexPackage();
+          }
+        } catch (error) {
+          console.error(error);
+          setStatus(`LIFF 初始化失敗：${error.message || error}`, "error");
+          showManualShare();
+        }
+      }
+
+      async function shareFlexPackage() {
+        if (!state.initialized || !state.readyToShare || state.sharing) {
+          return;
+        }
+
+        state.sharing = true;
+        shareButton.disabled = true;
+        setStatus("正在開啟好友選擇畫面。");
+
+        try {
+          await liff.shareTargetPicker([state.flexMessage], {
+            isMultiple: CONFIG.allowMultipleRecipients
+          });
+
+          setStatus("分享流程已完成。", "success");
+
+          if (liff.isInClient()) {
+            window.setTimeout(() => liff.closeWindow(), 700);
+          }
+        } catch (error) {
+          console.error(error);
+          setStatus(`分享失敗或已取消：${error.message || error}`, "error");
+          shareButton.disabled = false;
+          showManualShare();
+        } finally {
+          state.sharing = false;
+        }
+      }
+
+      shareButton.addEventListener("click", shareFlexPackage);
+      previewButton.addEventListener("click", () => {
+        refreshPreview();
+        debugPanel.open = !debugPanel.open;
+      });
+
+      initLiff();
+    </script>
+  </body>
+</html>
