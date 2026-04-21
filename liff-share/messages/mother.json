@@ -1,0 +1,86 @@
+{
+  "type": "flex",
+  "altText": "母親節造型手工皂",
+  "contents": {
+    "type": "bubble",
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "backgroundColor": "#003049",
+      "contents": [
+        {
+          "type": "text",
+          "text": "母親節造型手工皂",
+          "weight": "bold",
+          "color": "#FFFFFF",
+          "size": "xl"
+        },
+        {
+          "type": "text",
+          "text": "特別的愛獻給偉大的媽媽",
+          "color": "#DDDDDD",
+          "size": "sm",
+          "margin": "sm"
+        }
+      ]
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "backgroundColor": "#FFFFFF",
+      "paddingAll": "0px",
+      "contents": [
+        {
+          "type": "image",
+          "url": "https://raw.githubusercontent.com/sayit-studio/3000popup_event/main/04ac/03.png",
+          "size": "full",
+          "aspectRatio": "16:9",
+          "aspectMode": "cover"
+        },
+        {
+          "type": "image",
+          "url": "https://raw.githubusercontent.com/sayit-studio/3000popup_event/main/04ac/01.png",
+          "size": "full",
+          "aspectRatio": "16:9",
+          "aspectMode": "cover"
+        },
+        {
+          "type": "image",
+          "url": "https://raw.githubusercontent.com/sayit-studio/3000popup_event/main/04ac/02.png",
+          "size": "full",
+          "aspectRatio": "16:9",
+          "aspectMode": "cover"
+        }
+      ]
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "spacing": "sm",
+      "contents": [
+        {
+          "type": "button",
+          "action": {
+            "type": "uri",
+            "label": "轉發給好友",
+            "uri": "https://liff.line.me/2007387317-CLds7DK2?message=mother&ref={{refEncoded}}&campaign={{campaignEncoded}}"
+          },
+          "style": "primary",
+          "color": "#F77F00",
+          "height": "sm"
+        },
+        {
+          "type": "button",
+          "action": {
+            "type": "uri",
+            "label": "里長我也想辦活動",
+            "uri": "https://line.me/R/oaMessage/%40goodshot/?%E9%87%8C%E9%95%B7%E9%87%8C%E9%95%B7%E6%88%91%E4%B9%9F%E6%83%B3%E8%BE%A6%E6%B4%BB%E5%8B%95"
+          },
+          "style": "primary",
+          "color": "#F77F00",
+          "height": "sm"
+        }
+      ]
+    }
+  }
+}
