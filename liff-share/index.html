@@ -41,7 +41,7 @@
       const params = new URLSearchParams(window.location.search);
 
       const CONFIG = {
-        liffId: params.get("liffId") || "2007930859-PMmcwbZV",
+        liffId: params.get("liffId") || "2007387317-CLds7DK2",
         n8nWebhookUrl:
           params.get("webhook") || "https://example.com/webhook/line-mgm-conversion",
         referralId: params.get("ref") || "demo-referrer",
@@ -88,6 +88,8 @@
         return value
           .replaceAll("{{ref}}", CONFIG.referralId)
           .replaceAll("{{campaign}}", CONFIG.campaignId)
+          .replaceAll("{{refEncoded}}", encodeURIComponent(CONFIG.referralId))
+          .replaceAll("{{campaignEncoded}}", encodeURIComponent(CONFIG.campaignId))
           .replaceAll("{{claimUrl}}", buildTrackedUrl("claim"))
           .replaceAll("{{learnMoreUrl}}", buildTrackedUrl("learn_more"));
       }
