@@ -2618,6 +2618,11 @@ body::before {
   margin: 0 auto 72px;
 }
 
+.line-solution-panel {
+  display: grid;
+  gap: 24px;
+}
+
 .line-visual-pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2638,6 +2643,73 @@ body::before {
   aspect-ratio: 16 / 9;
 }
 
+.line-solution-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.line-solution-steps article {
+  position: relative;
+  min-height: 178px;
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(6,199,85,.16);
+  background: rgba(255,255,255,.76);
+  box-shadow: var(--shadow-sm);
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+
+.line-solution-steps article::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 0;
+  height: 4px;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(90deg, #06C755, var(--color-primary));
+  opacity: 0;
+  transition: opacity .24s ease;
+}
+
+.line-solution-steps article:hover {
+  transform: translateY(-5px);
+  border-color: rgba(6,199,85,.32);
+  box-shadow: var(--shadow);
+}
+
+.line-solution-steps article:hover::after {
+  opacity: 1;
+}
+
+.line-solution-steps span {
+  display: inline-flex;
+  margin-bottom: 14px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  color: #057c38;
+  background: rgba(6,199,85,.12);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.line-solution-steps b {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text);
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.line-solution-steps p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.75;
+}
+
 .line-benefit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2652,6 +2724,13 @@ body::before {
   background:
     linear-gradient(180deg, rgba(255,255,255,.86), rgba(246,255,249,.78));
   box-shadow: var(--shadow-sm);
+  transition: transform .24s ease, box-shadow .24s ease;
+}
+
+.line-benefit-grid article:hover,
+.office-screen-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
 }
 
 .line-benefit-grid article img {
@@ -2753,7 +2832,7 @@ body::before {
   grid-template-columns: minmax(0, .82fr) minmax(460px, 1.18fr);
   align-items: center;
   min-height: auto;
-  padding: clamp(34px, 4.2vw, 58px) 0 clamp(44px, 5vw, 70px);
+  padding: clamp(24px, 3.4vw, 44px) 0 clamp(42px, 5vw, 64px);
 }
 
 .office-screen-card {
@@ -2763,6 +2842,7 @@ body::before {
   border: 1px solid rgba(232,127,36,.16);
   background: rgba(255,255,255,.76);
   box-shadow: 0 24px 70px rgba(86,56,20,.14);
+  transition: transform .24s ease, box-shadow .24s ease;
 }
 
 .office-screen-card img {
@@ -2807,6 +2887,42 @@ body::before {
 .office-result-strip {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto 72px;
+}
+
+.office-logic-rail {
+  position: sticky;
+  top: 74px;
+  z-index: 12;
+  width: min(920px, calc(100% - 40px));
+  margin: -18px auto 56px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(232,127,36,.16);
+  background: rgba(255,252,240,.82);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-sm);
+}
+
+.office-logic-rail a {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 900;
+  transition: background .22s ease, color .22s ease, transform .22s ease;
+}
+
+.office-logic-rail a:hover {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary-deep), var(--color-primary));
+  transform: translateY(-1px);
 }
 
 .office-feature-section {
@@ -2895,6 +3011,7 @@ body::before {
 .office-line-showcase {
   grid-template-columns: 1fr;
   align-items: center;
+  scroll-margin-top: 144px;
 }
 
 .office-phone,
@@ -3097,8 +3214,16 @@ body::before {
   .office-feature-section,
   .office-feature-section.reverse,
   .office-line-showcase,
-  .office-mobile-demo {
+  .office-mobile-demo,
+  .line-solution-steps {
     grid-template-columns: 1fr;
+  }
+
+  .office-logic-rail {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 24px;
+    margin: -14px auto 40px;
   }
 
   .office-feature-section.reverse .office-feature-copy {
@@ -3248,6 +3373,10 @@ body::before {
   .line-feature-panel {
     width: min(100% - 28px, 1180px);
     margin-bottom: 54px;
+  }
+
+  .line-solution-steps article {
+    min-height: auto;
   }
 
   .routing-arrow {
