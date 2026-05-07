@@ -3,17 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>樂藝數位服務處｜市民陳情服務平台</title>
-
-<!-- SEO -->
-<meta name="description" content="公開透明的市民陳情平台，線上登錄陳情、即時查詢案件進度，每件問題都有人跟進處理。">
-<meta property="og:type"        content="website">
-<meta property="og:title"       content="樂藝數位服務處｜市民陳情服務平台">
-<meta property="og:description" content="公開透明的市民陳情平台，線上登錄陳情、即時查詢案件進度。">
-<meta property="og:image"       content="./og-image.png">
-<meta property="og:locale"      content="zh_TW">
+<title>樂藝數位服務處｜民代服務處數位化工具展示</title>
+<meta name="description" content="樂藝數位服務處提供民代與幕僚使用的陳情、政績、LINE訊息轉發與任務管理工具，協助服務處把民眾服務流程數位化。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="樂藝數位服務處｜民代服務處數位化工具展示">
+<meta property="og:description" content="陳情系統、政績牆、LINE訊息轉發工具與民代任務管理系統，為民代服務處打造可追蹤、可分工、可展示的工作平台。">
+<meta property="og:image" content="./leyi/assets/brand/logo.png">
+<meta property="og:locale" content="zh_TW">
 <link rel="icon" type="image/png" href="leyi/assets/brand/logo.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
@@ -22,7 +19,6 @@
 <body>
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
-<!-- ═══════════ NAVBAR ═══════════ -->
 <nav class="navbar">
   <div class="nav-inner">
     <a class="nav-brand" href="#" onclick="showPage('home');return false;">
@@ -30,369 +26,637 @@
       <span class="nav-brand-name">樂藝數位服務處</span>
     </a>
     <div class="nav-links">
-      <a class="nav-link active" href="#" onclick="showPage('home');return false;">首頁</a>
-      <a class="nav-link" href="#" onclick="showPage('list');return false;">陳情登錄</a>
-      <a class="nav-link" href="#" onclick="showPage('query');return false;">案件查詢</a>
-      <a class="nav-link" href="#" onclick="showPage('inspections');return false;">現場會勘</a>
-      <a class="nav-link" href="#" onclick="showPage('interpellations');return false;">國會質詢</a>
-      <a class="nav-link" href="#" onclick="showPage('proposals');return false;">國會提案</a>
-      <a class="nav-link" href="#" onclick="showPage('faq');return false;">常見問題</a>
-      <a class="nav-link nav-cta" href="form.html">＋ 我要陳情</a>
+      <a class="nav-link active" href="#" data-page-slug="home" onclick="showPage('home');return false;">首頁</a>
+      <a class="nav-link" href="#" data-page-slug="petition-system" onclick="showPage('petition-system');return false;">陳情系統網站</a>
+      <a class="nav-link" href="leyi/achievements.html" data-page-slug="achievement-wall">政績牆</a>
+      <a class="nav-link" href="#" data-page-slug="line-forward" onclick="showPage('line-forward');return false;">LINE訊息轉發工具</a>
+      <a class="nav-link" href="#" data-page-slug="office-task" onclick="showPage('office-task');return false;">民代任務管理系統</a>
+      <a class="nav-link" href="#" data-page-slug="faq" onclick="showPage('faq');return false;">常見問題</a>
+      <a class="nav-link nav-cta" href="#" data-page-slug="case-study" onclick="showPage('case-study');return false;">案例展示</a>
     </div>
     <button class="hamburger" onclick="toggleMenu()" aria-label="選單">
       <span></span><span></span><span></span>
     </button>
   </div>
   <div class="mobile-nav" id="mobileNav">
-    <a class="nav-link" href="#" onclick="showPage('home');return false;">🏠 首頁</a>
-    <a class="nav-link" href="#" onclick="showPage('list');return false;">📋 陳情登錄</a>
-    <a class="nav-link" href="#" onclick="showPage('query');return false;">🔍 案件查詢</a>
-    <a class="nav-link" href="#" onclick="showPage('inspections');return false;">🏗️ 現場會勘</a>
-    <a class="nav-link" href="#" onclick="showPage('interpellations');return false;">🎤 國會質詢</a>
-    <a class="nav-link" href="#" onclick="showPage('proposals');return false;">📜 國會提案</a>
-    <a class="nav-link" href="#" onclick="showPage('faq');return false;">❓ 常見問題</a>
-    <a class="nav-link nav-cta" href="form.html">＋ 我要陳情</a>
+    <a class="nav-link" href="#" data-page-slug="home" onclick="showPage('home');return false;">首頁</a>
+    <a class="nav-link" href="#" data-page-slug="petition-system" onclick="showPage('petition-system');return false;">陳情系統網站</a>
+    <a class="nav-link" href="leyi/achievements.html" data-page-slug="achievement-wall">政績牆</a>
+    <a class="nav-link" href="#" data-page-slug="line-forward" onclick="showPage('line-forward');return false;">LINE訊息轉發工具</a>
+    <a class="nav-link" href="#" data-page-slug="office-task" onclick="showPage('office-task');return false;">民代任務管理系統</a>
+    <a class="nav-link" href="#" data-page-slug="faq" onclick="showPage('faq');return false;">常見問題</a>
+    <a class="nav-link nav-cta" href="#" data-page-slug="case-study" onclick="showPage('case-study');return false;">案例展示</a>
   </div>
 </nav>
 
-<!-- ═══════════ HOME ═══════════ -->
-<section class="page-section active" id="page-home">
-
-  <!-- HERO -->
-  <div class="hero-unit">
-    <div class="hero-deco hero-deco-1"></div>
-    <div class="hero-deco hero-deco-2"></div>
-    <div class="hero-deco hero-deco-3"></div>
-    <div class="hero-deco hero-deco-4"></div>
-    <div class="bubble-field" id="bubbleField" aria-hidden="true">
-      <span class="bubble bubble-1"></span>
-      <span class="bubble bubble-2"></span>
-      <span class="bubble bubble-3"></span>
-      <span class="bubble bubble-4"></span>
-      <span class="bubble bubble-5"></span>
-      <span class="bubble bubble-6"></span>
-    </div>
-
-    <div class="hero-body">
-      <div class="hero-media-stage" id="heroMediaStage" aria-label="政績成果輪播">
-        <div class="hero-media-slide is-active" style="--hero-bg:url('../leyi/assets/achievements/achievement-01.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-02.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-03.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-04.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-05.jpg')"></div>
-        <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-06.jpg')"></div>
-        <div class="hero-copy">
-          <h1>數位時代的<br><span>市民新標準</span></h1>
-          <p>每一件服務、每一次改善，都讓居民看得見。放心交給我，讓地方需求被回應、被追蹤、被完成。</p>
-          <div class="hero-copy-actions">
-            <a href="form.html" class="hero-copy-cta">立即陳情</a>
-            <a href="#" class="hero-copy-link" onclick="showPage('query');return false;">已有案件？查詢進度</a>
-          </div>
+<main>
+  <section class="page-section active product-page product-home" id="page-home">
+    <div class="product-hero">
+      <div class="product-hero-copy reveal-on-load">
+        <h1>每一次服務<br><span>都能被看見</span></h1>
+        <p>民眾的問題有人接，進度查得到，完成的成果也能被長期看見。</p>
+        <div class="product-actions">
+          <a class="product-btn primary" href="#productOverview" onclick="document.getElementById('productOverview')?.scrollIntoView({behavior:'smooth'});return false;">看服務如何變有感</a>
+          <a class="product-btn secondary" href="https://lin.ee/Q9cWSP5" target="_blank" rel="noopener">加入 LINE 討論</a>
         </div>
       </div>
-
-      <!-- 統計卡片 — 政績版 -->
-      <div class="hero-data-title">數據儀錶板</div>
-      <div class="stats-grid hero-stats-grid">
-
-        <!-- 主角：累積服務件數 -->
-        <div class="stat-card stat-hero" onclick="openModal('totalPetitions')" tabindex="0">
-          <div class="stat-hero-num">
-            <span class="stat-num skeleton" id="stat-total">—</span>
-            <span class="stat-num-unit">件</span>
-          </div>
-          <div class="stat-hero-msg">
-            <div class="stat-label">累積服務件數</div>
-            <div class="stat-hero-desc" id="stat-total-desc">資料載入中…</div>
-          </div>
-          <div class="stat-hint">點擊了解更多</div>
+      <div class="home-hero-carousel reveal-on-load" aria-label="數位化工具輪播">
+        <article class="hero-product-slide is-active">
+          <img src="leyi/assets/products/home/hero-petition-system.webp.png" alt="陳情系統網站情境圖">
+          <div class="hero-slide-caption"><b>問題有人接</b><p>送出後查得到進度</p></div>
+        </article>
+        <article class="hero-product-slide">
+          <img src="leyi/assets/products/home/hero-line-flex.webp.png" alt="LINE Flex 推播情境圖">
+          <div class="hero-slide-caption"><b>活動有人看</b><p>一張圖卡讓消息被分享</p></div>
+        </article>
+        <article class="hero-product-slide">
+          <img src="leyi/assets/products/home/hero-office-task.webp.png" alt="民代任務管理情境圖">
+          <div class="hero-slide-caption"><b>服務不中斷</b><p>團隊接得住每個提醒</p></div>
+        </article>
+        <article class="hero-product-slide">
+          <img src="leyi/assets/products/home/hero-achievement-wall.webp.png" alt="政績牆情境圖">
+          <div class="hero-slide-caption"><b>成果被看見</b><p>做過的事累積成信任</p></div>
+        </article>
+        <div class="hero-carousel-dots" aria-hidden="true">
+          <span class="is-active"></span><span></span><span></span><span></span>
         </div>
-
-        <!-- 配角 5 張 -->
-        <div class="stat-card" onclick="openModal('inspections')" tabindex="0">
-          <div class="stat-label">現場會勘次數</div>
-          <span class="stat-num skeleton" id="stat-insp">—</span>
-          <div class="stat-unit">次</div>
-          <div class="stat-hint">點擊了解更多</div>
-        </div>
-
-        <div class="stat-card" onclick="openModal('interpellations')" tabindex="0">
-          <div class="stat-label">國會質詢次數</div>
-          <span class="stat-num skeleton" id="stat-inter">—</span>
-          <div class="stat-unit">次</div>
-          <div class="stat-hint">點擊了解更多</div>
-        </div>
-
-        <div class="stat-card" onclick="openModal('proposals')" tabindex="0">
-          <div class="stat-label">國會提案次數</div>
-          <span class="stat-num skeleton" id="stat-prop">—</span>
-          <div class="stat-unit">次</div>
-          <div class="stat-hint">點擊了解更多</div>
-        </div>
-
-        <div class="stat-card" onclick="openModal('avgDays')" tabindex="0">
-          <div class="stat-label">平均回覆天數</div>
-          <span class="stat-num skeleton" id="stat-avg">—</span>
-          <div class="stat-unit">天</div>
-          <div class="stat-hint">點擊了解更多</div>
-        </div>
-
-        <div class="stat-card" onclick="openModal('topType')" tabindex="0">
-          <div class="stat-label">最多陳情類型</div>
-          <span class="stat-num skeleton" id="stat-top"
-                style="font-size:clamp(16px,2.5vw,22px);letter-spacing:0;">—</span>
-          <div class="stat-unit" id="stat-top-rate">—%</div>
-          <div class="stat-hint">點擊了解更多</div>
-        </div>
-
-      </div><!-- /stats-grid -->
-    </div><!-- /hero-body -->
-
-    <!-- 彈窗 -->
-    <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
-      <div class="modal-box" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeModal()">✕</button>
-        <div class="modal-big-num" id="modalNum"></div>
-        <div class="modal-title" id="modalTitle"></div>
-        <div class="modal-desc" id="modalDesc"></div>
       </div>
     </div>
 
-  </div><!-- /hero-unit -->
-
-  <!-- 儀表板 -->
-  <div class="dashboard-section">
-    <div class="section-wrap">
-      <div class="section-title">當月案件處理情形</div>
-      <div class="dashboard-grid">
-
-        <div class="dash-card recent-replies-card">
-          <div class="dash-card-title">
-            <span>近期公開回覆</span>
-            <button class="dash-link-btn" type="button" onclick="showPage('list')">查看全部</button>
+    <section class="product-band" id="productOverview">
+      <div class="section-wrap">
+        <div class="product-section-head">
+          <div>
+            <h2>把服務變成民眾看得見的成果</h2>
           </div>
-          <div class="recent-replies" id="recentReplies">
-            <div class="chart-loading">載入近期公開回覆中...</div>
-          </div>
+          <p>把民眾最常遇到的等待、詢問、錯過與不確定，變成能查、能傳、能分工、能累積的服務體驗。</p>
         </div>
-
-        <div class="dash-card">
-          <div class="dash-card-title"><span>本月處理量</span></div>
-          <div class="month-stats" id="monthStats">
-            <div class="month-stat-row"><span class="month-stat-label">本月新增</span><span class="month-stat-num" id="ms-new">—</span></div>
-            <div class="month-stat-row"><span class="month-stat-label">本月結案</span><span class="month-stat-num" id="ms-closed">—</span></div>
-            <div class="month-stat-row"><span class="month-stat-label">處理中</span><span class="month-stat-num" id="ms-progress">—</span></div>
-            <div class="month-progress-wrap"><div class="month-progress-bar" id="msProgressBar" style="width:0%"></div></div>
-            <div class="month-progress-label" id="msProgressLabel">結案率 0%</div>
-          </div>
-        </div>
-
-        <div class="dash-card dash-card-full">
-          <div class="dash-card-title"><span>案件類別比例</span></div>
-          <div class="pie-wrap">
-            <div class="pie-canvas-wrap">
-              <canvas id="pieChart" width="220" height="220"></canvas>
+        <div class="visual-product-grid">
+          <a class="product-service-card" href="#" onclick="showPage('petition-system');return false;">
+            <div class="service-image-slot image-slot-petition">
+              <img src="leyi/assets/products/home/product-petition-submit.webp.png" alt="問題有人接">
             </div>
-            <div class="pie-legend" id="pieLegend"></div>
+            <h3>問題有人接</h3>
+            <p>陳情有編號，進度不再靠詢問。</p>
+          </a>
+          <a class="product-service-card" href="leyi/achievements.html">
+            <div class="service-image-slot image-slot-achievement">
+              <img src="leyi/assets/products/home/product-achievement-interaction.webp.png" alt="成果被看見">
+            </div>
+            <h3>成果被看見</h3>
+            <p>改善照片與故事，長期累積成信任。</p>
+          </a>
+          <a class="product-service-card" href="#" onclick="showPage('line-forward');return false;">
+            <div class="service-image-slot image-slot-line">
+              <img src="leyi/assets/products/home/product-line-share.webp.png" alt="活動有人傳">
+            </div>
+            <h3>活動有人傳</h3>
+            <p>LINE 圖卡一鍵轉發，活動觸及更多人。</p>
+          </a>
+          <a class="product-service-card" href="#" onclick="showPage('office-task');return false;">
+            <div class="service-image-slot image-slot-task">
+              <img src="leyi/assets/products/home/product-office-workbench.webp.png" alt="服務不中斷">
+            </div>
+            <h3>服務不中斷</h3>
+            <p>活動、日曆、會員、案件集中，不靠記憶。</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="product-band muted">
+      <div class="section-wrap">
+        <div class="product-section-head">
+          <div>
+            <h2>從一則需求，到一個被看見的成果</h2>
+          </div>
+        </div>
+        <div class="abc-flow">
+          <article>
+            <div class="flow-image-slot flow-a">
+              <img src="leyi/assets/products/home/flow-citizen-request.webp.png" alt="需求被接住">
+              <span>A</span>
+            </div>
+            <h3>需求被接住</h3>
+            <p>民眾不用重複說明</p>
+          </article>
+          <div class="abc-arrow">→</div>
+          <article>
+            <div class="flow-image-slot flow-b">
+              <img src="leyi/assets/products/home/flow-office-dispatch.webp.png" alt="團隊接得住">
+              <span>B</span>
+            </div>
+            <h3>團隊接得住</h3>
+            <p>誰處理、做到哪裡都清楚</p>
+          </article>
+          <div class="abc-arrow">→</div>
+          <article>
+            <div class="flow-image-slot flow-c">
+              <img src="leyi/assets/products/home/flow-public-result.webp.png" alt="成果被看見">
+              <span>C</span>
+            </div>
+            <h3>成果被看見</h3>
+            <p>服務留下紀錄，也累積信任</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-strip">
+      <div>
+        <h2>先讓一項服務被民眾看見</h2>
+        <p>從陳情、活動推播或成果展示開始。</p>
+      </div>
+      <a class="product-btn primary" href="https://lin.ee/Q9cWSP5" target="_blank" rel="noopener">加入 LINE 討論導入方式</a>
+    </section>
+  </section>
+
+  <section class="page-section product-page petition-original-page" id="page-petition-system">
+    <div class="hero-unit">
+      <div class="hero-deco hero-deco-1"></div>
+      <div class="hero-deco hero-deco-2"></div>
+      <div class="hero-deco hero-deco-3"></div>
+      <div class="hero-deco hero-deco-4"></div>
+      <div class="bubble-field" id="bubbleField" aria-hidden="true">
+        <span class="bubble bubble-1"></span>
+        <span class="bubble bubble-2"></span>
+        <span class="bubble bubble-3"></span>
+        <span class="bubble bubble-4"></span>
+        <span class="bubble bubble-5"></span>
+        <span class="bubble bubble-6"></span>
+      </div>
+
+      <div class="hero-body">
+        <div class="hero-media-stage" id="heroMediaStage" aria-label="政績成果輪播">
+          <div class="hero-media-slide is-active" style="--hero-bg:url('../leyi/assets/achievements/achievement-01.jpg')"></div>
+          <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-02.jpg')"></div>
+          <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-03.jpg')"></div>
+          <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-04.jpg')"></div>
+          <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-05.jpg')"></div>
+          <div class="hero-media-slide" style="--hero-bg:url('../leyi/assets/achievements/achievement-06.jpg')"></div>
+          <div class="hero-copy">
+            <h1>數位時代的<br><span>市民新標準</span></h1>
+            <p>每一件服務、每一次改善，都讓居民看得見。放心交給我，讓地方需求被回應、被追蹤、被完成。</p>
+            <div class="hero-copy-actions">
+              <a href="form.html" class="hero-copy-cta">立即陳情</a>
+              <a href="#" class="hero-copy-link" onclick="showPage('query');return false;">已有案件？查詢進度</a>
+            </div>
           </div>
         </div>
 
+        <div class="hero-data-title">數據儀錶板</div>
+        <div class="stats-grid hero-stats-grid">
+          <div class="stat-card stat-hero" onclick="openModal('totalPetitions')" tabindex="0">
+            <div class="stat-hero-num">
+              <span class="stat-num skeleton" id="stat-total">—</span>
+              <span class="stat-num-unit">件</span>
+            </div>
+            <div class="stat-hero-msg">
+              <div class="stat-label">累積服務件數</div>
+              <div class="stat-hero-desc" id="stat-total-desc">資料載入中…</div>
+            </div>
+            <div class="stat-hint">點擊了解更多</div>
+          </div>
+
+          <div class="stat-card" onclick="openModal('inspections')" tabindex="0">
+            <div class="stat-label">現場會勘次數</div>
+            <span class="stat-num skeleton" id="stat-insp">—</span>
+            <div class="stat-unit">次</div>
+            <div class="stat-hint">點擊了解更多</div>
+          </div>
+
+          <div class="stat-card" onclick="openModal('interpellations')" tabindex="0">
+            <div class="stat-label">國會質詢次數</div>
+            <span class="stat-num skeleton" id="stat-inter">—</span>
+            <div class="stat-unit">次</div>
+            <div class="stat-hint">點擊了解更多</div>
+          </div>
+
+          <div class="stat-card" onclick="openModal('proposals')" tabindex="0">
+            <div class="stat-label">國會提案次數</div>
+            <span class="stat-num skeleton" id="stat-prop">—</span>
+            <div class="stat-unit">次</div>
+            <div class="stat-hint">點擊了解更多</div>
+          </div>
+
+          <div class="stat-card" onclick="openModal('avgDays')" tabindex="0">
+            <div class="stat-label">平均回覆天數</div>
+            <span class="stat-num skeleton" id="stat-avg">—</span>
+            <div class="stat-unit">天</div>
+            <div class="stat-hint">點擊了解更多</div>
+          </div>
+
+          <div class="stat-card" onclick="openModal('topType')" tabindex="0">
+            <div class="stat-label">最多陳情類型</div>
+            <span class="stat-num skeleton" id="stat-top" style="font-size:clamp(16px,2.5vw,22px);letter-spacing:0;">—</span>
+            <div class="stat-unit" id="stat-top-rate">—%</div>
+            <div class="stat-hint">點擊了解更多</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <button class="modal-close" onclick="closeModal()">✕</button>
+          <div class="modal-big-num" id="modalNum"></div>
+          <div class="modal-title" id="modalTitle"></div>
+          <div class="modal-desc" id="modalDesc"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 政績快速檢視 -->
-  <div class="home-achievement-section">
-    <div class="section-wrap">
-      <div class="home-achievement-head">
+    <div class="dashboard-section">
+      <div class="section-wrap">
+        <div class="section-title">當月案件處理情形</div>
+        <div class="dashboard-grid">
+          <div class="dash-card recent-replies-card">
+            <div class="dash-card-title">
+              <span>近期公開回覆</span>
+              <button class="dash-link-btn" type="button" onclick="showPage('list')">查看全部</button>
+            </div>
+            <div class="recent-replies" id="recentReplies">
+              <div class="chart-loading">載入近期公開回覆中...</div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dash-card-title"><span>本月處理量</span></div>
+            <div class="month-stats" id="monthStats">
+              <div class="month-stat-row"><span class="month-stat-label">本月新增</span><span class="month-stat-num" id="ms-new">—</span></div>
+              <div class="month-stat-row"><span class="month-stat-label">本月結案</span><span class="month-stat-num" id="ms-closed">—</span></div>
+              <div class="month-stat-row"><span class="month-stat-label">處理中</span><span class="month-stat-num" id="ms-progress">—</span></div>
+              <div class="month-progress-wrap"><div class="month-progress-bar" id="msProgressBar" style="width:0%"></div></div>
+              <div class="month-progress-label" id="msProgressLabel">結案率 0%</div>
+            </div>
+          </div>
+
+          <div class="dash-card dash-card-full">
+            <div class="dash-card-title"><span>案件類別比例</span></div>
+            <div class="pie-wrap">
+              <div class="pie-canvas-wrap">
+                <canvas id="pieChart" width="220" height="220"></canvas>
+              </div>
+              <div class="pie-legend" id="pieLegend"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-achievement-section">
+      <div class="section-wrap">
+        <div class="home-achievement-head">
+          <div>
+            <div class="home-section-eyebrow">政績牆快速檢視</div>
+            <h2 class="home-section-title">先看最有感的服務成果</h2>
+            <p>用居民看得懂的照片、時間與處理重點，把地方服務成果快速呈現。</p>
+          </div>
+          <a class="dash-link-btn achievement-more-link" href="leyi/achievements.html">查看完整政績牆</a>
+        </div>
+        <div class="home-achievement-grid">
+          <a class="home-achievement-card" href="leyi/achievements.html">
+            <img src="leyi/assets/achievements/achievement-01.jpg" alt="社區改善成果">
+            <div class="home-achievement-card-body">
+              <span>社區改善</span>
+              <h3>整理公共空間，讓日常動線更舒適</h3>
+              <p>整合現場會勘、單位協調與後續追蹤，讓居民立即看見改善。</p>
+            </div>
+          </a>
+          <a class="home-achievement-card" href="leyi/achievements.html">
+            <img src="leyi/assets/achievements/achievement-02.jpg" alt="道路安全成果">
+            <div class="home-achievement-card-body">
+              <span>道路安全</span>
+              <h3>通學與通勤路線安全優先處理</h3>
+              <p>聚焦標線、路口提醒與行人空間，降低民眾每天遇到的風險。</p>
+            </div>
+          </a>
+          <a class="home-achievement-card" href="leyi/achievements.html">
+            <img src="leyi/assets/achievements/achievement-05.jpg" alt="樂齡關懷成果">
+            <div class="home-achievement-card-body">
+              <span>樂齡關懷</span>
+              <h3>把服務帶進社區，讓照顧更靠近居民</h3>
+              <p>用活動、據點與公共服務串起地方需求，累積可被看見的成果。</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-wrap">
+        <div class="section-title" style="text-align:center;">如何提出陳情？</div>
+        <p style="text-align:center;font-size:15px;color:var(--color-text-muted);margin-bottom:40px;margin-top:-16px;">四個步驟，讓您的問題被看見、被解決</p>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-num">01</div><div class="flow-icon">📝</div><div class="flow-step-title">填寫陳情表單</div><div class="flow-step-desc">說明問題地點、類型與詳細內容，留下聯絡資料方便後續溝通。</div></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="flow-num">02</div><div class="flow-icon">🎫</div><div class="flow-step-title">取得案件編號</div><div class="flow-step-desc">送出後系統自動產生專屬案件編號，請截圖保存以便查詢進度。</div></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="flow-num">03</div><div class="flow-icon">⚙️</div><div class="flow-step-title">幕僚受理追蹤</div><div class="flow-step-desc">專人審核案件並轉交相關單位，每個處理階段都會更新紀錄。</div></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="flow-num">04</div><div class="flow-icon">✅</div><div class="flow-step-title">結果通知回覆</div><div class="flow-step-desc">案件處理完成後，公開說明及結果回覆將同步更新在查詢頁面。</div></div>
+        </div>
+        <div class="flow-cta">
+          <div>
+            <div class="flow-cta-title">有問題？加入官方 LINE 隨時諮詢</div>
+            <div class="flow-cta-desc">服務團隊將在工作時間內盡速回覆您的問題與需求。</div>
+          </div>
+          <a href="https://lin.ee/Q9cWSP5" target="_blank" class="flow-line-btn">加入 LINE 官方帳號</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section product-page" id="page-achievement-wall">
+    <div class="product-detail-hero">
+      <div>
+        <div class="product-eyebrow">產品 02</div>
+        <h1>政績牆</h1>
+        <p>把服務成果從貼文與相簿中整理出來，變成能分類、能搜尋、能分享的公開成果展示頁。</p>
+        <div class="product-actions">
+          <a class="product-btn primary" href="leyi/achievements.html">前往政績牆</a>
+        </div>
+      </div>
+      <div class="achievement-collage">
+        <img src="leyi/assets/achievements/achievement-01.jpg" alt="政績成果照片">
+        <img src="leyi/assets/achievements/achievement-02.jpg" alt="政績成果照片">
+        <img src="leyi/assets/achievements/achievement-05.jpg" alt="政績成果照片">
+      </div>
+    </div>
+    <div class="visual-story-grid">
+      <article class="story-card wide"><div class="mock-achievement-wall"><span></span><span></span><span></span></div><h3>成果卡片牆</h3><p>用圖片、標籤、標題與摘要讓民眾快速掃描重點。</p></article>
+      <article class="story-card"><div class="mock-tags"></div><h3>分類篩選</h3><p>會勘、質詢、提案與地方建設可分開瀏覽。</p></article>
+      <article class="story-card"><div class="mock-detail"></div><h3>成果詳情</h3><p>補上處理過程、成果說明與相關圖片。</p></article>
+    </div>
+  </section>
+
+  <section class="page-section product-page line-forward-page" id="page-line-forward">
+    <div class="product-detail-hero">
+      <div>
+        <h1>讓訊息<br><span>無遠弗屆</span></h1>
+        <p>官方訊息只有官方有？太可惜了！民眾一鍵轉發官方訊息快速又有效。</p>
+        <div class="product-actions">
+          <a class="product-btn primary" href="https://lin.ee/Q9cWSP5" target="_blank" rel="noopener">立即了解詳情</a>
+        </div>
+      </div>
+      <div class="line-flex-showcase">
+        <div class="line-phone-frame">
+          <div class="line-flex-card">
+            <div class="flex-title">
+              <h3>母親節造型手工皂</h3>
+              <p>特別的愛獻給偉大的媽媽</p>
+            </div>
+            <div class="flex-hero-image flex-img-1">
+              <span>專為社區親子活動設計的主視覺</span>
+            </div>
+            <div class="flex-image-grid">
+              <div class="flex-img-2"></div>
+              <div class="flex-img-3"></div>
+            </div>
+            <div class="flex-actions">
+              <button type="button">轉發給好友</button>
+              <button type="button">里長我也想辦活動</button>
+            </div>
+          </div>
+          <div class="line-read-status">上午 10:58　已讀</div>
+        </div>
+        <div class="line-impact-panel">
+          <b>成效看得見</b>
+          <div class="line-effect-stat"><strong>328</strong><span>民眾轉發</span></div>
+          <div class="line-effect-stat"><strong>1,240</strong><span>延伸觸及</span></div>
+          <div class="line-effect-stat"><strong>86</strong><span>活動回覆</span></div>
+          <p>好康活動不只靠服務處推播，民眾自己也能把官方訊息分享出去。</p>
+        </div>
+      </div>
+    </div>
+    <div class="product-detail-panel">
+      <div class="product-section-head">
         <div>
-          <div class="home-section-eyebrow">政績牆快速檢視</div>
-          <h2 class="home-section-title">先看最有感的服務成果</h2>
-          <p>用居民看得懂的照片、時間與處理重點，把地方服務成果快速呈現。</p>
+          <h2>民眾痛點</h2>
         </div>
-        <a class="dash-link-btn achievement-more-link" href="leyi/achievements.html">查看完整政績牆</a>
+        <p>常常要辦活動，還要煩惱流量與宣傳成效。現在讓民眾自己轉發，好康的活動就該有方便的宣傳行動。</p>
       </div>
-      <div class="home-achievement-grid">
-        <a class="home-achievement-card" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-01.jpg" alt="社區改善成果">
-          <div class="home-achievement-card-body">
-            <span>社區改善</span>
-            <h3>整理公共空間，讓日常動線更舒適</h3>
-            <p>整合現場會勘、單位協調與後續追蹤，讓居民立即看見改善。</p>
-          </div>
-        </a>
-        <a class="home-achievement-card" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-02.jpg" alt="道路安全成果">
-          <div class="home-achievement-card-body">
-            <span>道路安全</span>
-            <h3>通學與通勤路線安全優先處理</h3>
-            <p>聚焦標線、路口提醒與行人空間，降低民眾每天遇到的風險。</p>
-          </div>
-        </a>
-        <a class="home-achievement-card" href="leyi/achievements.html">
-          <img src="leyi/assets/achievements/achievement-05.jpg" alt="樂齡關懷成果">
-          <div class="home-achievement-card-body">
-            <span>樂齡關懷</span>
-            <h3>把服務帶進社區，讓照顧更靠近居民</h3>
-            <p>用活動、據點與公共服務串起地方需求，累積可被看見的成果。</p>
-          </div>
-        </a>
+      <div class="detail-problem-grid">
+        <article><b>活動需要曝光</b><span>服務處努力辦活動，但只靠單次推播，很難讓更多民眾看見。</span></article>
+        <article><b>分享動作太麻煩</b><span>民眾覺得活動不錯，卻不知道要怎麼把官方訊息轉給朋友。</span></article>
+        <article><b>成效不好判斷</b><span>訊息發出後，如果沒有互動與分享數據，就很難知道宣傳是否有效。</span></article>
+        <article><b>好康不該被錯過</b><span>適合居民的活動與服務，應該更容易被傳開，而不是只停在原本的名單裡。</span></article>
       </div>
     </div>
-  </div>
-
-  <!-- 陳情流程 -->
-  <div class="flow-section">
-    <div class="section-wrap">
-      <div class="section-title" style="text-align:center;">如何提出陳情？</div>
-      <p style="text-align:center;font-size:15px;color:var(--color-text-muted);margin-bottom:40px;margin-top:-16px;">四個步驟，讓您的問題被看見、被解決</p>
-      <div class="flow-steps">
-        <div class="flow-step"><div class="flow-num">01</div><div class="flow-icon">📝</div><div class="flow-step-title">填寫陳情表單</div><div class="flow-step-desc">說明問題地點、類型與詳細內容，留下聯絡資料方便後續溝通。</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="flow-num">02</div><div class="flow-icon">🎫</div><div class="flow-step-title">取得案件編號</div><div class="flow-step-desc">送出後系統自動產生專屬案件編號，請截圖保存以便查詢進度。</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="flow-num">03</div><div class="flow-icon">⚙️</div><div class="flow-step-title">幕僚受理追蹤</div><div class="flow-step-desc">專人審核案件並轉交相關單位，每個處理階段都會更新紀錄。</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="flow-num">04</div><div class="flow-icon">✅</div><div class="flow-step-title">結果通知回覆</div><div class="flow-step-desc">案件處理完成後，公開說明及結果回覆將同步更新在查詢頁面。</div></div>
-      </div>
-      <div class="flow-cta">
+    <div class="line-feature-panel">
+      <div class="product-section-head">
         <div>
-          <div class="flow-cta-title">有問題？加入官方 LINE 隨時諮詢</div>
-          <div class="flow-cta-desc">服務團隊將在工作時間內盡速回覆您的問題與需求。</div>
+          <h2>功能特色</h2>
         </div>
-        <a href="https://lin.ee/Q9cWSP5" target="_blank" class="flow-line-btn">💬 加入 LINE 官方帳號</a>
+        <p>重點不是學系統，而是讓官方訊息更快被分享、更容易被看見。</p>
+      </div>
+      <div class="line-benefit-grid">
+        <article>
+          <span>01</span>
+          <h3>一鍵快速分享</h3>
+          <p>不受群組、個人、費用限制。民眾看到官方 LINE 圖卡後，可以直接轉發給好友、家人或社群，讓活動自然擴散。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>無須學習快速上架</h3>
+          <p>提供簡易的操作介面，把活動主題、圖片與按鈕整理成可分享訊息，服務處立刻就能上架並推播。</p>
+        </article>
       </div>
     </div>
-  </div>
+  </section>
 
-</section>
-
-<!-- ═══════════ 陳情登錄 ═══════════ -->
-<section class="page-section" id="page-list">
-  <div style="max-width:1100px;margin:0 auto;">
-    <h2 class="section-title">公開案件一覽</h2>
-    <div class="filter-bar">
-      <div class="cat-tabs">
-        <button class="cat-tab active" onclick="setCat(this,'')">全部</button>
-        <button class="cat-tab" onclick="setCat(this,'交通運輸')">交通運輸</button>
-        <button class="cat-tab" onclick="setCat(this,'公共設施')">公共設施</button>
-        <button class="cat-tab" onclick="setCat(this,'衛福勞動')">衛福勞動</button>
-        <button class="cat-tab" onclick="setCat(this,'文教科技')">文教科技</button>
-        <button class="cat-tab" onclick="setCat(this,'環境建管')">環境建管</button>
-        <button class="cat-tab" onclick="setCat(this,'警消政風')">警消政風</button>
-        <button class="cat-tab" onclick="setCat(this,'市政議題')">市政議題</button>
-        <button class="cat-tab" onclick="setCat(this,'里鄰事務')">里鄰事務</button>
-        <button class="cat-tab" onclick="setCat(this,'其他服務')">其他服務</button>
+  <section class="page-section product-page office-task-page" id="page-office-task">
+    <div class="product-detail-hero">
+      <div>
+        <h1>數位任務管理系統</h1>
+        <p>把傳統靠人記、靠紙本、靠群組提醒的服務流程，轉成無紙化、即時、可追蹤的數位服務工作台，資料更容易管理，還能串接LINE做訊息通知，掌握進度給民眾最有感的數位服務</p>
+        <div class="product-actions">
+          <a class="product-btn primary" href="https://lin.ee/Q9cWSP5" target="_blank" rel="noopener">討論服務處流程</a>
+        </div>
       </div>
-      <select class="status-select" id="statusFilter" onchange="setStatus()">
-        <option value="">全部狀態</option>
-        <option value="待受理">待受理</option>
-        <option value="處理中">處理中</option>
-        <option value="追蹤中">追蹤中</option>
-        <option value="已結案">已結案</option>
-      </select>
-    </div>
-    <div class="table-wrap">
-      <table class="petition-table">
-        <thead><tr><th>案件編號</th><th>類型</th><th>標題</th><th>登錄日期</th><th>狀態</th></tr></thead>
-        <tbody id="petitionTbody"><tr><td colspan="5"><div class="loading-row"><div class="loading-spinner"></div>載入中…</div></td></tr></tbody>
-      </table>
-    </div>
-    <div class="pagination" id="pagination"></div>
-  </div>
-</section>
-
-<!-- ═══════════ 案件查詢 ═══════════ -->
-<section class="page-section" id="page-query">
-  <div style="max-width:680px;margin:0 auto;">
-    <h2 class="section-title" style="text-align:center;margin-bottom:24px;">輸入編號查詢進度</h2>
-    <div class="query-card">
-      <h2>查詢您的陳情案件</h2>
-      <p>送出陳情後，您會收到一組專屬案件編號<br>輸入編號即可查詢目前辦理進度與回覆</p>
-      <div class="query-input-wrap">
-        <input type="text" class="query-input" id="queryInput"
-               placeholder="請輸入案件編號（例：SVC-20250101-0001）"
-               autocomplete="off" autocapitalize="characters">
-        <button class="query-btn" id="queryBtn" onclick="queryCase()">
-          <div class="spinner"></div><span class="btn-label">查詢</span>
-        </button>
-      </div>
-      <div class="query-error" id="queryError"></div>
-      <div class="query-result" id="queryResult">
-        <div class="qr-row"><span class="qr-key">案件編號</span><span class="qr-val" id="qr-id"></span></div>
-        <div class="qr-row"><span class="qr-key">案件標題</span><span class="qr-val" id="qr-title"></span></div>
-        <div class="qr-row"><span class="qr-key">案件類型</span><span class="qr-val" id="qr-type"></span></div>
-        <div class="qr-row"><span class="qr-key">案件區域</span><span class="qr-val" id="qr-area"></span></div>
-        <div class="qr-row"><span class="qr-key">登錄日期</span><span class="qr-val" id="qr-date"></span></div>
-        <div class="qr-row"><span class="qr-key">目前狀態</span><span class="qr-val"><span class="badge" id="qr-status"></span></span></div>
-        <div class="qr-row"><span class="qr-key">辦理說明</span><span class="qr-val qr-text" id="qr-summary"></span></div>
-        <div id="qr-reply-wrap" style="display:none;"><div class="qr-row"><span class="qr-key">結果回覆</span><span class="qr-val qr-text" id="qr-reply"></span></div></div>
-        <div id="qr-images-wrap" style="display:none;margin-top:12px;"><div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px;font-weight:700;">相關圖片</div><div class="qr-images" id="qr-images"></div></div>
+      <div class="office-screen-card">
+        <img src="leyi/assets/products/office-task/office-task-hero-dashboard.png" alt="數位任務管理系統總覽">
+        <div class="office-screen-caption"><b>可追蹤的服務工作台</b><span>案件、狀態、負責人與處理紀錄集中管理</span></div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- ═══════════ 現場會勘 ═══════════ -->
-<section class="page-section" id="page-inspections">
-  <div style="max-width:1100px;margin:0 auto;">
-    <h2 class="section-title">現場會勘紀錄</h2>
-    <p style="color:var(--color-text-muted);margin-bottom:32px;font-size:15px;">親赴現場實地了解問題，以第一手資訊為民眾發聲。</p>
-    <div class="record-grid" id="inspGrid">
-      <div class="loading-row"><div class="loading-spinner"></div>載入中…</div>
+    <div class="office-feature-section">
+      <div class="office-feature-copy">
+        <h2>數位服務處</h2>
+        <h3>人力流程變成數位工作台</h3>
+        <p>服務處每天接到的活動、陳情、諮詢與回覆，不再只靠紙本紀錄或幕僚記憶。系統把每一件服務整理成可查詢、可分派、可交接的資料，讓團隊一打開後台就知道今天要處理什麼。</p>
+        <ul>
+          <li>服務資料集中，不再散落在不同人手上。</li>
+          <li>負責人、狀態、日期與內容都能留下紀錄。</li>
+          <li>交接時不用重新翻群組與紙本資料。</li>
+        </ul>
+      </div>
+      <div class="office-screen-card">
+        <img src="leyi/assets/products/office-task/office-task-digital-service-desk.png" alt="數位服務處工作台">
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ═══════════ 國會質詢 ═══════════ -->
-<section class="page-section" id="page-interpellations">
-  <div style="max-width:1100px;margin:0 auto;">
-    <h2 class="section-title">國會質詢紀錄</h2>
-    <p style="color:var(--color-text-muted);margin-bottom:32px;font-size:15px;">在立法院積極質詢各部會，將市民的聲音帶上最高立法殿堂。</p>
-    <div class="record-grid" id="interGrid">
-      <div class="loading-row"><div class="loading-spinner"></div>載入中…</div>
+    <div class="office-feature-section reverse">
+      <div class="office-feature-copy">
+        <h2>24H即時處理</h2>
+        <h3>LINE 收到就能分流</h3>
+        <p>民眾習慣用 LINE 詢問、報名與接收通知，系統把 LINE 作為服務入口，讓服務處能即時掌握民眾需求。訊息不只是被看見，也能轉成名單、任務或案件，後續處理不再斷線。</p>
+        <ul>
+          <li>LINE 入口符合民眾使用習慣，溝通更自然。</li>
+          <li>報名、會員、活動與案件能被整理成資料。</li>
+          <li>幕僚可以即時看到新需求並接續處理。</li>
+        </ul>
+      </div>
+      <div class="office-line-showcase">
+        <div class="office-phone">
+          <div class="phone-status">LINE 服務通知</div>
+          <div class="line-bubble incoming">已收到您的活動報名，服務處將保留名額。</div>
+          <div class="line-card">
+            <b>母親節手作活動</b>
+            <span>報名成功｜3 位同行｜已同步到後台名單</span>
+            <button type="button">查看活動資訊</button>
+          </div>
+          <div class="line-bubble outgoing">需要協助可直接回覆訊息。</div>
+        </div>
+        <div class="office-screen-card small">
+          <img src="leyi/assets/products/office-task/office-task-line-notification.png" alt="LINE 即時通知與分流">
+        </div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ═══════════ 國會提案 ═══════════ -->
-<section class="page-section" id="page-proposals">
-  <div style="max-width:1100px;margin:0 auto;">
-    <h2 class="section-title">國會提案紀錄</h2>
-    <p style="color:var(--color-text-muted);margin-bottom:32px;font-size:15px;">積極推動立法，以制度化方式解決市民問題。</p>
-    <div class="record-grid" id="propGrid">
-      <div class="loading-row"><div class="loading-spinner"></div>載入中…</div>
+    <div class="office-feature-section">
+      <div class="office-feature-copy">
+        <h2>數位管理</h2>
+        <h3>資料好找，進度好追</h3>
+        <p>活動、日曆、法扶諮詢、報名名單與陳情案件都能在後台留下清楚資料。服務處不需要靠人力反覆整理 Excel 或翻聊天紀錄，就能掌握每個服務節點。</p>
+        <ul>
+          <li>活動日曆協助掌握月份安排與現場任務。</li>
+          <li>報名名單可同步整理民眾資料與狀態。</li>
+          <li>案件與諮詢紀錄能被分類、查詢與追蹤。</li>
+        </ul>
+      </div>
+      <div class="office-shot-grid">
+        <div class="office-screen-card"><img src="leyi/assets/products/office-task/office-task-digital-management.png" alt="無紙化資料管理"></div>
+        <div class="office-screen-card"><img src="leyi/assets/products/office-task/office-task-mobile-line-alert.png" alt="外出服務同步 LINE 通知"></div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ═══════════ 常見問題 ═══════════ -->
-<section class="page-section" id="page-faq">
-  <div style="max-width:720px;margin:0 auto;">
-    <h2 class="section-title" style="text-align:center;margin-bottom:24px;">您可能想知道的事</h2>
-    <div class="faq-list">
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>🏛️ 什麼是樂藝數位服務處？</span><span class="arrow">▾</span></div><div class="faq-a">這是一個公開透明的市民陳情服務平台，讓每一件市民的問題都能被看見、被追蹤、被解決。</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>📝 如何提出陳情？</span><span class="arrow">▾</span></div><div class="faq-a">點選「我要陳情」按鈕，填寫問題類型、標題與詳細內容，留下聯絡資料後送出即可。</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>🔍 如何查詢陳情進度？</span><span class="arrow">▾</span></div><div class="faq-a">點選「案件查詢」，輸入您的案件編號（格式：SVC-YYYYMMDD-XXXX）即可查看目前辦理狀態。</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>⏱️ 案件一般需要多久處理？</span><span class="arrow">▾</span></div><div class="faq-a">視案件性質及主管機關時程而定，一般案件約 7–14 個工作天，緊急案件會優先處理。</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>🔒 我的個人資料會被保護嗎？</span><span class="arrow">▾</span></div><div class="faq-a">是的。您的個人資料依《個人資料保護法》嚴格保管，不會外流或用於其他用途。</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>💬 可以透過 LINE 聯繫嗎？</span><span class="arrow">▾</span></div><div class="faq-a">可以！加入我們的 LINE 官方帳號，服務團隊將在工作時間內盡速回覆您的問題。<br><br><a href="https://lin.ee/Q9cWSP5" target="_blank" style="color:#06C755;font-weight:700;">💬 加入 LINE 官方帳號</a></div></div>
+    <div class="office-feature-section reverse">
+      <div class="office-feature-copy">
+        <h2>手機也能用</h2>
+        <h3>外出服務也能即時掌握</h3>
+        <p>民代與幕僚不一定都坐在辦公室。手機介面讓活動、名單、案件與提醒可以在外出拜訪、活動現場或會勘時快速查看，LINE 通知也能把重要事件即時帶到手上。</p>
+        <ul>
+          <li>手機查看今日活動與待處理事項。</li>
+          <li>活動現場即時確認報名與同行人數。</li>
+          <li>LINE 通知協助幕僚掌握新案件與提醒。</li>
+        </ul>
+      </div>
+      <div class="office-mobile-demo">
+        <div class="mobile-device">
+          <div class="mobile-top">今日服務</div>
+          <div class="mobile-metric"><b>6</b><span>待處理任務</span></div>
+          <div class="mobile-list-item"><strong>活動報名確認</strong><span>母親節手工皂｜12:00</span></div>
+          <div class="mobile-list-item"><strong>陳情案件追蹤</strong><span>道路改善｜待回覆</span></div>
+          <div class="mobile-list-item"><strong>LINE會員提醒</strong><span>新報名 9 筆</span></div>
+        </div>
+        <div class="mobile-device image-device">
+          <img src="leyi/assets/products/office-task/office-task-mobile-dashboard.png" alt="手機即時查看任務">
+        </div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ═══════════ FOOTER ═══════════ -->
+    <div class="office-result-strip">
+      <b>導入後的改變</b>
+      <span>少紙本</span>
+      <span>少漏接</span>
+      <span>少重複整理</span>
+      <span>更多即時紀錄</span>
+      <span>更多服務被追蹤</span>
+    </div>
+  </section>
+
+  <section class="page-section product-page" id="page-case-study">
+    <div class="section-wrap">
+      <div class="product-section-head">
+        <div>
+          <h2>看得到的服務入口</h2>
+        </div>
+        <p>不是用文字介紹系統，而是直接讓民眾進入可以使用、可以查看、可以分享的服務頁面。</p>
+      </div>
+      <div class="case-showcase-grid">
+        <a class="case-card" href="form.html">
+          <img src="leyi/assets/brand/logo.png" alt="陳情系統">
+          <h3>問題有人接</h3>
+          <p>民眾可以線上送出陳情，案件有編號，後續進度查得到。</p>
+        </a>
+        <a class="case-card" href="leyi/achievements.html">
+          <img src="leyi/assets/achievements/achievement-03.jpg" alt="政績牆">
+          <h3>成果被看見</h3>
+          <p>用照片與故事整理地方改善，讓做過的事變成可累積的信任。</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section product-page" id="page-faq">
+    <div class="faq-shell">
+      <h2>導入前，先確認會不會真的變簡單</h2>
+      <div class="faq-list">
+        <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>樂藝數位服務處想解決什麼問題？</span><span class="arrow">▾</span></div><div class="faq-a">樂藝數位服務處協助民代與里長把日常服務流程變得可追蹤、可分工、可呈現。民眾不只是在網路上看到一個表單，而是能感受到問題有人接、進度查得到、活動資訊能分享、服務成果長期看得見。</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>一定需要官方 LINE 嗎？</span><span class="arrow">▾</span></div><div class="faq-a">需要，而且建議把官方 LINE 視為服務處與民眾建立長期溝通的重要平台。民眾已經習慣用 LINE 詢問事情、接收通知與轉傳活動資訊，官方 LINE 可以把陳情提醒、活動推播、報名連結、成果分享集中在同一個熟悉入口，降低民眾使用門檻，也讓服務處建立可持續經營的名單與互動紀錄。</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>一定要一次導入全部工具嗎？</span><span class="arrow">▾</span></div><div class="faq-a">不一定。樂藝會建議先從最能讓民眾有感的一項開始，例如陳情追蹤、LINE 活動推播或政績成果展示。等幕僚熟悉流程後，再逐步加入任務管理、會員經營與案件整合，讓數位化是自然接上原本工作，而不是一次造成負擔。</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>會不會讓幕僚工作變更複雜？</span><span class="arrow">▾</span></div><div class="faq-a">不應該。好的數位服務不是增加表格和步驟，而是減少找資料、重複詢問、人工提醒與口頭交接。系統會依照服務處現有習慣整理流程，把原本散在 LINE 群組、日曆、紙本、表格裡的資訊集中起來，讓幕僚更快知道下一步要做什麼。</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>民代任務管理系統包含哪些內容？</span><span class="arrow">▾</span></div><div class="faq-a">民代任務管理系統不是只有待辦清單。活動管理可以整理活動資料、籌備事項、報名名單與現場執行進度；行程日曆可以集中拜訪、會議、地方活動與提醒，減少撞期和漏排；LINE 會員管理可以整理民眾、支持者、活動參與者與互動紀錄，讓服務能持續經營；陳情案件管理可以把案件後續拆成任務，追蹤負責人、處理狀態、期限與回覆紀錄；幕僚任務追蹤則讓每件事都知道誰負責、做到哪裡、下一步是什麼。</div></div>
+        <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>民眾真的會感受到差異嗎？</span><span class="arrow">▾</span></div><div class="faq-a">會。民眾最在意的不是後台用了什麼系統，而是服務是否更靠近自己。當陳情有編號、活動能一鍵分享、LINE 有固定入口、成果能用照片與故事呈現，民眾會更容易理解服務正在發生，也更容易把好的服務經驗分享出去。</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
 <footer class="site-footer">
-  <div class="footer-brand">🏛️ 樂藝數位服務處</div>
-  <div class="footer-sub">數位透明 · 為民服務 · 每件問題都有人跟進</div>
+  <div class="footer-brand">樂藝數位服務處</div>
+  <div class="footer-sub">民代服務處數位化工具 · 陳情 · LINE · 任務 · 政績</div>
   <div class="footer-social">
-    <a class="footer-social-card" href="https://lin.ee/Q9cWSP5" target="_blank">💬 LINE 官方帳號</a>
+    <a class="footer-social-card" href="https://lin.ee/Q9cWSP5" target="_blank" rel="noopener">LINE 官方帳號</a>
   </div>
-  <div class="footer-copy">© 2025 樂藝數位服務處 · All rights reserved.</div>
+  <div class="footer-copy">© 2026 樂藝數位服務處 · All rights reserved.</div>
 </footer>
 
 <script src="js/config.js"></script>
 <script src="js/main.js"></script>
 <script src="js/site-navigation.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const heroSlides = Array.from(document.querySelectorAll('.hero-product-slide'));
+  const heroDots = Array.from(document.querySelectorAll('.hero-carousel-dots span'));
+  if (heroSlides.length) {
+    let activeHeroSlide = 0;
+    const showHeroSlide = index => {
+      activeHeroSlide = index % heroSlides.length;
+      heroSlides.forEach((slide, i) => slide.classList.toggle('is-active', i === activeHeroSlide));
+      heroDots.forEach((dot, i) => dot.classList.toggle('is-active', i === activeHeroSlide));
+    };
+    setInterval(() => showHeroSlide(activeHeroSlide + 1), 3000);
+  }
+
+  document.querySelectorAll('.count-up').forEach(el => {
+    const target = Number(el.dataset.count || el.textContent || 0);
+    const started = performance.now();
+    const tick = now => {
+      const progress = Math.min((now - started) / 1200, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('is-visible');
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.story-card,.product-service-card,.pain-grid article,.case-card').forEach(el => observer.observe(el));
+});
+</script>
 </body>
 </html>

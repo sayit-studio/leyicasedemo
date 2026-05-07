@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateScrollProgress();
   window.addEventListener('scroll', updateScrollProgress, { passive: true });
   window.addEventListener('resize', updateScrollProgress);
-  loadStats();
-  loadDashboard('7d');
-  loadRecentReplies();
+  if (document.getElementById('stat-total')) loadStats();
+  if (document.getElementById('pieChart') || document.getElementById('ms-new')) loadDashboard('7d');
+  if (document.getElementById('recentReplies')) loadRecentReplies();
 });
